@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ATP Money Challenge – Enhanced Edition</title>
+  <style>
+    /* Ensure currency options are always readable */
+    .currency-option { color: #e5e7eb !important; }
+    .currency-option:hover { color: #ffffff !important; }
+    [data-theme="light"] .currency-option { color: #1e293b !important; }
+    [data-theme="fun"] .currency-option { color: #2d3748 !important; }
+    [data-theme="gaming"] .currency-option { color: #00ff88 !important; }
+    :root{--bg:#0f172a;--card:#111827;--muted:#1f2937;--text:#e5e7eb;--accent:#3b82f6;--accent-2:#22c55e;--warn:#f59e0b;--danger:#ef4444;--highlight:#fbbf24}html,body{height:100%}body{margin:0;padding-bottom:80px;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Inter,"Noto Sans",sans-serif;background:linear-gradient(180deg,#0b1229,#0f172a 30%,#0b1229);color:var(--text)}.container{max-width:1200px;margin:0 auto;padding:24px}header{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap}.title{font-size:clamp(22px,3vw,32px);font-weight:800;letter-spacing:.3px}.subtitle{opacity:.8;font-size:14px}.badge{background:var(--accent);color:white;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;margin-left:8px}.row{display:flex;gap:16px;flex-wrap:wrap}.card{background:var(--card);border:1px solid #1f2538;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.35)}.panel{padding:16px}nav.menu{display:flex;gap:10px;flex-wrap:wrap}nav.menu button{appearance:none;border:1px solid #253054;background:var(--muted);color:#e5e7eb;padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;transition:all .2s}nav.menu button:hover{background:#2a3558;transform:translateY(-1px)}nav.menu button.primary{background:var(--accent);border-color:transparent}nav.menu button.primary:hover{background:#2563eb}nav.menu button:disabled{opacity:.5;cursor:not-allowed}.screen{display:none}.screen.active{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0;flex-wrap:wrap}.money-area{display:flex;flex-wrap:wrap;gap:16px;padding:14px;background:#0e1427;border-radius:12px;border:1px dashed #2a355a;min-height:220px;position:relative}.money-item{width:160px;height:93px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:#0d1330;border:2px solid #26315a;position:relative;user-select:none;cursor:pointer;transition:all .3s}.money-item:hover{transform:scale(1.05);border-color:#3b82f6}.money-item.selected{border-color:var(--highlight);box-shadow:0 0 20px rgba(251,191,36,.6);animation:pulse 1.5s infinite}.money-item.counted{opacity:.6;border-color:#22c55e}.money-item img{max-width:160px;max-height:93px;object-fit:contain;pointer-events:none}.coin{width:100px;height:100px;border-radius:50%;background:#0d1330;border:2px solid #26315a;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s}.coin:hover{transform:scale(1.05);border-color:#3b82f6}.coin.selected{border-color:var(--highlight);box-shadow:0 0 20px rgba(251,191,36,.6);animation:pulse 1.5s infinite}.coin.counted{opacity:.6;border-color:#22c55e}.coin img{max-width:100px;max-height:100px}.dropzone{min-height:240px;background:#0b1124;border:2px dashed #2f3a63;border-radius:14px;padding:12px;display:flex;flex-wrap:wrap;gap:10px;transition:all .3s}.dropzone.drag-over{border-color:var(--accent);background:#0f1a2e}.kbd{padding:2px 6px;border-radius:6px;border:1px solid #374151;background:#111827;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}.score{font-weight:800;color:var(--accent-2)}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.notice{padding:10px 12px;border-radius:10px;background:#10213d;border:1px solid #1f2f53;margin:8px 0}.success{border-color:#234b35;background:#0b1d15;color:#86efac}.error{border-color:#4b2a2a;background:#1d0b0b;color:#fca5a5}.warning{border-color:#4b3a2a;background:#1d150b;color:#fcd34d}.footer{opacity:.8;font-size:12px;margin-top:24px;text-align:center}.pill{display:inline-block;padding:4px 8px;border-radius:9999px;border:1px solid #2b365c;background:#101938;font-size:12px}.tray-total{font-weight:800;color:var(--accent-2)}.btn{appearance:none;border:1px solid #2a3558;background:#152042;color:var(--text);padding:10px 14px;border-radius:10px;font-weight:700;cursor:pointer;transition:all .2s}.btn:hover{background:#1a2855;transform:translateY(-1px)}.btn.primary{background:var(--accent);border-color:transparent}.btn.primary:hover{background:#2563eb}.btn.attn{background:var(--warn);border-color:transparent;color:#111}.btn.attn:hover{background:#d97706}.btn.ghost{background:transparent;border-color:#334155}.btn.ghost:hover{background:#1e293b}.btn.success{background:var(--accent-2);border-color:transparent;color:#111}.btn:disabled{opacity:.5;cursor:not-allowed}input[type="number"],input[type="text"],select{background:#0e152c;color:var(--text);border:1px solid #2b365c;border-radius:10px;padding:10px 12px}.calc-btn{appearance:none;background:#1a2642;border:1px solid #2a3558;color:var(--text);padding:16px;border-radius:8px;font-size:18px;font-weight:700;cursor:pointer;transition:all .2s}.calc-btn:hover{background:#243050;transform:translateY(-1px)}.calc-btn:active{transform:scale(0.95)}.calc-btn.calc-op{background:#2a3558;color:var(--accent)}.calc-btn.calc-op:hover{background:#334165}.calc-btn.calc-eq{background:var(--accent-2);color:#111}.calc-btn.calc-eq:hover{background:#16a34a}.calc-btn.calc-clear{background:#4b2a2a;color:#fca5a5}.calc-btn.calc-clear:hover{background:#5c3232}@keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(251,191,36,.6)}50%{box-shadow:0 0 30px rgba(251,191,36,.9)}}@keyframes celebrate{0%{transform:scale(1) rotate(0deg)}25%{transform:scale(1.2) rotate(5deg)}75%{transform:scale(1.2) rotate(-5deg)}100%{transform:scale(1) rotate(0deg)}}@keyframes slideIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}.celebrate{animation:celebrate .6s ease-in-out}.slide-in{animation:slideIn .4s ease-out}.progress-container{background:#111827;border:1px solid #334155;border-radius:9999px;height:12px;overflow:hidden;margin:8px 0}.progress-bar{height:100%;background:linear-gradient(90deg,#3b82f6,#22c55e);transition:width .5s ease}.hint-box{background:#1a2332;border:1px solid #2d3e54;border-radius:10px;padding:12px;margin:8px 0}.hint-level{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;margin-right:8px}.hint-level-1{background:#3b82f6;color:white}.hint-level-2{background:#f59e0b;color:#111}.hint-level-3{background:#22c55e;color:#111}.stat-card{background:#0e1427;border:1px solid #2a355a;border-radius:10px;padding:12px;text-align:center}.stat-value{font-size:24px;font-weight:800;color:var(--accent-2);margin:4px 0}.stat-label{font-size:12px;opacity:.8}.tutorial-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}.tutorial-box{background:var(--card);border:2px solid var(--accent);border-radius:14px;padding:24px;max-width:600px;box-shadow:0 20px 60px rgba(0,0,0,.5)}.tutorial-step{font-size:18px;margin-bottom:16px}.tutorial-progress{display:flex;gap:8px;margin-top:16px;justify-content:center}.tutorial-dot{width:10px;height:10px;border-radius:50%;background:#334155}.tutorial-dot.active{background:var(--accent)}.confetti{position:fixed;width:10px;height:10px;pointer-events:none;z-index:9998}.toast{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--accent);border-radius:10px;padding:12px 16px;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:9999;animation:slideIn .3s ease-out}.high-contrast .money-item,.high-contrast .coin{border-width:3px}.high-contrast .money-item.selected,.high-contrast .coin.selected{border-width:4px}.undo-btn{position:relative}.undo-btn:disabled::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,.5);border-radius:10px}.welcome-msg{line-height:1.6;font-size:15px}.teacher-sig{margin-top:16px;font-weight:700;color:var(--accent-2)}.currency-display{background:#1a2642;border:2px solid #2a3558;border-radius:14px;padding:32px;text-align:center;margin:20px 0;min-height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center}.currency-display img{max-width:200px;max-height:140px;margin:20px 0;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3))}.currency-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:16px}.currency-option{background:#152042;border:2px solid #2a3558;padding:16px;border-radius:10px;cursor:pointer;transition:all 0.3s;font-weight:700;text-align:center;font-size:16px;color:#e5e7eb}.currency-option:hover{background:#1a2855;border-color:var(--accent);transform:translateY(-2px);color:#ffffff}.currency-option.correct{background:var(--accent-2);border-color:var(--accent-2);color:#111}.currency-option.incorrect{background:var(--danger);border-color:var(--danger);color:white}.tip-display{background:linear-gradient(135deg,#1a2642,#152042);border:2px solid #2a3558;border-radius:14px;padding:32px;text-align:center;margin:16px 0}.tip-amount{font-size:64px;font-weight:800;color:var(--accent-2);margin:8px 0}.tip-percent{font-size:24px;color:var(--accent);margin:8px 0}.change-scenario{background:#1a2642;border:2px solid #2a3558;border-radius:14px;padding:24px;text-align:center;margin:16px 0}.item-icon{font-size:72px;margin:16px 0}.price-display{font-size:48px;font-weight:800;color:var(--accent);margin:12px 0}.change-display{font-size:36px;font-weight:800;color:var(--highlight);margin:12px 0}
+    color: var(--text);
+    /* Light Mode */
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --muted: #f1f5f9;
+      --text: #1e293b;
+    }
+    /* High Contrast */
+    [data-theme="high-contrast"] {
+      --bg: #000000;
+      --card: #1a1a1a;
+      --muted: #2a2a2a;
+      --text: #ffffff;
+    }
+    /* Fun Colors */
+    [data-theme="fun"] {
+      --bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --card: rgba(255, 255, 255, 0.95);
+      --muted: rgba(255, 255, 255, 0.8);
+      --text: #2d3748;
+    }
+    /* Gaming Style */
+    [data-theme="gaming"] {
+      --bg: #0a0e27;
+      --card: #1a1f3a;
+      --muted: #252d4a;
+      --text: #00ff88;
+    }
+  @keyframes coinFlip { 0% { transform: rotateY(0deg) scale(1); } 50% { transform: rotateY(180deg) scale(1.1); } 100% { transform: rotateY(360deg) scale(1); } }
+@keyframes scorePopUp { 0% { opacity: 0; transform: translateY(0) scale(0.5); } 50% { opacity: 1; transform: translateY(-30px) scale(1.2); } 100% { opacity: 0; transform: translateY(-60px) scale(1); } }
+@keyframes sparkle { 0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); } 50% { opacity: 1; transform: scale(1) rotate(180deg); } }
+.coin-flip { animation: coinFlip 0.6s ease-in-out; }
+.score-popup { position: fixed; font-size: 32px; font-weight: 800; color: var(--accent-2); animation: scorePopUp 1s ease-out; pointer-events: none; z-index: 9999; }
+.sparkle-particle { position: absolute; width: 8px; height: 8px; background: var(--highlight); border-radius: 50%; animation: sparkle 0.6s ease-out; pointer-events: none; }
+.feedback-overlay { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: var(--card); border: 3px solid var(--accent-2); border-radius: 20px; padding: 40px; text-align: center; z-index: 9999; animation: levelUp 0.6s ease-out; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); max-width: 500px; }
+.feedback-overlay.error { border-color: var(--danger); }
+.feedback-icon { font-size: 80px; margin-bottom: 16px; animation: celebrate 0.6s ease-in-out; }
+.feedback-title { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+.feedback-message { font-size: 18px; margin-bottom: 8px; line-height: 1.5; }
+@keyframes levelUp { 0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; } 50% { transform: translate(-50%, -50%) scale(1.05); } 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+.quick-bar { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(10px); border-top: 1px solid #1f2538; padding: 12px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; z-index: 1000; box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.3); }
+.quick-btn { appearance: none; background: #1a2642; border: 1px solid #2a3558; color: var(--text); padding: 8px 16px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 14px; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+.quick-btn:hover { background: #243050; transform: translateY(-2px); }
+.quick-btn:active { transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1 class="title">💰 AT Money Challenge <span class="badge">Enhanced</span></h1>
+        <p class="subtitle">Money skills practice with detailed progress tracking</p>
+      </div>
+    </header>
+
+    <main>
+      <!-- HOME SCREEN -->
+      <section class="screen active" id="home">
+        <div class="card panel">
+          <div class="welcome-msg">
+            <h2>Welcome, Student! 🎯</h2>
+            <p>This app helps you practice important money skills for everyday life and work. Choose an activity to begin:</p>
+            
+            <nav class="menu" style="margin:16px 0">
+              <button class="primary" data-screen="recognize">🔍 Recognize Money</button>
+              <button data-screen="count">💵 Count Money</button>
+              <button data-screen="shop">🛒 Shopping Challenge</button>
+              <button data-screen="cashier">💳 Cashier Challenge</button>
+              <button data-screen="budget">💼 Budget Challenge</button>
+              <button data-screen="tips">🍔 Tips Calculator</button>
+              <button data-screen="change20">💸 Change from $20</button>
+              <button data-screen="nextdollar">⬆️ Next Dollar Up</button>
+            </nav>
+
+            <nav class="menu">
+              <button data-screen="progress">📊 View Progress</button>
+              <button data-screen="settings">⚙️ Settings</button>
+            </nav>
+
+            <div class="teacher-sig">Created by Mr. K - ATP Teacher</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Currency Recognition (stub - keeping original structure) -->
+      <section class="screen" id="recognize">
+        <div class="card panel">
+          <h2>🔍 Recognize Currency</h2>
+          <div class="toolbar">
+            <button class="btn ghost" data-screen="home">← Back</button>
+          </div>
+          <p>Currency recognition challenges...</p>
+        </div>
+      </section>
+
+      <!-- Count Money (stub) -->
+      <section class="screen" id="count">
+        <div class="card panel">
+          <h2>💵 Count Money</h2>
+          <div class="toolbar">
+            <button class="btn ghost" data-screen="home">← Back</button>
+          </div>
+          <p>Money counting practice...</p>
+        </div>
+      </section>
+
+      <!-- Shopping (stub) -->
+      <section class="screen" id="shop">
+        <div class="card panel">
+          <h2>🛒 Shopping Challenge</h2>
+          <div class="toolbar">
+            <button class="btn ghost" data-screen="home">← Back</button>
+          </div>
+          <p>Shopping scenarios...</p>
+        </div>
+      </section>
+
+      <!-- Cashier (stub) -->
+      <section class="screen" id="cashier">
+        <div class="card panel">
+          <h2>💳 Cashier Challenge</h2>
+          <div class="toolbar">
+            <button class="btn ghost" data-screen="home">← Back</button>
+          </div>
+          <p>Cashier practice...</p>
+        </div>
+      </section>
+
+      <!-- Budget (stub) -->
+      <section class="screen" id="budget">
+        <div class="card panel">
+          <h2>💼 Budget Challenge</h2>
+          <div class="toolbar">
+            <button class="btn ghost" data-screen="home">← Back</button>
+          </div>
+          <p>Budget scenarios...</p>
+        </div>
+      </section>
+
+      <!-- Tips (stub) -->
+      <section class="screen" id="tips">
+        <div class="card panel">
+          <h2>🍔 Tips Calculator</h2>
+          <div class="toolbar">
+            <button class="btn ghost" data-screen="home">← Back</button>
+          </div>
+          <p>Tip calculation practice...</p>
+        </div>
+      </section>
+
+      <!-- Change from $20 (stub) -->
+      <section class="screen" id="change20">
+        <div class="card panel">
+          <h2>💸 Change from $20</h2>
+          <div class="toolbar">
+            <button class="btn ghost" data-screen="home">← Back</button>
+          </div>
+          <p>Change calculation practice...</p>
+        </div>
+      </section>
+
+      <!-- Next Dollar Up (stub) -->
+      <section class="screen" id="nextdollar">
+        <div class="card panel">
+          <h2>⬆️ Next Dollar Up</h2>
+          <div class="toolbar">
+            <button class="btn ghost" data-screen="home">← Back</button>
+          </div>
+          <p>Next dollar up practice...</p>
+        </div>
+      </section>
+
+      <!-- PROGRESS/STATS SCREEN -->
+      <section class="screen" id="progress">
+        <div class="card panel">
+          <h2>📊 Your Progress</h2>
+          <div class="toolbar">
+            <button class="btn ghost" data-screen="home">← Back</button>
+          </div>
+          
+          <div class="row" style="margin:16px 0">
+            <div class="card stat-card" style="flex:1;min-width:180px">
+              <div class="stat-label">Total Points</div>
+              <div class="stat-value" id="total-score">0</div>
+            </div>
+            <div class="card stat-card" style="flex:1;min-width:180px">
+              <div class="stat-label">Overall Accuracy</div>
+              <div class="stat-value" id="accuracy">0%</div>
+            </div>
+            <div class="card stat-card" style="flex:1;min-width:180px">
+              <div class="stat-label">Sessions Completed</div>
+              <div class="stat-value" id="sessions">0</div>
+            </div>
+          </div>
+          
+          <div id="prog-body" class="notice" style="margin-top:16px"></div>
+          
+          <div class="toolbar" style="margin-top:16px">
+            <button class="btn success" id="prog-email">📧 Email Detailed Report</button>
+            <button class="btn primary" id="prog-download">📥 Download Full Report (CSV)</button>
+            <button class="btn" id="prog-reset">🔄 Reset Progress</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SETTINGS SCREEN -->
+      <section class="screen" id="settings">
+        <div class="card panel">
+          <h2>⚙️ Settings</h2>
+          <div class="toolbar">
+            <button class="btn ghost" data-screen="home">← Back</button>
+          </div>
+          <p>Settings controls...</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <span>Created by <strong>Mr. K - ATP Teacher</strong></span>
+    </footer>
+  </div>
+
+<script>
+// TEACHER CONFIGURATION
+const TEACHER_EMAIL = 'keating_r@auhsd.us';
+
+// Mode display names for better readability
+const MODE_NAMES = {
+  recognize: 'Currency Recognition',
+  count: 'Count Money',
+  shop: 'Shopping Challenge',
+  cashier: 'Cashier Challenge',
+  budget: 'Budget Planning',
+  tips: 'Tips Calculator',
+  change20: 'Change from $20',
+  nextdollar: 'Next Dollar Up'
+};
+
+// Settings
+let settings = {
+  speechOn: false,
+  soundsOn: true,
+  hapticOn: true,
+  highContrast: false,
+  animations: true,
+  adaptive: true,
+  hints: true,
+  theme: 'dark'
+};
+
+// Progress tracking
+function loadProgress() {
+  try {
+    return JSON.parse(localStorage.getItem('emc-progress') || '{}');
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveProgress(mode, data) {
+  const p = loadProgress();
+  const ts = Date.now();
+  if (!p[mode]) {
+    p[mode] = { sessions: [], totalScore: 0, attempts: 0, correct: 0 };
+  }
+  p[mode].sessions.push({ ...data, timestamp: ts });
+  p[mode].totalScore = (p[mode].totalScore || 0) + (data.score || 0);
+  p[mode].attempts = (p[mode].attempts || 0) + (data.attempts || 0);
+  p[mode].correct = (p[mode].correct || 0) + (data.correct || 0);
+  localStorage.setItem('emc-progress', JSON.stringify(p));
+  updateProgress();
+}
+
+function updateProgress() {
+  const p = loadProgress();
+  let total = 0, attempts = 0, correct = 0, sessions = 0;
+  
+  Object.values(p).forEach(m => {
+    total += m.totalScore || 0;
+    attempts += m.attempts || 0;
+    correct += m.correct || 0;
+    sessions += m.sessions?.length || 0;
+  });
+  
+  document.getElementById('total-score').textContent = total;
+  document.getElementById('accuracy').textContent = attempts > 0 ? Math.round((correct / attempts) * 100) + '%' : '0%';
+  document.getElementById('sessions').textContent = sessions;
+  
+  const progBody = document.getElementById('prog-body');
+  const rows = [];
+  Object.entries(p).forEach(([mode, data]) => {
+    rows.push(`<strong>${MODE_NAMES[mode] || mode}:</strong> ${data.totalScore || 0} points, ${data.correct || 0}/${data.attempts || 0} correct`);
+  });
+  progBody.innerHTML = rows.length ? rows.join('<br>') : 'No progress yet. Start practicing!';
+}
+
+// ENHANCED ANALYTICS FUNCTIONS
+
+function calculateModeStats(mode, data) {
+  if (!data || !data.sessions || data.sessions.length === 0) {
+    return null;
+  }
+  
+  const sessions = data.sessions;
+  const accuracy = data.attempts > 0 ? Math.round((data.correct / data.attempts) * 100) : 0;
+  
+  // Calculate average time (if available)
+  const sessionsWithTime = sessions.filter(s => s.time);
+  const avgTime = sessionsWithTime.length > 0 
+    ? Math.round(sessionsWithTime.reduce((sum, s) => sum + s.time, 0) / sessionsWithTime.length)
+    : null;
+  
+  // Calculate hint usage rate (if available)
+  const sessionsWithHints = sessions.filter(s => s.hintsUsed !== undefined);
+  const avgHints = sessionsWithHints.length > 0
+    ? (sessionsWithHints.reduce((sum, s) => sum + (s.hintsUsed || 0), 0) / sessionsWithHints.length).toFixed(1)
+    : null;
+  
+  // Recent performance (last 5 sessions)
+  const recentSessions = sessions.slice(-5);
+  const recentCorrect = recentSessions.filter(s => s.correct > 0).length;
+  const recentAccuracy = (recentCorrect / recentSessions.length * 100).toFixed(0);
+  
+  // Consistency score (std deviation of scores)
+  const scores = sessions.map(s => s.score || 0);
+  const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+  const variance = scores.reduce((sum, score) => sum + Math.pow(score - avgScore, 2), 0) / scores.length;
+  const consistency = 100 - Math.min(100, Math.sqrt(variance));
+  
+  return {
+    mode,
+    modeName: MODE_NAMES[mode] || mode,
+    totalScore: data.totalScore || 0,
+    attempts: data.attempts || 0,
+    correct: data.correct || 0,
+    accuracy,
+    sessions: sessions.length,
+    avgTime,
+    avgHints,
+    recentAccuracy: parseInt(recentAccuracy),
+    consistency: Math.round(consistency),
+    lastPlayed: new Date(sessions[sessions.length - 1].timestamp)
+  };
+}
+
+function analyzeStrengthsAndWeaknesses(progress) {
+  const analysis = {
+    strengths: [],
+    areasToWorkOn: [],
+    overall: {}
+  };
+  
+  const modeStats = [];
+  let totalAttempts = 0, totalCorrect = 0, totalSessions = 0, totalScore = 0;
+  
+  // Collect stats for each mode
+  Object.entries(progress).forEach(([mode, data]) => {
+    const stats = calculateModeStats(mode, data);
+    if (stats) {
+      modeStats.push(stats);
+      totalAttempts += stats.attempts;
+      totalCorrect += stats.correct;
+      totalSessions += stats.sessions;
+      totalScore += stats.totalScore;
+    }
+  });
+  
+  if (modeStats.length === 0) {
+    return analysis;
+  }
+  
+  // Overall stats
+  analysis.overall = {
+    accuracy: totalAttempts > 0 ? Math.round((totalCorrect / totalAttempts) * 100) : 0,
+    totalSessions,
+    totalScore,
+    modesPlayed: modeStats.length
+  };
+  
+  // Sort by different metrics to find strengths and weaknesses
+  const byAccuracy = [...modeStats].sort((a, b) => b.accuracy - a.accuracy);
+  const bySessions = [...modeStats].sort((a, b) => b.sessions - a.sessions);
+  const byConsistency = [...modeStats].sort((a, b) => b.consistency - a.consistency);
+  
+  // IDENTIFY STRENGTHS
+  
+  // High accuracy modes (80%+)
+  const highAccuracyModes = modeStats.filter(m => m.accuracy >= 80);
+  highAccuracyModes.forEach(mode => {
+    analysis.strengths.push({
+      category: 'High Accuracy',
+      text: `Excellent accuracy in ${mode.modeName}`,
+      data: `${mode.accuracy}% correct (${mode.correct}/${mode.attempts} questions)`,
+      emoji: '🎯'
+    });
+  });
+  
+  // Fast completion (if time data available)
+  const modesWithTime = modeStats.filter(m => m.avgTime !== null && m.avgTime < 15);
+  modesWithTime.forEach(mode => {
+    analysis.strengths.push({
+      category: 'Speed',
+      text: `Quick completion times in ${mode.modeName}`,
+      data: `Average: ${mode.avgTime} seconds per question`,
+      emoji: '⚡'
+    });
+  });
+  
+  // Low hint usage (if hint data available)
+  const modesWithLowHints = modeStats.filter(m => m.avgHints !== null && parseFloat(m.avgHints) < 0.5);
+  modesWithLowHints.forEach(mode => {
+    analysis.strengths.push({
+      category: 'Independence',
+      text: `Works independently in ${mode.modeName}`,
+      data: `Average: ${mode.avgHints} hints per session`,
+      emoji: '💪'
+    });
+  });
+  
+  // High consistency
+  const consistentModes = modeStats.filter(m => m.consistency >= 75);
+  consistentModes.forEach(mode => {
+    analysis.strengths.push({
+      category: 'Consistency',
+      text: `Consistent performance in ${mode.modeName}`,
+      data: `Consistency score: ${mode.consistency}/100`,
+      emoji: '📈'
+    });
+  });
+  
+  // Most practiced modes
+  if (bySessions.length > 0 && bySessions[0].sessions >= 5) {
+    analysis.strengths.push({
+      category: 'Practice',
+      text: `Strong commitment to ${bySessions[0].modeName}`,
+      data: `Completed ${bySessions[0].sessions} practice sessions`,
+      emoji: '🌟'
+    });
+  }
+  
+  // IDENTIFY AREAS TO WORK ON
+  
+  // Low accuracy modes (<70%)
+  const lowAccuracyModes = modeStats.filter(m => m.accuracy < 70 && m.attempts >= 3);
+  lowAccuracyModes.forEach(mode => {
+    analysis.areasToWorkOn.push({
+      category: 'Accuracy',
+      text: `Practice needed in ${mode.modeName}`,
+      data: `Current accuracy: ${mode.accuracy}% (${mode.correct}/${mode.attempts})`,
+      suggestion: 'Try using hints and take your time on each question',
+      emoji: '🎯'
+    });
+  });
+  
+  // Slow completion times
+  const slowModes = modeStats.filter(m => m.avgTime !== null && m.avgTime > 30);
+  slowModes.forEach(mode => {
+    analysis.areasToWorkOn.push({
+      category: 'Speed',
+      text: `Work on speed in ${mode.modeName}`,
+      data: `Average time: ${mode.avgTime} seconds`,
+      suggestion: 'As you get more comfortable, try to work a bit faster',
+      emoji: '⏱️'
+    });
+  });
+  
+  // High hint usage
+  const highHintModes = modeStats.filter(m => m.avgHints !== null && parseFloat(m.avgHints) > 1.5);
+  highHintModes.forEach(mode => {
+    analysis.areasToWorkOn.push({
+      category: 'Independence',
+      text: `Build confidence in ${mode.modeName}`,
+      data: `Average: ${mode.avgHints} hints per session`,
+      suggestion: 'Try solving some questions without hints first',
+      emoji: '💡'
+    });
+  });
+  
+  // Limited practice
+  const limitedPracticeModes = modeStats.filter(m => m.sessions < 3);
+  limitedPracticeModes.forEach(mode => {
+    analysis.areasToWorkOn.push({
+      category: 'Practice',
+      text: `More practice needed in ${mode.modeName}`,
+      data: `Only ${mode.sessions} session${mode.sessions === 1 ? '' : 's'} completed`,
+      suggestion: 'Regular practice will help build skills and confidence',
+      emoji: '📚'
+    });
+  });
+  
+  // Declining recent performance
+  const decliningModes = modeStats.filter(m => 
+    m.sessions >= 5 && m.recentAccuracy < m.accuracy - 15
+  );
+  decliningModes.forEach(mode => {
+    analysis.areasToWorkOn.push({
+      category: 'Recent Performance',
+      text: `Recent dip in ${mode.modeName}`,
+      data: `Recent: ${mode.recentAccuracy}% vs Overall: ${mode.accuracy}%`,
+      suggestion: 'Review the basics and focus on accuracy over speed',
+      emoji: '📉'
+    });
+  });
+  
+  // No strengths identified
+  if (analysis.strengths.length === 0) {
+    analysis.strengths.push({
+      category: 'Getting Started',
+      text: 'You\'re building your skills!',
+      data: `${totalSessions} practice sessions completed`,
+      emoji: '🌱'
+    });
+  }
+  
+  return analysis;
+}
+
+// ENHANCED EMAIL FUNCTION
+document.getElementById('prog-email')?.addEventListener('click', () => {
+  const p = loadProgress();
+  const analysis = analyzeStrengthsAndWeaknesses(p);
+  
+  const date = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
+  // Get student name
+  let studentName = prompt('Enter your name:', '');
+  if (!studentName) studentName = 'Student';
+  
+  // Build comprehensive email body
+  let body = `Hi Mr. K,%0D%0A%0D%0A`;
+  body += `This is my detailed progress report from the ATP Money Challenge app.%0D%0A%0D%0A`;
+  body += `Student Name: ${encodeURIComponent(studentName)}%0D%0A`;
+  body += `Date: ${encodeURIComponent(date)}%0D%0A%0D%0A`;
+  
+  // Overall Summary
+  body += `========================================%0D%0A`;
+  body += `OVERALL SUMMARY%0D%0A`;
+  body += `========================================%0D%0A`;
+  body += `Total Points Earned: ${analysis.overall.totalScore}%0D%0A`;
+  body += `Overall Accuracy: ${analysis.overall.accuracy}%25%0D%0A`;
+  body += `Total Practice Sessions: ${analysis.overall.totalSessions}%0D%0A`;
+  body += `Modes Practiced: ${analysis.overall.modesPlayed}/8%0D%0A%0D%0A`;
+  
+  // Areas of Strength
+  body += `========================================%0D%0A`;
+  body += `AREAS OF STRENGTH%0D%0A`;
+  body += `========================================%0D%0A`;
+  if (analysis.strengths.length > 0) {
+    analysis.strengths.forEach((strength, idx) => {
+      body += `%0D%0A${strength.emoji} ${encodeURIComponent(strength.text)}%0D%0A`;
+      body += `   Data: ${encodeURIComponent(strength.data)}%0D%0A`;
+    });
+  } else {
+    body += `Still building skills - keep practicing!%0D%0A`;
+  }
+  body += `%0D%0A`;
+  
+  // Areas to Work On
+  body += `========================================%0D%0A`;
+  body += `AREAS TO WORK ON%0D%0A`;
+  body += `========================================%0D%0A`;
+  if (analysis.areasToWorkOn.length > 0) {
+    analysis.areasToWorkOn.forEach((area, idx) => {
+      body += `%0D%0A${area.emoji} ${encodeURIComponent(area.text)}%0D%0A`;
+      body += `   Data: ${encodeURIComponent(area.data)}%0D%0A`;
+      if (area.suggestion) {
+        body += `   Suggestion: ${encodeURIComponent(area.suggestion)}%0D%0A`;
+      }
+    });
+  } else {
+    body += `Great work! Keep up the excellent performance!%0D%0A`;
+  }
+  body += `%0D%0A`;
+  
+  // Detailed breakdown by mode
+  body += `========================================%0D%0A`;
+  body += `DETAILED BREAKDOWN BY MODE%0D%0A`;
+  body += `========================================%0D%0A`;
+  
+  Object.entries(p).forEach(([mode, data]) => {
+    const stats = calculateModeStats(mode, data);
+    if (stats) {
+      body += `%0D%0A${encodeURIComponent(stats.modeName).toUpperCase()}:%0D%0A`;
+      body += `  - Total Points: ${stats.totalScore}%0D%0A`;
+      body += `  - Accuracy: ${stats.accuracy}%25 (${stats.correct}/${stats.attempts} correct)%0D%0A`;
+      body += `  - Sessions Completed: ${stats.sessions}%0D%0A`;
+      if (stats.avgTime !== null) {
+        body += `  - Avg Time Per Question: ${stats.avgTime} seconds%0D%0A`;
+      }
+      if (stats.avgHints !== null) {
+        body += `  - Avg Hints Used: ${stats.avgHints} per session%0D%0A`;
+      }
+      body += `  - Recent Performance: ${stats.recentAccuracy}%25 (last 5 sessions)%0D%0A`;
+      body += `  - Consistency Score: ${stats.consistency}/100%0D%0A`;
+      body += `  - Last Practiced: ${stats.lastPlayed.toLocaleDateString()}%0D%0A`;
+    }
+  });
+  
+  body += `%0D%0A%0D%0A========================================%0D%0A`;
+  body += `This detailed report can help guide my continued practice and growth.%0D%0A%0D%0A`;
+  body += `Thank you!%0D%0A${encodeURIComponent(studentName)}`;
+  
+  const subject = encodeURIComponent(`ATP Money Challenge - Detailed Progress Report - ${studentName}`);
+  const mailtoLink = `mailto:${TEACHER_EMAIL}?subject=${subject}&body=${body}`;
+  
+  // Open email client
+  window.location.href = mailtoLink;
+  toast('📧 Opening email with detailed report...');
+});
+
+// ENHANCED CSV DOWNLOAD FUNCTION
+document.getElementById('prog-download')?.addEventListener('click', () => {
+  const p = loadProgress();
+  const analysis = analyzeStrengthsAndWeaknesses(p);
+  const date = new Date().toLocaleDateString();
+  
+  // Get student name
+  let studentName = prompt('Enter your name for the report:', '');
+  if (!studentName) studentName = 'Student';
+  
+  const rows = [];
+  
+  // Header section
+  rows.push(['ATP Money Challenge - Comprehensive Progress Report']);
+  rows.push(['Student:', studentName]);
+  rows.push(['Date:', date]);
+  rows.push(['']);
+  
+  // Overall summary
+  rows.push(['OVERALL SUMMARY']);
+  rows.push(['Total Points', analysis.overall.totalScore]);
+  rows.push(['Overall Accuracy', analysis.overall.accuracy + '%']);
+  rows.push(['Total Sessions', analysis.overall.totalSessions]);
+  rows.push(['Modes Practiced', analysis.overall.modesPlayed + '/8']);
+  rows.push(['']);
+  
+  // Areas of Strength
+  rows.push(['AREAS OF STRENGTH']);
+  rows.push(['Category', 'Description', 'Supporting Data']);
+  if (analysis.strengths.length > 0) {
+    analysis.strengths.forEach(strength => {
+      rows.push([strength.category, strength.text, strength.data]);
+    });
+  } else {
+    rows.push(['', 'Building skills through practice', '']);
+  }
+  rows.push(['']);
+  
+  // Areas to Work On
+  rows.push(['AREAS TO WORK ON']);
+  rows.push(['Category', 'Description', 'Supporting Data', 'Suggestion']);
+  if (analysis.areasToWorkOn.length > 0) {
+    analysis.areasToWorkOn.forEach(area => {
+      rows.push([area.category, area.text, area.data, area.suggestion || '']);
+    });
+  } else {
+    rows.push(['', 'Excellent work! Keep it up!', '', '']);
+  }
+  rows.push(['']);
+  
+  // Detailed mode statistics
+  rows.push(['DETAILED MODE STATISTICS']);
+  rows.push(['Mode', 'Total Points', 'Accuracy', 'Sessions', 'Avg Time (sec)', 'Avg Hints', 'Recent Accuracy', 'Consistency', 'Last Played']);
+  
+  Object.entries(p).forEach(([mode, data]) => {
+    const stats = calculateModeStats(mode, data);
+    if (stats) {
+      rows.push([
+        stats.modeName,
+        stats.totalScore,
+        stats.accuracy + '%',
+        stats.sessions,
+        stats.avgTime || 'N/A',
+        stats.avgHints || 'N/A',
+        stats.recentAccuracy + '%',
+        stats.consistency + '/100',
+        stats.lastPlayed.toLocaleDateString()
+      ]);
+    }
+  });
+  rows.push(['']);
+  
+  // Session-by-session detail
+  rows.push(['COMPLETE SESSION HISTORY']);
+  rows.push(['Mode', 'Score', 'Correct', 'Attempts', 'Time (sec)', 'Hints Used', 'Timestamp']);
+  
+  Object.entries(p).forEach(([mode, data]) => {
+    if (data.sessions) {
+      data.sessions.forEach(session => {
+        rows.push([
+          MODE_NAMES[mode] || mode,
+          session.score || 0,
+          session.correct || 0,
+          session.attempts || 0,
+          session.time || 'N/A',
+          session.hintsUsed !== undefined ? session.hintsUsed : 'N/A',
+          new Date(session.timestamp).toLocaleString()
+        ]);
+      });
+    }
+  });
+  
+  // Convert to CSV
+  const csv = rows.map(row => 
+    row.map(cell => {
+      // Escape quotes and wrap in quotes if contains comma or quote
+      const cellStr = String(cell);
+      if (cellStr.includes(',') || cellStr.includes('"') || cellStr.includes('\n')) {
+        return '"' + cellStr.replace(/"/g, '""') + '"';
+      }
+      return cellStr;
+    }).join(',')
+  ).join('\n');
+  
+  // Create download
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', `ATP_Money_Challenge_Report_${studentName.replace(/\s+/g, '_')}_${date.replace(/\//g, '-')}.csv`);
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  toast('📥 Comprehensive report downloaded!');
+});
+
+// Reset progress
+document.getElementById('prog-reset')?.addEventListener('click', () => {
+  if (confirm('Reset all progress? This cannot be undone.')) {
+    localStorage.removeItem('emc-progress');
+    updateProgress();
+    toast('Progress reset');
+  }
+});
+
+// Toast notification
+function toast(message) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = message;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// Screen navigation
+document.querySelectorAll('[data-screen]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.getAttribute('data-screen');
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(target)?.classList.add('active');
+  });
+});
+
+// Initialize
+function init() {
+  updateProgress();
+  console.log('✅ ATP Money Challenge Enhanced Edition - Comprehensive Reporting Added!');
+}
+
+init();
+</script>
+</body>
+</html>

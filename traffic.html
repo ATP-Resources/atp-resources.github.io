@@ -2,326 +2,125 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Traffic Sign Challenge</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <title>Mr. K's Traffic Sign Challenge</title>
   <style>
-    :root {
-      --bg: #0f172a;
-      --card: #1e293b;
-      --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.1);
-      --correct: #22c55e;
-      --wrong: #ef4444;
-      --text-main: #e5e7eb;
-      --text-muted: #94a3b8;
-    }
-
     * {
-      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --purple-start: #8b5cf6;
+      --purple-mid: #6366f1;
+      --blue-mid: #3b82f6;
+      --cyan: #06b6d4;
+      --green: #10b981;
+      --pink: #ec4899;
+      --dark: #0f172a;
+      --card-dark: #1e293b;
+      --text-light: #f1f5f9;
+      --text-muted: #94a3b8;
+      --correct: #22c55e;
+      --wrong: #ef4444;
     }
 
     body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
       min-height: 100vh;
-      background: radial-gradient(circle at top, #1f2937 0, #020617 55%);
-      color: var(--text-main);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      color: var(--text-light);
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      min-height: 100vh;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
-      padding: 16px;
     }
 
-    .app {
-      width: 100%;
-      max-width: 960px;
-      background-color: rgba(15, 23, 42, 0.92);
-      border-radius: 24px;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-      padding: 24px;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      backdrop-filter: blur(16px);
+    /* Landing Page */
+    .landing-page {
+      text-align: center;
+      animation: fadeIn 0.6s ease-out;
     }
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    .title-block {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .logo-chip {
-      width: 44px;
-      height: 44px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 30%, #f97316, #b91c1c);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #f9fafb;
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 3.5rem);
       font-weight: 800;
-      font-size: 20px;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6);
+      background: linear-gradient(135deg, #ffffff 0%, #e0e7ff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
-    h1 {
-      font-size: 24px;
-      letter-spacing: 0.05em;
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: rgba(255, 255, 255, 0.9);
+      margin-bottom: 40px;
+      font-weight: 300;
     }
 
-    .subtitle {
-      font-size: 14px;
-      color: var(--text-muted);
+    .input-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 40px 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
-    .badge {
-      padding: 6px 14px;
-      border-radius: 999px;
-      background-color: var(--accent-soft);
-      color: var(--accent);
-      font-size: 12px;
-    }
-
-    main {
-      display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-      gap: 20px;
-    }
-
-    .card {
-      background-color: var(--card);
-      border-radius: 20px;
-      padding: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-    }
-
-    .card h2 {
-      font-size: 18px;
-      margin-bottom: 8px;
-    }
-
-    .card p {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 10px;
-    }
-
-    .chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 6px;
-    }
-
-    .chip {
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 999px;
-      background-color: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      color: var(--text-muted);
-    }
-
-    .landing-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(to right, #22c55e, #16a34a);
-      color: #0b1120;
-      padding: 10px 18px;
-      border-radius: 999px;
-      font-weight: 600;
-      box-shadow: 0 14px 30px rgba(22, 163, 74, 0.55);
-      border: none;
-      cursor: pointer;
-    }
-
-    .btn-ghost {
-      padding: 9px 16px;
-      border-radius: 999px;
-      background-color: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      color: var(--text-muted);
-      cursor: pointer;
-    }
-
-    .choice-btn {
-      width: 100%;
-      padding: 9px 12px;
+    .input-group {
+      margin-bottom: 24px;
       text-align: left;
-      border-radius: 12px;
-      background-color: #020617;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      color: var(--text-main);
+    }
+
+    .input-label {
+      display: block;
       font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: rgba(255, 255, 255, 0.95);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    .correct {
-      background-color: rgba(34, 197, 94, 0.20);
-      border-color: var(--correct);
+    .input-field {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 12px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
     }
 
-    .wrong {
-      background-color: rgba(239, 68, 68, 0.20);
-      border-color: var(--wrong);
+    .input-field:focus {
+      outline: none;
+      border-color: var(--cyan);
+      background: rgba(255, 255, 255, 0.15);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
     }
-  </style>
-</head>
 
-<body>
-  <div class="app">
-    <header>
-      <div class="title-block">
-        <div class="logo-chip">TS</div>
-        <div>
-          <h1>Traffic Sign Challenge</h1>
-          <p class="subtitle">Practice real traffic and safety signs with ATP students.</p>
-        </div>
-      </div>
-      <div class="badge">Teacher Mode Ready</div>
-    </header>
+    .input-field::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
 
-    <main>
-      <section class="card">
-        <h2>How it works</h2>
-        <p>Students see a real sign, choose the meaning, and get instant feedback.</p>
-
-        <div class="chip-row">
-          <div class="chip">Street Safety</div>
-          <div class="chip">Real Signs</div>
-          <div class="chip">CBI Prep</div>
-          <div class="chip">Decision Making</div>
-        </div>
-
-        <div class="landing-actions">
-          <button id="startBtn" class="btn-primary">Start Quiz</button>
-          <button id="nextBtn" class="btn-ghost" disabled>Next Sign</button>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2>Current Sign</h2>
-
-        <div class="sign-stage" style="text-align:center;">
-          <div style="background:#020617;border:1px solid #475569;border-radius:18px;padding:20px;">
-            <img id="signImage" src="" alt="" style="max-width:200px;">
-          </div>
-        </div>
-
-        <h3 id="questionText" style="margin-top:12px;text-align:center;">
-          Click Start Quiz to begin
-        </h3>
-
-        <div id="choices" style="margin-top:14px;"></div>
-
-        <p id="feedback" style="margin-top:10px;font-size:14px;text-align:center;"></p>
-      </section>
-    </main>
-  </div>
-
-<script>
-const signs = [
-  {
-    file: "traffic-signs/Stop_Sign.png",
-    question: "What should you do at this sign?",
-    choices: [
-      "Slow down and continue",
-      "Stop fully, then go when safe",
-      "Speed up",
-      "Only stop if another car is coming"
-    ],
-    correctIndex: 1
-  },
-  {
-    file: "traffic-signs/Road_Closed_Sign.png",
-    question: "What does this sign mean?",
-    choices: [
-      "Road is closed ahead",
-      "Only trucks allowed",
-      "Drive faster",
-      "Road work ahead"
-    ],
-    correctIndex: 0
-  },
-  {
-    file: "traffic-signs/School_Zone_Sign.png",
-    question: "What should you do near this sign?",
-    choices: [
-      "Ignore it",
-      "Drive the normal speed",
-      "Slow down and watch for students",
-      "Change lanes quickly"
-    ],
-    correctIndex: 2
-  }
-];
-
-let currentIndex = -1;
-let hasAnswered = false;
-
-const startBtn = document.getElementById("startBtn");
-const nextBtn = document.getElementById("nextBtn");
-const signImage = document.getElementById("signImage");
-const questionText = document.getElementById("questionText");
-const choicesContainer = document.getElementById("choices");
-const feedback = document.getElementById("feedback");
-
-function loadSign() {
-  currentIndex++;
-  if (currentIndex >= signs.length) currentIndex = 0;
-
-  const s = signs[currentIndex];
-  signImage.src = s.file;
-  questionText.textContent = s.question;
-  feedback.textContent = "";
-  choicesContainer.innerHTML = "";
-  hasAnswered = false;
-  nextBtn.disabled = true;
-
-  s.choices.forEach((choice, i) => {
-    const btn = document.createElement("button");
-    btn.className = "choice-btn";
-    btn.textContent = choice;
-    btn.onclick = () => handleAnswer(btn, i, s.correctIndex);
-    choicesContainer.appendChild(btn);
-  });
-}
-
-function handleAnswer(btn, index, correctIndex) {
-  if (hasAnswered) return;
-  hasAnswered = true;
-
-  const allButtons = choicesContainer.querySelectorAll(".choice-btn");
-
-  allButtons.forEach((b, i) => {
-    if (i === correctIndex) b.classList.add("correct");
-    if (i === index && index !== correctIndex) b.classList.add("wrong");
-  });
-
-  feedback.textContent =
-    index === correctIndex
-      ? "Great job. That is the correct choice."
-      : "Good try. Talk through the safe choice.";
-
-  nextBtn.disabled = false;
-}
-
-startBtn.onclick = loadSign;
-nextBtn.onclick = loadSign;
-</script>
-
-</body>
-</html>
+    .start-button {
+      width: 100%;
+      padding: 18px;
+      font-size: 18px;
+      font-weight: 700;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--green) 0%, var(--cyan) 100%);

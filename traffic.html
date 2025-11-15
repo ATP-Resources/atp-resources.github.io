@@ -12,6 +12,8 @@
     }
 
     :root {
+      --katella-red: #ED1C24;
+      --accent-red: #ED1C24;
       --purple-start: #8b5cf6;
       --purple-mid: #6366f1;
       --blue-mid: #3b82f6;
@@ -30,7 +32,7 @@
     body {
       font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
       min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+      background: linear-gradient(135deg, #2a1215 0%, #1a0a0c 50%, #0a0505 100%);
       color: var(--text-light);
       overflow-x: hidden;
     }
@@ -77,20 +79,22 @@
     }
 
     .role-card {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
       border-radius: 24px;
       padding: 40px 30px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(237, 28, 36, 0.3);
       cursor: pointer;
       transition: all 0.3s ease;
       text-align: center;
+      color: #1a1a1a;
     }
 
     .role-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 1);
+      border-color: var(--katella-red);
     }
 
     .role-icon {
@@ -102,21 +106,22 @@
       font-size: 24px;
       font-weight: 700;
       margin-bottom: 10px;
+      color: #1a1a1a;
     }
 
     .role-description {
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(26, 26, 26, 0.7);
     }
 
     .input-card {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
       border-radius: 24px;
       padding: 40px 30px;
       margin-bottom: 30px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(237, 28, 36, 0.2);
     }
 
     .input-group {
@@ -129,7 +134,7 @@
       font-size: 14px;
       font-weight: 600;
       margin-bottom: 8px;
-      color: rgba(255, 255, 255, 0.95);
+      color: #1a1a1a;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -138,9 +143,9 @@
       width: 100%;
       padding: 14px 18px;
       border-radius: 12px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
+      border: 2px solid rgba(26, 26, 26, 0.2);
+      background: rgba(255, 255, 255, 0.8);
+      color: #1a1a1a;
       font-size: 16px;
       transition: all 0.3s ease;
       backdrop-filter: blur(10px);
@@ -148,13 +153,13 @@
 
     .input-field:focus {
       outline: none;
-      border-color: var(--cyan);
-      background: rgba(255, 255, 255, 0.15);
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+      border-color: var(--katella-red);
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0 0 20px rgba(237, 28, 36, 0.3);
     }
 
     .input-field::placeholder {
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(26, 26, 26, 0.4);
     }
 
     .start-button, .mode-button {
@@ -164,18 +169,19 @@
       font-weight: 700;
       border: none;
       border-radius: 16px;
-      background: linear-gradient(135deg, var(--green) 0%, var(--cyan) 100%);
+      background: var(--katella-red);
       color: white;
       cursor: pointer;
       transition: all 0.3s ease;
-      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+      box-shadow: 0 10px 30px rgba(237, 28, 36, 0.3);
       text-transform: uppercase;
       letter-spacing: 1px;
     }
 
     .start-button:hover, .mode-button:hover {
       transform: translateY(-2px);
-      box-shadow: 0 15px 40px rgba(16, 185, 129, 0.5);
+      box-shadow: 0 15px 40px rgba(237, 28, 36, 0.4);
+      background: #c41820;
     }
 
     .start-button.disabled {
@@ -204,6 +210,39 @@
       transform: translateX(-3px);
     }
 
+    /* Home Button */
+    .home-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 12px 20px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .home-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .home-button:active {
+      transform: translateY(0);
+    }
+
     /* Mode Selection */
     .mode-selection {
       animation: fadeIn 0.6s ease-out;
@@ -217,20 +256,22 @@
     }
 
     .mode-card {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(20px);
       border-radius: 20px;
       padding: 30px 24px;
-      border: 2px solid rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(237, 28, 36, 0.2);
       cursor: pointer;
       transition: all 0.3s ease;
       text-align: center;
+      color: #1a1a1a;
     }
 
     .mode-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-      border-color: var(--cyan);
+      border-color: var(--katella-red);
+      background: rgba(255, 255, 255, 1);
     }
 
     .mode-card.study { border-color: rgba(59, 130, 246, 0.5); }
@@ -247,11 +288,12 @@
       font-size: 22px;
       font-weight: 700;
       margin-bottom: 10px;
+      color: #1a1a1a;
     }
 
     .mode-description {
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.8);
+      color: rgba(26, 26, 26, 0.7);
       line-height: 1.5;
     }
 
@@ -799,9 +841,258 @@
         justify-content: space-between;
       }
     }
-  </style>
+  
+    /* Navigation Menu */
+    .nav-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 12px;
+      z-index: 1000;
+      flex-wrap: wrap;
+    }
+
+    .nav-button {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      color: white;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      padding: 12px 20px;
+      border-radius: 14px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .nav-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    /* Avatar Selection */
+    .avatar-selection {
+      margin: 24px 0;
+    }
+
+    .avatar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .avatar-option {
+      aspect-ratio: 1;
+      font-size: 36px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .avatar-option:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: scale(1.05);
+    }
+
+    .avatar-option.selected {
+      border-color: var(--cyan);
+      background: rgba(6, 182, 212, 0.3);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+      transform: scale(1.1);
+    }
+
+    /* Leaderboard */
+    .leaderboard-page {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .leaderboard-title {
+      font-size: 36px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 30px;
+      color: white;
+    }
+
+    .leaderboard-container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .leaderboard-item {
+      display: grid;
+      grid-template-columns: 60px 60px 1fr 100px 100px;
+      gap: 20px;
+      align-items: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      margin-bottom: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .leaderboard-item:hover {
+      background: rgba(255, 255, 255, 0.15);
+      transform: translateX(5px);
+    }
+
+    .leaderboard-item.top-1 {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.3) 0%, rgba(251, 146, 60, 0.3) 100%);
+      border: 2px solid var(--gold);
+    }
+
+    .leaderboard-item.top-2 {
+      background: linear-gradient(135deg, rgba(203, 213, 225, 0.3) 0%, rgba(148, 163, 184, 0.3) 100%);
+      border: 2px solid #cbd5e1;
+    }
+
+    .leaderboard-item.top-3 {
+      background: linear-gradient(135deg, rgba(205, 127, 50, 0.3) 0%, rgba(180, 83, 9, 0.3) 100%);
+      border: 2px solid #cd7f32;
+    }
+
+    .rank-badge {
+      font-size: 28px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .player-avatar {
+      font-size: 36px;
+      text-align: center;
+    }
+
+    .player-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .player-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .player-school {
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .leaderboard-score {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--gold);
+      text-align: center;
+    }
+
+    .leaderboard-accuracy {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+      text-align: center;
+    }
+
+    /* Statistics Page */
+    .statistics-page {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .stats-title {
+      font-size: 36px;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 30px;
+      color: white;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stats-card {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .stats-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .stats-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .stats-card-icon {
+      font-size: 24px;
+    }
+
+    .stats-card-value {
+      font-size: 36px;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 8px;
+    }
+
+    .stats-card-label {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    @media (max-width: 768px) {
+      .nav-menu {
+        top: auto;
+        bottom: 20px;
+        right: 20px;
+        flex-direction: column;
+      }
+      
+      .leaderboard-item {
+        grid-template-columns: 50px 50px 1fr;
+      }
+      
+      .leaderboard-score,
+      .leaderboard-accuracy {
+        display: none;
+      }
+    }
+</style>
 </head>
 <body>
+  <!-- Home Button (takes students to Mode Selection, teachers/login to Landing) -->
+  <button id="homeButton" class="home-button hidden">
+    🏠 Home
+  </button>
+
   <div class="container">
     <!-- Landing Page -->
     <div id="landingPage" class="landing-page">
@@ -820,6 +1111,10 @@
           <div class="role-title">Teacher</div>
           <div class="role-description">View student progress and analytics</div>
         </div>
+      </div>
+      
+      <div style="margin-top: 40px; padding: 20px; text-align: center; color: rgba(255, 255, 255, 0.6); font-size: 14px; border-top: 1px solid rgba(255, 255, 255, 0.15);">
+        Created by Mr. Keating - Katella ATP
       </div>
     </div>
 
@@ -1002,6 +1297,24 @@
       </div>
     </div>
 
+        <!-- Leaderboard Page -->
+    <div class="leaderboard-page hidden" id="leaderboardPage">
+      <h2 class="leaderboard-title">🏆 Leaderboard 🏆</h2>
+      <p style="text-align: center; color: rgba(255,255,255,0.8); margin-bottom: 30px;">Top performers across all modes</p>
+      <div class="leaderboard-container" id="leaderboardContainer">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Statistics Page -->
+    <div class="statistics-page hidden" id="statisticsPage">
+      <h2 class="stats-title">📊 My Statistics</h2>
+      <p style="text-align: center; color: rgba(255,255,255,0.8); margin-top: 10px; margin-bottom: 30px;">Track your progress and improvement</p>
+      <div class="stats-grid" id="statsGrid">
+        <!-- Populated by JavaScript -->
+      </div>
+    </div>
+
     <!-- Teacher Dashboard -->
     <div id="teacherDashboard" class="teacher-dashboard hidden">
       <div class="dashboard-header">
@@ -1131,6 +1444,7 @@
   const quizPage = document.getElementById("quizPage");
   const resultsPage = document.getElementById("resultsPage");
   const teacherDashboard = document.getElementById("teacherDashboard");
+  const homeButton = document.getElementById("homeButton");
 
   const studentNameInput = document.getElementById("studentName");
   const schoolNameInput = document.getElementById("schoolName");
@@ -1139,30 +1453,54 @@
   const teacherLoginBtn = document.getElementById("teacherLoginBtn");
   const loginError = document.getElementById("loginError");
 
+  // Home Button Navigation
+  homeButton.addEventListener("click", () => {
+    // Reset any ongoing quiz
+    if (questionTimer) clearInterval(questionTimer);
+    
+    // Check which page we're on to determine where "home" is
+    const isTeacherPage = !teacherDashboard.classList.contains("hidden");
+    const isLoginPage = !studentLoginPage.classList.contains("hidden") || 
+                        !teacherLoginPage.classList.contains("hidden");
+    
+    if (isTeacherPage || isLoginPage) {
+      // From teacher dashboard or login pages, go to landing
+      showLanding();
+    } else {
+      // From student pages (quiz, results), go to mode selection
+      backToModeSelection();
+    }
+  });
+
   // Navigation Functions
   function showLanding() {
     hideAllPages();
     landingPage.classList.remove("hidden");
+    homeButton.classList.add("hidden"); // Hide home button on landing page
   }
 
   function showStudentLogin() {
     hideAllPages();
     studentLoginPage.classList.remove("hidden");
+    homeButton.classList.remove("hidden"); // Show home button
   }
 
   function showTeacherLogin() {
     hideAllPages();
     teacherLoginPage.classList.remove("hidden");
+    homeButton.classList.remove("hidden"); // Show home button
   }
 
   function backToStudentLogin() {
     hideAllPages();
     studentLoginPage.classList.remove("hidden");
+    homeButton.classList.remove("hidden"); // Show home button
   }
 
   function backToModeSelection() {
     hideAllPages();
     modeSelectionPage.classList.remove("hidden");
+    homeButton.classList.add("hidden"); // Hide home button on mode selection (this is home)
   }
 
   function hideAllPages() {
@@ -1196,6 +1534,7 @@
       schoolName = schoolNameInput.value.trim();
       hideAllPages();
       modeSelectionPage.classList.remove("hidden");
+      homeButton.classList.add("hidden"); // Hide home button on mode selection (this is home)
     }
   });
 
@@ -1227,6 +1566,7 @@
     currentMode = mode;
     hideAllPages();
     quizPage.classList.remove("hidden");
+    homeButton.classList.remove("hidden"); // Show home button in quiz mode
     
     // Initialize game state
     currentSignIndex = 0;
@@ -1444,6 +1784,7 @@
     
     hideAllPages();
     resultsPage.classList.remove("hidden");
+    homeButton.classList.remove("hidden"); // Show home button on results page
 
     const endTime = Date.now();
     const totalTime = Math.round((endTime - startTime) / 1000);
@@ -1515,6 +1856,7 @@
   function showTeacherDashboard() {
     hideAllPages();
     teacherDashboard.classList.remove("hidden");
+    homeButton.classList.remove("hidden"); // Show home button on teacher dashboard
     loadTeacherData();
   }
 
@@ -1616,7 +1958,244 @@
     document.body.removeChild(a);
     window.URL.revokeObjectURL(url);
   }
+
+  // ============================================
+  // ENHANCED FEATURES: AVATARS, LEADERBOARD, STATISTICS
+  // ============================================
+  
+  const AVATARS = ["😀", "😎", "🤓", "😃", "🥳", "🤩", "😊", "😇", "🙂", "🤗", "🤠", "👦", "👧", "🧑", "👨", "👩"];
+  let selectedAvatar = "";
+
+  // Initialize avatars when page loads
+  function initializeAvatars() {
+    const grid = document.getElementById("avatarGrid");
+    if (!grid) return;
+    
+    grid.innerHTML = "";
+    AVATARS.forEach(avatar => {
+      const option = document.createElement("div");
+      option.className = "avatar-option";
+      option.textContent = avatar;
+      option.onclick = () => selectAvatar(avatar);
+      grid.appendChild(option);
+    });
+    
+    // Load saved avatar
+    loadSavedAvatar();
+  }
+
+  function selectAvatar(avatar) {
+    selectedAvatar = avatar;
+    document.querySelectorAll(".avatar-option").forEach(opt => {
+      opt.classList.remove("selected");
+      if (opt.textContent === avatar) {
+        opt.classList.add("selected");
+      }
+    });
+    saveUserProfile();
+  }
+
+  function loadSavedAvatar() {
+    const profile = localStorage.getItem('trafficUserProfile');
+    if (profile) {
+      try {
+        const data = JSON.parse(profile);
+        if (data.avatar) {
+          selectedAvatar = data.avatar;
+          setTimeout(() => {
+            const options = document.querySelectorAll(".avatar-option");
+            options.forEach(opt => {
+              if (opt.textContent === selectedAvatar) {
+                opt.classList.add("selected");
+              }
+            });
+          }, 100);
+        }
+      } catch (e) {
+        console.log("No saved profile");
+      }
+    }
+  }
+
+  function saveUserProfile() {
+    localStorage.setItem('trafficUserProfile', JSON.stringify({
+      studentName,
+      schoolName,
+      avatar: selectedAvatar
+    }));
+  }
+
+  // Show/hide navigation menu
+  function updateNavMenu() {
+    const navMenu = document.getElementById("navMenu");
+    const isStudentView = !teacherDashboard.classList.contains("hidden") === false;
+    if (navMenu && studentName) {
+      navMenu.classList.remove("hidden");
+    }
+  }
+
+  // Leaderboard functions
+  function showLeaderboard() {
+    hideAllPages();
+    const leaderboardPage = document.getElementById("leaderboardPage");
+    leaderboardPage.classList.remove("hidden");
+    homeButton.classList.remove("hidden");
+    loadLeaderboard();
+  }
+
+  function loadLeaderboard() {
+    const sessions = getSessions();
+    const container = document.getElementById("leaderboardContainer");
+    
+    if (sessions.length === 0) {
+      container.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">No data yet. Complete a quiz to see scores!</div>';
+      return;
+    }
+
+    // Get best score per student
+    const studentBest = {};
+    sessions.forEach(session => {
+      const key = session.studentName;
+      if (!studentBest[key] || session.score > studentBest[key].score) {
+        studentBest[key] = session;
+      }
+    });
+
+    // Sort by score
+    const sorted = Object.values(studentBest).sort((a, b) => b.score - a.score).slice(0, 10);
+
+    container.innerHTML = sorted.map((session, index) => {
+      const rank = index + 1;
+      const topClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
+      const avatar = session.avatar || '👤';
+      return `
+        <div class="leaderboard-item ${topClass}">
+          <div class="rank-badge">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</div>
+          <div class="player-avatar">${avatar}</div>
+          <div class="player-info">
+            <div class="player-name">${session.studentName}</div>
+            <div class="player-school">${session.schoolName}</div>
+          </div>
+          <div class="leaderboard-score">${session.score}</div>
+          <div class="leaderboard-accuracy">${session.accuracy}%</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Statistics functions
+  function showStatistics() {
+    hideAllPages();
+    const statisticsPage = document.getElementById("statisticsPage");
+    statisticsPage.classList.remove("hidden");
+    homeButton.classList.remove("hidden");
+    loadStatistics();
+  }
+
+  function loadStatistics() {
+    const sessions = getSessions();
+    const userSessions = sessions.filter(s => s.studentName === studentName);
+    const grid = document.getElementById("statsGrid");
+
+    if (userSessions.length === 0) {
+      grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: rgba(255,255,255,0.6);">Complete some quizzes to see your statistics!</div>';
+      return;
+    }
+
+    const totalSessions = userSessions.length;
+    const totalScore = userSessions.reduce((sum, s) => sum + s.score, 0);
+    const avgAccuracy = Math.round(userSessions.reduce((sum, s) => sum + s.accuracy, 0) / totalSessions);
+    const bestScore = Math.max(...userSessions.map(s => s.score));
+    const totalQuestions = userSessions.reduce((sum, s) => sum + s.totalQuestions, 0);
+    const totalCorrect = userSessions.reduce((sum, s) => sum + s.correctAnswers, 0);
+
+    grid.innerHTML = `
+      <div class="stats-card">
+        <div class="stats-card-header">
+          <div class="stats-card-title">Total Sessions</div>
+          <div class="stats-card-icon">📚</div>
+        </div>
+        <div class="stats-card-value">${totalSessions}</div>
+        <div class="stats-card-label">Quizzes completed</div>
+      </div>
+
+      <div class="stats-card">
+        <div class="stats-card-header">
+          <div class="stats-card-title">Total Points</div>
+          <div class="stats-card-icon">⭐</div>
+        </div>
+        <div class="stats-card-value">${totalScore}</div>
+        <div class="stats-card-label">Points earned</div>
+      </div>
+
+      <div class="stats-card">
+        <div class="stats-card-header">
+          <div class="stats-card-title">Avg Accuracy</div>
+          <div class="stats-card-icon">🎯</div>
+        </div>
+        <div class="stats-card-value">${avgAccuracy}%</div>
+        <div class="stats-card-label">Average score</div>
+      </div>
+
+      <div class="stats-card">
+        <div class="stats-card-header">
+          <div class="stats-card-title">Best Score</div>
+          <div class="stats-card-icon">🏆</div>
+        </div>
+        <div class="stats-card-value">${bestScore}</div>
+        <div class="stats-card-label">Highest points in one session</div>
+      </div>
+
+      <div class="stats-card">
+        <div class="stats-card-header">
+          <div class="stats-card-title">Questions Answered</div>
+          <div class="stats-card-icon">❓</div>
+        </div>
+        <div class="stats-card-value">${totalQuestions}</div>
+        <div class="stats-card-label">Total questions attempted</div>
+      </div>
+
+      <div class="stats-card">
+        <div class="stats-card-header">
+          <div class="stats-card-title">Correct Answers</div>
+          <div class="stats-card-icon">✅</div>
+        </div>
+        <div class="stats-card-value">${totalCorrect}</div>
+        <div class="stats-card-label">Questions answered correctly</div>
+      </div>
+    `;
+  }
+
+  // Initialize avatars when DOM is ready
+  setTimeout(() => {
+    initializeAvatars();
+    updateNavMenu();
+  }, 100);
+
+  // Update hideAllPages to include new pages
+  const originalHideAllPages = hideAllPages;
+  hideAllPages = function() {
+    originalHideAllPages();
+    const leaderboardPage = document.getElementById("leaderboardPage");
+    const statisticsPage = document.getElementById("statisticsPage");
+    if (leaderboardPage) leaderboardPage.classList.add("hidden");
+    if (statisticsPage) statisticsPage.classList.add("hidden");
+  };
+
+  // Save avatar with session data
+  const originalSaveSession = saveSession;
+  saveSession = function(session) {
+    session.avatar = selectedAvatar || "👤";
+    originalSaveSession(session);
+  };
+
 </script>
 
 </body>
-</html>
+</html  <!-- Navigation Menu -->
+  <div class="nav-menu hidden" id="navMenu">
+    <button class="nav-button" onclick="showLeaderboard()">🏆 Leaderboard</button>
+    <button class="nav-button" onclick="showStatistics()">📊 My Stats</button>
+  </div>
+
+  >

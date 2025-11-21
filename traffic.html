@@ -1283,12 +1283,24 @@
 
       <div class="input-card">
         <div class="input-group">
+          <label class="input-label" for="teacherEmail">Teacher Email</label>
+          <input
+            type="email"
+            id="teacherEmail"
+            class="input-field"
+            placeholder="Enter your teacher email"
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="input-group">
           <label class="input-label" for="teacherPassword">Password</label>
           <input
             type="password"
             id="teacherPassword"
             class="input-field"
-            placeholder="Enter teacher password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
           >
         </div>
 
@@ -1791,6 +1803,8 @@
 
   // For this demo, I'll complete the basic structure. In production, all 57 signs would have explanations.
   // Game State
+  const auth = window.auth; // Get Auth from the module script
+  let currentUser = null; // Variable to track logged-in user
   let currentMode = 'study';
   let currentSignIndex = 0;
   let score = 0;
@@ -1816,9 +1830,6 @@
     { id: 'firsttry', name: 'First Try', icon: '🎯', condition: (data) => data.totalQuestions >= 5 && data.accuracy >= 80 },
     { id: 'dedicated', name: 'Dedicated', icon: '📚', condition: (data) => data.totalQuestions >= 20 }
   ];
-
-  // Teacher password
-  const TEACHER_PASSWORD = 'Katella805';
 
   // DOM Elements
   const landingPage = document.getElementById("landingPage");
@@ -1940,16 +1951,37 @@
     }
   });
 
-  // Teacher Login
+  // Teacher Login - Firebase Authentication
   teacherLoginBtn.addEventListener("click", () => {
+    const email = document.getElementById("teacherEmail").value;
     const password = teacherPasswordInput.value;
-    if (password === TEACHER_PASSWORD) {
-      loginError.style.display = "none";
-      teacherPasswordInput.value = "";
-      showTeacherDashboard();
-    } else {
-      loginError.style.display = "block";
-    }
+    
+    // Disable button to prevent multiple clicks
+    teacherLoginBtn.classList.add("disabled");
+    teacherLoginBtn.textContent = "Logging in...";
+    loginError.style.display = "none";
+
+    window.signIn(auth, email, password)
+      .then((userCredential) => {
+        // Sign-in successful.
+        currentUser = userCredential.user;
+        teacherPasswordInput.value = "";
+        teacherLoginBtn.classList.remove("disabled");
+        teacherLoginBtn.textContent = "Login";
+        showTeacherDashboard();
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        currentUser = null;
+        if (error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-email') {
+          loginError.textContent = "Incorrect email or password.";
+        } else {
+          loginError.textContent = "An error occurred. Please try again.";
+        }
+        loginError.style.display = "block";
+        teacherLoginBtn.classList.remove("disabled");
+        teacherLoginBtn.textContent = "Login";
+      });
   });
 
   teacherPasswordInput.addEventListener("keypress", (e) => {
@@ -1958,9 +1990,28 @@
     }
   });
 
+  // Also allow Enter key from email field
+  const teacherEmailInput = document.getElementById("teacherEmail");
+  teacherEmailInput.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      teacherLoginBtn.click();
+    }
+  });
+
+  // Teacher Logout - Firebase Authentication
   function teacherLogout() {
-    hideAllPages();
-    showLanding();
+    window.signOut(auth).then(() => {
+      // Sign-out successful.
+      currentUser = null;
+      hideAllPages();
+      showLanding();
+    }).catch((error) => {
+      // An error happened.
+      console.error("Logout Error: ", error);
+      currentUser = null; // Log them out on the frontend anyway
+      hideAllPages();
+      showLanding();
+    });
   }
 
   // Mode Selection
@@ -2707,13 +2758,21 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 
-  // *** NEW: Add Firestore SDKs ***
+  // *** NEW: Add Firestore (Database) SDKs ***
   import { 
     getFirestore, 
     collection, 
     addDoc, 
     getDocs 
   } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+  
+  // *** NEW: Add Auth (Login) SDKs ***
+  import { 
+    getAuth, 
+    signInWithEmailAndPassword, 
+    signOut 
+  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+
 
   // Your web app's Firebase configuration
   const firebaseConfig = {
@@ -2730,12 +2789,17 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   
-  // *** NEW: Initialize Firestore and make it globally available ***
-  // We attach it to the 'window' object so your main script can see it.
+  // *** Make Firestore and Auth globally available ***
+  // We attach them to the 'window' object so your main script can see them.
   window.db = getFirestore(app);
   window.db_collection = collection;
   window.db_addDoc = addDoc;
   window.db_getDocs = getDocs;
+
+  // NEW: Make Auth functions global
+  window.auth = getAuth(app);
+  window.signIn = signInWithEmailAndPassword;
+  window.signOut = signOut;
 </script>
 
 </body>

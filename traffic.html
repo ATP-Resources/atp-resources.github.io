@@ -850,9 +850,50 @@
     }
 
     @keyframes badgeEarn {
-      0% { transform: scale(0.5) rotate(-180deg); opacity: 0; }
-      50% { transform: scale(1.2) rotate(10deg); }
-      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+      0% {
+        transform: translateX(-100px) rotateY(180deg) scale(0.5);
+        opacity: 0;
+      }
+      60% {
+        transform: translateX(10px) rotateY(0deg) scale(0.8);
+        opacity: 1;
+      }
+      80% {
+        transform: translateX(-5px) scale(1.1);
+      }
+      100% {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* SVG Icon Styles */
+    .mode-icon {
+      font-size: 50px;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #1a1a1a;
+    }
+
+    .mode-icon svg {
+      width: 1.2em;
+      height: 1.2em;
+      stroke-width: 1.5;
+    }
+
+    .badges-title, .dashboard-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .badge-icon svg {
+      width: 1em;
+      height: 1em;
+      stroke-width: 2.5;
     }
 
     @keyframes shimmer {
@@ -1258,25 +1299,33 @@
 
       <div class="mode-grid">
         <div class="mode-card study" onclick="startMode('study')">
-          <div class="mode-icon">📚</div>
+          <div class="mode-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
+          </div>
           <div class="mode-title">Study Mode</div>
           <div class="mode-description">Learn all signs at your own pace with detailed explanations</div>
         </div>
 
         <div class="mode-card practice" onclick="startMode('practice')">
-          <div class="mode-icon">✏️</div>
+          <div class="mode-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg>
+          </div>
           <div class="mode-title">Practice Mode</div>
           <div class="mode-description">Random questions to test your knowledge</div>
         </div>
 
         <div class="mode-card challenge" onclick="startMode('challenge')">
-          <div class="mode-icon">⚡</div>
+          <div class="mode-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
           <div class="mode-title">Challenge Mode</div>
           <div class="mode-description">Timed questions for a real test experience</div>
         </div>
 
         <div class="mode-card scenario" onclick="startMode('scenario')">
-          <div class="mode-icon">🚗</div>
+          <div class="mode-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 16.5V18a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1.5"></path><path d="M14 12.5V14a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-1.5"></path><path d="m18 10.5-2.2-.8c-.6-.2-1.3-.3-1.8-.3H5c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h11c.6 0 1.2-.1 1.8-.3l2.2-.8a2 2 0 0 0 1.2-1.8V12.3c0-.8-.5-1.6-1.2-1.8Z"></path><path d="m17 6.5-2-1c-.6-.3-1.4-.5-2-.5H5c-1.1 0-2 .9-2 2v3c0 1.1.9 2 2 2h10c.6 0 1.1-.2 1.7-.5l2-1c.6-.3.9-1 .9-1.8V8.3c0-.8-.4-1.5-1-1.8Z"></path></svg>
+          </div>
           <div class="mode-title">Scenario Mode</div>
           <div class="mode-description">Real-world driving situations to solve</div>
         </div>
@@ -1336,7 +1385,10 @@
         <p class="student-name-display" id="studentNameResult"></p>
 
         <div class="badges-section">
-          <div class="badges-title">🏆 Badges Earned</div>
+          <div class="badges-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+            Badges Earned
+          </div>
           <div class="badges-grid" id="badgesContainer"></div>
         </div>
 
@@ -1370,7 +1422,11 @@
 
         <!-- Leaderboard Page -->
     <div class="leaderboard-page hidden" id="leaderboardPage">
-      <h2 class="leaderboard-title">🏆 Leaderboard 🏆</h2>
+      <h2 class="leaderboard-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -6px; margin-right: 4px;"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+        Leaderboard
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -6px; margin-left: 4px; transform: scaleX(-1);"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+      </h2>
       <p style="text-align: center; color: rgba(255,255,255,0.8); margin-bottom: 30px;">Top performers across all modes</p>
       <div class="leaderboard-container" id="leaderboardContainer">
         <!-- Populated by JavaScript -->
@@ -1379,7 +1435,10 @@
 
     <!-- Statistics Page -->
     <div class="statistics-page hidden" id="statisticsPage">
-      <h2 class="stats-title">📊 My Statistics</h2>
+      <h2 class="stats-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -6px; margin-right: 8px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        My Statistics
+      </h2>
       <p style="text-align: center; color: rgba(255,255,255,0.8); margin-top: 10px; margin-bottom: 30px;">Track your progress and improvement</p>
       <div class="stats-grid" id="statsGrid">
         <!-- Populated by JavaScript -->
@@ -1389,9 +1448,15 @@
     <!-- Teacher Dashboard -->
     <div id="teacherDashboard" class="teacher-dashboard hidden">
       <div class="dashboard-header">
-        <div class="dashboard-title">👨‍🏫 Teacher Dashboard</div>
+        <div class="dashboard-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 8px;"><path d="M18 20V4c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v16"></path><path d="M12 18h.01"></path><path d="M12 14h.01"></path><path d="M12 10h.01"></path><path d="M12 6h.01"></path></svg>
+          Teacher Dashboard
+        </div>
         <div style="display: flex; gap: 12px;">
-          <button class="export-button" onclick="exportToCSV()">📊 Export Data</button>
+          <button class="export-button" onclick="exportToCSV()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            Export Data
+          </button>
           <button class="logout-button" onclick="teacherLogout()">Logout</button>
         </div>
       </div>
@@ -1406,6 +1471,133 @@
   </div>
 
 <script>
+  // ============================================
+  // CONSOLE-NEKO.JS (Standalone Confetti)
+  // ============================================
+  var confetti = {
+    maxCount: 150,
+    speed: 2,
+    frameInterval: 15,
+    alpha: 1,
+    gradient: !1,
+    start: null,
+    stop: null,
+    toggle: null,
+    pause: null,
+    resume: null,
+    togglePause: null,
+    remove: null,
+    isPaused: !1,
+    isRunning: !1,
+    particles: [],
+    canvas: null,
+    context: null,
+    init: function () {
+      (this.canvas = document.createElement("canvas")),
+        (this.canvas.style.display = "block"),
+        (this.canvas.style.position = "fixed"),
+        (this.canvas.style.pointerEvents = "none"),
+        (this.canvas.style.top = 0),
+        (this.canvas.style.left = 0),
+        (this.canvas.style.width = "100vw"),
+        (this.canvas.style.height = "100vh"),
+        (this.canvas.style.zIndex = 9999),
+        document.body.appendChild(this.canvas),
+        (this.context = this.canvas.getContext("2d")),
+        (window.onresize = () => {
+          this.canvas &&
+            ((this.canvas.width = this.canvas.clientWidth),
+            (this.canvas.height = this.canvas.clientHeight));
+        }),
+        this.canvas.width = this.canvas.clientWidth;
+        this.canvas.height = this.canvas.clientHeight;
+    },
+    Particle: function () {
+      (this.x = Math.random() * confetti.canvas.width),
+        (this.y =
+          Math.random() * confetti.canvas.height - confetti.canvas.height),
+        (this.r = (10 * Math.random() + 5)),
+        (this.d = Math.random() * confetti.maxCount + 10),
+        (this.color =
+          "rgba(" +
+          Math.floor(256 * Math.random()) +
+          ", " +
+          Math.floor(256 * Math.random()) +
+          ", " +
+          Math.floor(256 * Math.random()) +
+          ", " +
+          confetti.alpha +
+          ")"),
+        (this.tilt = Math.floor(10 * Math.random()) - 10),
+        (this.tiltAngleIncremental = 0.07 * Math.random() + 0.05),
+        (this.tiltAngle = 0),
+        (this.draw = function () {
+          return (
+            confetti.context.beginPath(),
+            (confetti.context.lineWidth = this.r / 2),
+            (confetti.context.strokeStyle = this.color),
+            confetti.context.moveTo(this.x + this.tilt + this.r / 4, this.y),
+            confetti.context.lineTo(
+              this.x + this.tilt,
+              this.y + this.tilt + this.r / 4
+            ),
+            confetti.context.stroke()
+          );
+        });
+    },
+    run: function () {
+      this.init(), (this.isRunning = !0);
+      var t = this,
+        e =
+          window.requestAnimationFrame ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.oRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          function (t) {
+            return window.setTimeout(t, t.frameInterval);
+          },
+        i = function i() {
+          if (t.isPaused) return;
+          t.context.clearRect(
+            0,
+            0,
+            t.canvas.width,
+            t.canvas.height
+          );
+          for (var s = 0; s < t.particles.length; s++)
+            t.particles[s].draw();
+          t.update(), e(i);
+        };
+      e(i);
+      for (var s = 0; s < this.maxCount; s++)
+        this.particles.push(new this.Particle());
+    },
+    update: function () {
+      for (var t = 0, e = 0; e < this.particles.length; e++) {
+        var i = this.particles[e];
+        this.isPaused ||
+          ((i.tiltAngle += i.tiltAngleIncremental),
+          (i.y += (Math.cos(i.d) + 3 + i.r / 2) / this.speed),
+          (i.x += Math.sin(i.tiltAngle) - 0.5),
+          (i.tilt = 15 * Math.sin(i.tiltAngle)),
+          i.y > this.canvas.height && t++);
+      }
+      t === this.particles.length && (this.stop(), (this.isRunning = !1));
+    },
+    stop: function () {
+      this.particles = [];
+      this.context.clearRect(
+        0,
+        0,
+        this.canvas.width,
+        this.canvas.height
+      );
+      this.canvas.parentNode.removeChild(this.canvas);
+      this.canvas = null;
+    }
+  };
+
   // Traffic Signs Data with Explanations
   const signs = [
     {
@@ -1418,6 +1610,14 @@
         "Only stop if another car is coming"
       ],
       correctIndex: 1,
+      scenarioQuestion: "You're driving to school and approach this sign at an intersection. A pedestrian is waiting to cross. What should you do?",
+      scenarioChoices: [
+        "Slow down and wave the pedestrian across while rolling through",
+        "Stop completely, let the pedestrian cross, then proceed when safe",
+        "Speed up to pass before the pedestrian crosses",
+        "Honk to let the pedestrian know you're coming through"
+      ],
+      scenarioCorrectIndex: 1,
       explanation: "A stop sign requires you to come to a complete stop before the stop line or crosswalk. Look both ways, yield to pedestrians and other traffic, then proceed when it's safe.",
       category: "Regulatory"
     },
@@ -1431,6 +1631,14 @@
         "Pedestrians do not have the right of way here"
       ],
       correctIndex: 1,
+      scenarioQuestion: "You arrive at this intersection at the same time as a car on your right. Both of you stop. Who should go first?",
+      scenarioChoices: [
+        "You should go first since you saw the sign first",
+        "The car on your right has the right of way",
+        "Whoever honks first goes first",
+        "Both cars should go at the same time"
+      ],
+      scenarioCorrectIndex: 1,
       explanation: "An all-way stop means every vehicle approaching the intersection from any direction must stop. The first vehicle to arrive proceeds first. If vehicles arrive at the same time, the vehicle on the right has the right of way.",
       category: "Regulatory"
     },
@@ -1444,6 +1652,14 @@
         "You do not need to stop at the next sign"
       ],
       correctIndex: 1,
+      scenarioQuestion: "You're driving 45 mph on a highway and see this sign. What should you do?",
+      scenarioChoices: [
+        "Maintain your speed until you see the actual stop sign",
+        "Begin slowing down now and prepare to stop ahead",
+        "Speed up to get through the intersection faster",
+        "Change lanes to avoid stopping"
+      ],
+      scenarioCorrectIndex: 1,
       explanation: "This warning sign tells you that a stop sign is coming up ahead. Begin slowing down and prepare to stop completely at the stop sign. This gives you advance notice, especially helpful on high-speed roads.",
       category: "Warning"
     },
@@ -1457,6 +1673,14 @@
         "Ignore it if no one is honking"
       ],
       correctIndex: 2,
+      scenarioQuestion: "You're merging onto a busy road and see this sign. Traffic is coming from your left. What should you do?",
+      scenarioChoices: [
+        "Merge quickly before the cars reach you",
+        "Stop completely and wait for all traffic to clear",
+        "Slow down, wait for a safe gap in traffic, then merge",
+        "Honk your horn and merge anyway"
+      ],
+      scenarioCorrectIndex: 2,
       explanation: "A yield sign means you must slow down and be prepared to stop if necessary. Give the right of way to pedestrians and vehicles already in the intersection or approaching. You may proceed when it's safe to do so.",
       category: "Regulatory"
     },
@@ -1470,6 +1694,14 @@
         "Pedestrians are not allowed ahead"
       ],
       correctIndex: 1,
+      scenarioQuestion: "You're driving and your friend is talking to you when you see this sign. What's the safest thing to do?",
+      scenarioChoices: [
+        "Keep talking and watch for the yield sign",
+        "Ask your friend to be quiet, start slowing down, and prepare to yield",
+        "Speed up to get through the yield sign area quickly",
+        "Ignore the sign since you don't see a yield sign yet"
+      ],
+      scenarioCorrectIndex: 1,
       explanation: "This warning sign alerts you that a yield sign is ahead. Prepare to slow down and yield to other traffic. This advance warning is especially important on faster roads where you need time to adjust your speed.",
       category: "Warning"
     }
@@ -1687,7 +1919,13 @@
 
     document.getElementById("signImage").src = sign.file;
     document.getElementById("signImage").alt = sign.question;
-    document.getElementById("questionText").textContent = sign.question;
+    
+    // Use scenario question/choices in scenario mode, regular in other modes
+    const questionText = (currentMode === 'scenario') ? sign.scenarioQuestion : sign.question;
+    const choicesArray = (currentMode === 'scenario') ? sign.scenarioChoices : sign.choices;
+    const correctIdx = (currentMode === 'scenario') ? sign.scenarioCorrectIndex : sign.correctIndex;
+    
+    document.getElementById("questionText").textContent = questionText;
     document.getElementById("feedback").textContent = "";
     document.getElementById("explanationContainer").innerHTML = "";
     document.getElementById("nextButton").classList.add("hidden");
@@ -1695,11 +1933,11 @@
     const choicesContainer = document.getElementById("choicesContainer");
     choicesContainer.innerHTML = "";
     
-    sign.choices.forEach((choice, index) => {
+    choicesArray.forEach((choice, index) => {
       const button = document.createElement("button");
       button.className = "choice-button";
       button.textContent = choice;
-      button.onclick = () => handleAnswer(index, sign.correctIndex, button);
+      button.onclick = () => handleAnswer(index, correctIdx, button);
       choicesContainer.appendChild(button);
     });
 
@@ -1747,8 +1985,9 @@
     
     showExplanation(signs[currentSignIndex]);
     
+    const questionText = (currentMode === 'scenario') ? signs[currentSignIndex].scenarioQuestion : signs[currentSignIndex].question;
     sessionData.questions.push({
-      question: signs[currentSignIndex].question,
+      question: questionText,
       correct: false,
       timeSpent: 30
     });
@@ -1796,8 +2035,9 @@
     showExplanation(signs[currentSignIndex]);
 
     // Record question data
+    const questionText = (currentMode === 'scenario') ? signs[currentSignIndex].scenarioQuestion : signs[currentSignIndex].question;
     sessionData.questions.push({
-      question: signs[currentSignIndex].question,
+      question: questionText,
       correct: isCorrect,
       timeSpent: questionTime
     });
@@ -1812,7 +2052,8 @@
     const explanationHTML = `
       <div class="explanation-box">
         <div class="explanation-title">
-          💡 Explanation
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+          Explanation
         </div>
         <div class="explanation-text">
           ${sign.explanation}
@@ -1889,18 +2130,45 @@
 
     // Show badges
     displayBadges(sessionData);
+
+    // *** NEW FEATURE: Trigger Confetti! ***
+    if (accuracy >= 80 && !confetti.isRunning) {
+      confetti.run();
+      // Stop confetti after 5 seconds
+      setTimeout(() => {
+        if (confetti.isRunning) {
+          confetti.stop();
+        }
+      }, 5000);
+    }
   }
 
   function displayBadges(data) {
     const badgesContainer = document.getElementById("badgesContainer");
     badgesContainer.innerHTML = "";
+    
+    // Define SVG icons for badges
+    const badgeIcons = {
+      'perfect': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>',
+      'speed': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>',
+      'streak5': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H3l-1 1c-1 1-1 2 0 3l1 1h4l2-2 3 5 3.5-3.5.5-.5c.2-.3.2-.8 0-1.1z"></path></svg>',
+      'streak10': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>',
+      'firsttry': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>',
+      'dedicated': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>'
+    };
 
-    badges.forEach(badge => {
+    badges.forEach((badge, index) => {
       const earned = badge.condition(data);
       const badgeDiv = document.createElement("div");
       badgeDiv.className = `badge ${earned ? 'earned' : 'locked'}`;
+      
+      // Add a staggered animation delay
+      if (earned) {
+        badgeDiv.style.animationDelay = `${index * 0.1}s`;
+      }
+
       badgeDiv.innerHTML = `
-        <div class="badge-icon">${badge.icon}</div>
+        <div class="badge-icon">${badgeIcons[badge.id] || badge.icon}</div>
         <div class="badge-name">${badge.name}</div>
       `;
       badgesContainer.appendChild(badgeDiv);
@@ -2179,12 +2447,22 @@
     const bestScore = Math.max(...userSessions.map(s => s.score));
     const totalQuestions = userSessions.reduce((sum, s) => sum + s.totalQuestions, 0);
     const totalCorrect = userSessions.reduce((sum, s) => sum + s.correctAnswers, 0);
+    
+    // Define SVG icons for stats
+    const statIcons = {
+      sessions: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>',
+      points: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>',
+      accuracy: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>',
+      best: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>',
+      answered: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>',
+      correct: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+    };
 
     grid.innerHTML = `
       <div class="stats-card">
         <div class="stats-card-header">
           <div class="stats-card-title">Total Sessions</div>
-          <div class="stats-card-icon">📚</div>
+          <div class="stats-card-icon">${statIcons.sessions}</div>
         </div>
         <div class="stats-card-value">${totalSessions}</div>
         <div class="stats-card-label">Quizzes completed</div>
@@ -2193,7 +2471,7 @@
       <div class="stats-card">
         <div class="stats-card-header">
           <div class="stats-card-title">Total Points</div>
-          <div class="stats-card-icon">⭐</div>
+          <div class="stats-card-icon">${statIcons.points}</div>
         </div>
         <div class="stats-card-value">${totalScore}</div>
         <div class="stats-card-label">Points earned</div>
@@ -2202,7 +2480,7 @@
       <div class="stats-card">
         <div class="stats-card-header">
           <div class="stats-card-title">Avg Accuracy</div>
-          <div class="stats-card-icon">🎯</div>
+          <div class="stats-card-icon">${statIcons.accuracy}</div>
         </div>
         <div class="stats-card-value">${avgAccuracy}%</div>
         <div class="stats-card-label">Average score</div>
@@ -2211,7 +2489,7 @@
       <div class="stats-card">
         <div class="stats-card-header">
           <div class="stats-card-title">Best Score</div>
-          <div class="stats-card-icon">🏆</div>
+          <div class="stats-card-icon">${statIcons.best}</div>
         </div>
         <div class="stats-card-value">${bestScore}</div>
         <div class="stats-card-label">Highest points in one session</div>
@@ -2220,7 +2498,7 @@
       <div class="stats-card">
         <div class="stats-card-header">
           <div class="stats-card-title">Questions Answered</div>
-          <div class="stats-card-icon">❓</div>
+          <div class="stats-card-icon">${statIcons.answered}</div>
         </div>
         <div class="stats-card-value">${totalQuestions}</div>
         <div class="stats-card-label">Total questions attempted</div>
@@ -2229,7 +2507,7 @@
       <div class="stats-card">
         <div class="stats-card-header">
           <div class="stats-card-title">Correct Answers</div>
-          <div class="stats-card-icon">✅</div>
+          <div class="stats-card-icon">${statIcons.correct}</div>
         </div>
         <div class="stats-card-value">${totalCorrect}</div>
         <div class="stats-card-label">Questions answered correctly</div>
@@ -2265,8 +2543,14 @@
 </body>
 </html  <!-- Navigation Menu -->
   <div class="nav-menu hidden" id="navMenu">
-    <button class="nav-button" onclick="showLeaderboard()">🏆 Leaderboard</button>
-    <button class="nav-button" onclick="showStatistics()">📊 My Stats</button>
+    <button class="nav-button" onclick="showLeaderboard()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+      Leaderboard
+    </button>
+    <button class="nav-button" onclick="showStatistics()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 6px;"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+      My Stats
+    </button>
   </div>
 
   >

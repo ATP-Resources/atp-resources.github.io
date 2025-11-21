@@ -357,6 +357,10 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      /* ADD THESE 3 LINES */
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .progress-container {
@@ -1387,7 +1391,24 @@
     <!-- Results Page -->
     <div id="resultsPage" class="results-page hidden">
       <div class="results-card">
-        <h2 class="results-title">🎉 Challenge Complete! 🎉</h2>
+        <!-- NEW Results Title -->
+        <h2 class="results-title" style="display: flex; justify-content: center; align-items: center; gap: 12px;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gold);">
+            <path d="M4 14v-2.28a2 2 0 0 1 .586-1.414l2.28-2.28a2 2 0 0 1 1.414-.586H10"></path>
+            <path d="m20 10-2.5 2.5a2 2 0 0 1-2.828 0L14 12"></path>
+            <path d="M14 4.5 12 2 9.5 4.5"></path><path d="M14 9.5 12 7 9.5 9.5"></path>
+            <path d="M19.5 12 17 14.5l-2.5-2.5"></path>
+            <path d="m14.28 15.14 1.41 1.41a2 2 0 0 1 0 2.83l-1.41 1.41a2 2 0 0 1-2.83 0l-1.41-1.41a2 2 0 0 1 0-2.83l1.41-1.41a2 2 0 0 1 2.83 0Z"></path>
+          </svg>
+          <span>Challenge Complete!</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gold); transform: scaleX(-1);">
+            <path d="M4 14v-2.28a2 2 0 0 1 .586-1.414l2.28-2.28a2 2 0 0 1 1.414-.586H10"></path>
+            <path d="m20 10-2.5 2.5a2 2 0 0 1-2.828 0L14 12"></path>
+            <path d="M14 4.5 12 2 9.5 4.5"></path><path d="M14 9.5 12 7 9.5 9.5"></path>
+            <path d="M19.5 12 17 14.5l-2.5-2.5"></path>
+            <path d="m14.28 15.14 1.41 1.41a2 2 0 0 1 0 2.83l-1.41 1.41a2 2 0 0 1-2.83 0l-1.41-1.41a2 2 0 0 1 0-2.83l1.41-1.41a2 2 0 0 1 2.83 0Z"></path>
+          </svg>
+        </h2>
         <p class="student-name-display" id="studentNameResult"></p>
 
         <div class="badges-section">
@@ -1618,9 +1639,15 @@
   let isMuted = false;
 
   // 2. Mute button logic
+  const SvgIcon = {
+    volume: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>',
+    volumeMute: '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg>'
+  };
+
   document.addEventListener("DOMContentLoaded", () => {
     const muteButton = document.getElementById("muteButton");
     if (muteButton) {
+      muteButton.innerHTML = SvgIcon.volume; // Set initial icon
       muteButton.addEventListener("click", toggleMute);
     }
 
@@ -1637,7 +1664,7 @@
     isMuted = !isMuted;
     const muteButton = document.getElementById("muteButton");
     if (muteButton) {
-      muteButton.textContent = isMuted ? "🔇" : "🔊";
+      muteButton.innerHTML = isMuted ? SvgIcon.volumeMute : SvgIcon.volume;
     }
   }
 
@@ -2142,8 +2169,14 @@
   function showCelebration() {
     const celebration = document.createElement("div");
     celebration.className = "celebration";
-    const emojis = ["🎉", "🌟", "⭐", "✨"];
-    celebration.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    
+    // Replaced emojis with SVGs
+    const svgs = [
+      '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="#fbbf24" stroke="#fff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>',
+      '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="#06b6d4" stroke="#fff" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>',
+      '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--pink);"><path d="M4 14v-2.28a2 2 0 0 1 .586-1.414l2.28-2.28a2 2 0 0 1 1.414-.586H10"></path><path d="m20 10-2.5 2.5a2 2 0 0 1-2.828 0L14 12"></path><path d="M14 4.5 12 2 9.5 4.5"></path><path d="M14 9.5 12 7 9.5 9.5"></path><path d="M19.5 12 17 14.5l-2.5-2.5"></path><path d="m14.28 15.14 1.41 1.41a2 2 0 0 1 0 2.83l-1.41 1.41a2 2 0 0 1-2.83 0l-1.41-1.41a2 2 0 0 1 0-2.83l1.41-1.41a2 2 0 0 1 2.83 0Z"></path></svg>'
+    ];
+    celebration.innerHTML = svgs[Math.floor(Math.random() * svgs.length)];
     document.body.appendChild(celebration);
 
     setTimeout(() => celebration.remove(), 600);
@@ -2151,7 +2184,14 @@
 
   function updateStats() {
     document.getElementById("scoreDisplay").textContent = score;
-    document.getElementById("streakDisplay").textContent = streak > 0 ? `${streak}🔥` : "0";
+    
+    // Replaced '🔥' emoji with an inline SVG
+    const streakDisplay = document.getElementById("streakDisplay");
+    if (streak > 0) {
+      streakDisplay.innerHTML = `${streak} <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -6px; fill: #fbbf24; stroke: #fbbf24;"><path d="M14.5 4.5c1.8 1.8 1.8 4.6 0 6.4s-4.6 1.8-6.4 0-1.8-4.6 0-6.4 4.6-1.8 6.4 0z"></path><path d="M12 22s5-4 5-10c0-4-3-7-5-7s-5 3-5 7c0 6 5 10 5 10z"></path></svg>`;
+    } else {
+      streakDisplay.textContent = "0";
+    }
 
     const progress = signs.length
       ? Math.round((totalAnswered / signs.length) * 100)
@@ -2497,14 +2537,28 @@
 
     // Sort by score
     const sorted = Object.values(studentBest).sort((a, b) => b.score - a.score).slice(0, 10);
+    
+    // --- NEW SVG DEFINITIONS ---
+    const fallbackAvatar = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+    const rankIcon = {
+        1: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#fbbf24" stroke="white" stroke-width="1"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17.5a2.5 2.5 0 0 0 2.5 2.5h0a2.5 2.5 0 0 0 2.5-2.5v-2.84"></path><path d="M12 14.25a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"></path><path d="M12 2v2.21"></path></svg>', // gold
+        2: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#cbd5e1" stroke="white" stroke-width="1"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17.5a2.5 2.5 0 0 0 2.5 2.5h0a2.5 2.5 0 0 0 2.5-2.5v-2.84"></path><path d="M12.5 10.75a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"></path><path d="M9 2v2.21"></path></svg>', // silver
+        3: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#cd7f32" stroke="white" stroke-width="1"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17.5a2.5 2.5 0 0 0 2.5 2.5h0a2.5 2.5 0 0 0 2.5-2.5v-2.84"></path><path d="M15.5 10.75a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"></path><path d="M15 2v2.21"></path></svg>'  // bronze
+    };
+    // --- END NEW DEFINITIONS ---
 
     container.innerHTML = sorted.map((session, index) => {
       const rank = index + 1;
       const topClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
-      const avatar = session.avatar || '👤';
+      
+      // Use SVG fallback if avatar is '👤' or missing
+      const avatar = (session.avatar === "👤" || !session.avatar) ? fallbackAvatar : session.avatar;
+      // Use SVG for rank badge
+      const rankBadge = rankIcon[rank] || rank;
+
       return `
         <div class="leaderboard-item ${topClass}">
-          <div class="rank-badge">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</div>
+          <div class="rank-badge">${rankBadge}</div>
           <div class="player-avatar">${avatar}</div>
           <div class="player-info">
             <div class="player-name">${session.studentName}</div>

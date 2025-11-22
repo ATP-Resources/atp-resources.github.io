@@ -1803,7 +1803,6 @@
 
   // For this demo, I'll complete the basic structure. In production, all 57 signs would have explanations.
   // Game State
-  const auth = window.auth; // Get Auth from the module script
   let currentUser = null; // Variable to track logged-in user
   let currentMode = 'study';
   let currentSignIndex = 0;
@@ -1956,28 +1955,70 @@
     const email = document.getElementById("teacherEmail").value;
     const password = teacherPasswordInput.value;
     
+    console.log("=== LOGIN ATTEMPT ===");
+    console.log("Email:", email);
+    console.log("Password length:", password.length);
+    console.log("Auth object:", auth);
+    console.log("SignIn function:", window.signIn);
+    
+    // Validate inputs
+    if (!email || !password) {
+      loginError.textContent = "Please enter both email and password.";
+      loginError.style.display = "block";
+      return;
+    }
+    
+    // Check if auth is initialized
+    if (!window.auth || !window.signIn) {
+      loginError.textContent = "Authentication not ready. Please refresh the page.";
+      loginError.style.display = "block";
+      console.error("Auth not initialized:", { auth: window.auth, signIn: window.signIn });
+      return;
+    }
+    
     // Disable button to prevent multiple clicks
     teacherLoginBtn.classList.add("disabled");
     teacherLoginBtn.textContent = "Logging in...";
     loginError.style.display = "none";
 
-    window.signIn(auth, email, password)
+    console.log("Calling Firebase signIn...");
+    
+    window.signIn(window.auth, email, password)
       .then((userCredential) => {
         // Sign-in successful.
+        console.log("✅ LOGIN SUCCESS:", userCredential.user);
         currentUser = userCredential.user;
         teacherPasswordInput.value = "";
+        document.getElementById("teacherEmail").value = "";
         teacherLoginBtn.classList.remove("disabled");
         teacherLoginBtn.textContent = "Login";
         showTeacherDashboard();
       })
       .catch((error) => {
         // Handle Errors here.
+        console.error("❌ LOGIN ERROR:", error);
+        console.error("Error code:", error.code);
+        console.error("Error message:", error.message);
+        
         currentUser = null;
-        if (error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-email') {
+        
+        // Detailed error messages
+        if (error.code === 'auth/invalid-credential') {
           loginError.textContent = "Incorrect email or password.";
+        } else if (error.code === 'auth/invalid-email') {
+          loginError.textContent = "Invalid email format.";
+        } else if (error.code === 'auth/user-not-found') {
+          loginError.textContent = "No account found with this email.";
+        } else if (error.code === 'auth/wrong-password') {
+          loginError.textContent = "Incorrect password.";
+        } else if (error.code === 'auth/too-many-requests') {
+          loginError.textContent = "Too many failed attempts. Try again later.";
+        } else if (error.code === 'auth/network-request-failed') {
+          loginError.textContent = "Network error. Check your internet connection.";
         } else {
-          loginError.textContent = "An error occurred. Please try again.";
+          loginError.textContent = `Error: ${error.message}`;
         }
+        
         loginError.style.display = "block";
         teacherLoginBtn.classList.remove("disabled");
         teacherLoginBtn.textContent = "Login";
@@ -2000,7 +2041,7 @@
 
   // Teacher Logout - Firebase Authentication
   function teacherLogout() {
-    window.signOut(auth).then(() => {
+    window.signOut(window.auth).then(() => {
       // Sign-out successful.
       currentUser = null;
       hideAllPages();
@@ -2789,6 +2830,9 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   
+  console.log("🔥 Firebase initialized successfully");
+  console.log("Firebase app:", app);
+  
   // *** Make Firestore and Auth globally available ***
   // We attach them to the 'window' object so your main script can see them.
   window.db = getFirestore(app);
@@ -2800,6 +2844,10 @@
   window.auth = getAuth(app);
   window.signIn = signInWithEmailAndPassword;
   window.signOut = signOut;
+  
+  console.log("🔐 Firebase Auth initialized");
+  console.log("Auth object:", window.auth);
+  console.log("SignIn function:", window.signIn);
 </script>
 
 </body>

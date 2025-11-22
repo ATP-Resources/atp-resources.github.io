@@ -1184,6 +1184,24 @@
         display: none;
       }
     }
+
+    .student-summary {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.8);
+      font-style: italic;
+      margin-top: 8px;
+      grid-column: 1 / -1; /* Make it span all columns */
+      padding: 8px 4px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    /* CSS for the new SVG avatars */
+    .avatar-option svg, .player-avatar svg {
+      width: 40px;
+      height: 40px;
+    }
 </style>
 </head>
 <body>
@@ -1283,24 +1301,12 @@
 
       <div class="input-card">
         <div class="input-group">
-          <label class="input-label" for="teacherEmail">Teacher Email</label>
-          <input
-            type="email"
-            id="teacherEmail"
-            class="input-field"
-            placeholder="Enter your teacher email"
-            autocomplete="email"
-          >
-        </div>
-
-        <div class="input-group">
           <label class="input-label" for="teacherPassword">Password</label>
           <input
             type="password"
             id="teacherPassword"
             class="input-field"
-            placeholder="Enter your password"
-            autocomplete="current-password"
+            placeholder="Enter teacher password"
           >
         </div>
 
@@ -1803,7 +1809,6 @@
 
   // For this demo, I'll complete the basic structure. In production, all 57 signs would have explanations.
   // Game State
-  let currentUser = null; // Variable to track logged-in user
   let currentMode = 'study';
   let currentSignIndex = 0;
   let score = 0;
@@ -1829,6 +1834,9 @@
     { id: 'firsttry', name: 'First Try', icon: '🎯', condition: (data) => data.totalQuestions >= 5 && data.accuracy >= 80 },
     { id: 'dedicated', name: 'Dedicated', icon: '📚', condition: (data) => data.totalQuestions >= 20 }
   ];
+
+  // Teacher password
+  const TEACHER_PASSWORD = 'Katella805';
 
   // DOM Elements
   const landingPage = document.getElementById("landingPage");
@@ -1950,79 +1958,16 @@
     }
   });
 
-  // Teacher Login - Firebase Authentication
+  // Teacher Login
   teacherLoginBtn.addEventListener("click", () => {
-    const email = document.getElementById("teacherEmail").value;
     const password = teacherPasswordInput.value;
-    
-    console.log("=== LOGIN ATTEMPT ===");
-    console.log("Email:", email);
-    console.log("Password length:", password.length);
-    console.log("Auth object:", auth);
-    console.log("SignIn function:", window.signIn);
-    
-    // Validate inputs
-    if (!email || !password) {
-      loginError.textContent = "Please enter both email and password.";
+    if (password === TEACHER_PASSWORD) {
+      loginError.style.display = "none";
+      teacherPasswordInput.value = "";
+      showTeacherDashboard();
+    } else {
       loginError.style.display = "block";
-      return;
     }
-    
-    // Check if auth is initialized
-    if (!window.auth || !window.signIn) {
-      loginError.textContent = "Authentication not ready. Please refresh the page.";
-      loginError.style.display = "block";
-      console.error("Auth not initialized:", { auth: window.auth, signIn: window.signIn });
-      return;
-    }
-    
-    // Disable button to prevent multiple clicks
-    teacherLoginBtn.classList.add("disabled");
-    teacherLoginBtn.textContent = "Logging in...";
-    loginError.style.display = "none";
-
-    console.log("Calling Firebase signIn...");
-    
-    window.signIn(window.auth, email, password)
-      .then((userCredential) => {
-        // Sign-in successful.
-        console.log("✅ LOGIN SUCCESS:", userCredential.user);
-        currentUser = userCredential.user;
-        teacherPasswordInput.value = "";
-        document.getElementById("teacherEmail").value = "";
-        teacherLoginBtn.classList.remove("disabled");
-        teacherLoginBtn.textContent = "Login";
-        showTeacherDashboard();
-      })
-      .catch((error) => {
-        // Handle Errors here.
-        console.error("❌ LOGIN ERROR:", error);
-        console.error("Error code:", error.code);
-        console.error("Error message:", error.message);
-        
-        currentUser = null;
-        
-        // Detailed error messages
-        if (error.code === 'auth/invalid-credential') {
-          loginError.textContent = "Incorrect email or password.";
-        } else if (error.code === 'auth/invalid-email') {
-          loginError.textContent = "Invalid email format.";
-        } else if (error.code === 'auth/user-not-found') {
-          loginError.textContent = "No account found with this email.";
-        } else if (error.code === 'auth/wrong-password') {
-          loginError.textContent = "Incorrect password.";
-        } else if (error.code === 'auth/too-many-requests') {
-          loginError.textContent = "Too many failed attempts. Try again later.";
-        } else if (error.code === 'auth/network-request-failed') {
-          loginError.textContent = "Network error. Check your internet connection.";
-        } else {
-          loginError.textContent = `Error: ${error.message}`;
-        }
-        
-        loginError.style.display = "block";
-        teacherLoginBtn.classList.remove("disabled");
-        teacherLoginBtn.textContent = "Login";
-      });
   });
 
   teacherPasswordInput.addEventListener("keypress", (e) => {
@@ -2031,28 +1976,9 @@
     }
   });
 
-  // Also allow Enter key from email field
-  const teacherEmailInput = document.getElementById("teacherEmail");
-  teacherEmailInput.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-      teacherLoginBtn.click();
-    }
-  });
-
-  // Teacher Logout - Firebase Authentication
   function teacherLogout() {
-    window.signOut(window.auth).then(() => {
-      // Sign-out successful.
-      currentUser = null;
-      hideAllPages();
-      showLanding();
-    }).catch((error) => {
-      // An error happened.
-      console.error("Logout Error: ", error);
-      currentUser = null; // Log them out on the frontend anyway
-      hideAllPages();
-      showLanding();
-    });
+    hideAllPages();
+    showLanding();
   }
 
   // Mode Selection
@@ -2416,6 +2342,81 @@
     localStorage.removeItem('trafficSignSessions');
   }
 
+  // NEW: Algorithm to analyze a student's performance by category
+  // REPLACED with new 4-sentence, IEP-style summary
+  function generateStudentSummary(studentName, studentData) {
+    if (!studentData) return "No category-specific data is available for this student. More sessions are needed to identify trends.";
+
+    let categories = Object.keys(studentData);
+    let strengths = [];
+    let weaknesses = [];
+    let overallCorrect = 0;
+    let overallTotal = 0;
+
+    categories.forEach(cat => {
+      if (!cat || cat === 'undefined') return; // Skip invalid categories
+      const { correct, total } = studentData[cat];
+      if (total > 0) { // Only consider categories they've been tested on
+        const accuracy = (correct / total) * 100;
+        if (accuracy >= 90 && total >= 3) { // Strength: >= 90% and at least 3 questions
+          strengths.push(cat);
+        } else if (accuracy < 70 && total >= 3) { // Focus: < 70% and at least 3 questions
+          weaknesses.push(cat);
+        }
+      }
+      overallCorrect += correct;
+      overallTotal += total;
+    });
+
+    // Check if there's enough data to even make a call.
+    if (overallTotal < 5) { // Threshold: 5 questions total
+      return `${studentName} has begun practice. Additional session data is needed to provide a detailed performance analysis and identify specific trends.`;
+    }
+
+    // Now, build the 3-4 sentence summary.
+    let summarySentences = [];
+    const overallAccuracy = (overallTotal > 0) ? (overallCorrect / overallTotal) * 100 : 0;
+
+    // Sentence 1: Overall Observation
+    if (overallAccuracy >= 85) {
+      summarySentences.push(`${studentName} is demonstrating a high level of proficiency with an overall accuracy of ${overallAccuracy.toFixed(0)}%.`);
+    } else if (overallAccuracy >= 70) {
+      summarySentences.push(`${studentName} is building a solid foundation, currently maintaining an overall accuracy of ${overallAccuracy.toFixed(0)}%.`);
+    } else {
+      summarySentences.push(`${studentName} is in the early stages of skill acquisition and currently demonstrates an overall accuracy of ${overallAccuracy.toFixed(0)}%.`);
+    }
+
+    // Sentence 2: Strengths
+    if (strengths.length > 1) {
+      summarySentences.push(`The data indicates consistent mastery in both ${strengths.join(' and ')} signs.`);
+    } else if (strengths.length === 1) {
+      summarySentences.push(`A clear area of strength is apparent in the ${strengths[0]} signs category.`);
+    } else {
+      summarySentences.push(`The student is developing their skills across all categories, with no single high-mastery area yet identified.`);
+    }
+
+    // Sentence 3: Area of Focus (Weakness)
+    if (weaknesses.length > 1) {
+      summarySentences.push(`Areas identified for additional practice include ${weaknesses.join(' and ')} signs.`);
+    } else if (weaknesses.length === 1) {
+      summarySentences.push(`A specific area for future focus is the ${weaknesses[0]} signs category.`);
+    } else {
+      summarySentences.push(`The student is performing with general consistency across all categories at this time.`);
+    }
+    
+    // Sentence 4: Concluding Recommendation
+    if (weaknesses.length > 0) {
+      summarySentences.push(`Targeted review of these specific sign types will support their continued progress in road safety knowledge.`);
+    } else if (overallAccuracy < 100) {
+      summarySentences.push(`Continued general practice will help solidify and advance their understanding across the board.`);
+    } else {
+      summarySentences.push(`This student has demonstrated excellent mastery. The next step could be more complex, scenario-based challenges.`);
+    }
+
+    // Join them
+    return summarySentences.join(' ');
+  }
+
   // Teacher Dashboard
   function showTeacherDashboard() {
     hideAllPages();
@@ -2428,7 +2429,47 @@
   async function loadTeacherData() {
     const sessions = await getSessions();
     
-    // Calculate overview stats
+    // --- NEW: Analytics Aggregation ---
+    // 1. Create a map of all questions to their categories
+    const signCategoryMap = {};
+    signs.forEach(sign => {
+      signCategoryMap[sign.question] = sign.category;
+      if (sign.scenarioQuestion) {
+        signCategoryMap[sign.scenarioQuestion] = sign.category;
+      }
+    });
+
+    // 2. Aggregate all student data across all sessions
+    const studentAnalytics = {};
+    sessions.forEach(session => {
+      const name = session.studentName;
+      if (!studentAnalytics[name]) {
+        // Initialize with all known categories
+        studentAnalytics[name] = {};
+        signs.forEach(s => {
+          if (s.category && !studentAnalytics[name][s.category]) {
+            studentAnalytics[name][s.category] = { correct: 0, total: 0 };
+          }
+        });
+      }
+
+      // Tally correct/incorrect for each question
+      if (session.questions) {
+        session.questions.forEach(q => {
+          const category = signCategoryMap[q.question];
+          if (category && studentAnalytics[name][category]) {
+            studentAnalytics[name][category].total++;
+            if (q.correct) {
+              studentAnalytics[name][category].correct++;
+            }
+          }
+        });
+      }
+    });
+    // --- END: Analytics Aggregation ---
+
+    
+    // Calculate overview stats (this part is unchanged)
     const totalSessions = sessions.length;
     const totalStudents = new Set(sessions.map(s => s.studentName)).size;
     const avgScore = totalSessions > 0 
@@ -2470,7 +2511,15 @@
     // Sort by most recent first
     sessions.sort((a, b) => new Date(b.endTime) - new Date(a.endTime));
 
-    sessionsContainer.innerHTML = sessions.map(session => `
+    // Build the HTML for each session item
+    sessionsContainer.innerHTML = sessions.map(session => {
+      
+      // --- NEW: Get summary for this session's student ---
+      const analyticsData = studentAnalytics[session.studentName];
+      const summaryText = generateStudentSummary(session.studentName, analyticsData);
+
+      // This is the HTML template for each session
+      return `
       <div class="student-item">
         <div>
           <div class="student-info">${session.studentName}</div>
@@ -2492,8 +2541,14 @@
           <div class="student-stat-label">Date</div>
           <div class="student-stat-value" style="font-size: 12px;">${new Date(session.endTime).toLocaleDateString()}</div>
         </div>
+
+        <!-- NEWLY ADDED SUMMARY DIV -->
+        <div class="student-summary">
+          ${summaryText}
+        </div>
       </div>
-    `).join('');
+      `;
+    }).join('');
   }
 
   async function exportToCSV() {
@@ -2528,7 +2583,15 @@
   // ENHANCED FEATURES: AVATARS, LEADERBOARD, STATISTICS
   // ============================================
   
-  const AVATARS = ["😀", "😎", "🤓", "😃", "🥳", "🤩", "😊", "😇", "🙂", "🤗", "🤠", "👦", "👧", "🧑", "👨", "👩"];
+  // --- NEW AVATARS ARRAY (SVG) - No more emojis ---
+  const AVATARS = [
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="10" r="3"></circle><path d="M7 16c0-2.5 2-4.5 5-4.5s5 2 5 4.5"></path></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M9 9c.5-1 1.5-2 3-2s2.5 1 3 2"></path><path d="M7 16c0-2.5 2-4.5 5-4.5s5 2 5 4.5"></path></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5-2 4-2 4 2 4 2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M16 16c0-2.5-2-4.5-5-4.5S6 13.5 6 16"></path><path d="m9 9 1 1 1-1"></path><path d="m14 9 1 1 1-1"></path></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M15 14c-1 1-2.5 2-4 2s-3-1-4-2"></path><path d="m9 9 1 1 1-1"></path><path d="m14 9 1 1 1-1"></path></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M7 16c0-2.5 2-4.5 5-4.5s5 2 5 4.5"></path><line x1="8" y1="9" x2="16" y2="9"></line></svg>'
+  ];
   let selectedAvatar = "";
 
   // Initialize avatars when page loads
@@ -2609,6 +2672,7 @@
     loadLeaderboard();
   }
 
+  // REPLACED to use SVG avatars and remove emojis
   async function loadLeaderboard() {
     const sessions = await getSessions();
     const container = document.getElementById("leaderboardContainer");
@@ -2630,21 +2694,21 @@
     // Sort by score
     const sorted = Object.values(studentBest).sort((a, b) => b.score - a.score).slice(0, 10);
     
-    // --- NEW SVG DEFINITIONS ---
+    // --- SVG DEFINITIONS ---
     const fallbackAvatar = '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.7;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
     const rankIcon = {
         1: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#fbbf24" stroke="white" stroke-width="1"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17.5a2.5 2.5 0 0 0 2.5 2.5h0a2.5 2.5 0 0 0 2.5-2.5v-2.84"></path><path d="M12 14.25a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Z"></path><path d="M12 2v2.21"></path></svg>', // gold
         2: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#cbd5e1" stroke="white" stroke-width="1"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17.5a2.5 2.5 0 0 0 2.5 2.5h0a2.5 2.5 0 0 0 2.5-2.5v-2.84"></path><path d="M12.5 10.75a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"></path><path d="M9 2v2.21"></path></svg>', // silver
         3: '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="#cd7f32" stroke="white" stroke-width="1"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17.5a2.5 2.5 0 0 0 2.5 2.5h0a2.5 2.5 0 0 0 2.5-2.5v-2.84"></path><path d="M15.5 10.75a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"></path><path d="M15 2v2.21"></path></svg>'  // bronze
     };
-    // --- END NEW DEFINITIONS ---
+    // --- END DEFINITIONS ---
 
     container.innerHTML = sorted.map((session, index) => {
       const rank = index + 1;
       const topClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
       
-      // Use SVG fallback if avatar is '👤' or missing
-      const avatar = (session.avatar === "👤" || !session.avatar) ? fallbackAvatar : session.avatar;
+      // Use SVG fallback if avatar is an emoji or missing
+      const avatar = (session.avatar && session.avatar.startsWith('<svg')) ? session.avatar : fallbackAvatar;
       // Use SVG for rank badge
       const rankBadge = rankIcon[rank] || rank;
 
@@ -2799,21 +2863,13 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
 
-  // *** NEW: Add Firestore (Database) SDKs ***
+  // *** NEW: Add Firestore SDKs ***
   import { 
     getFirestore, 
     collection, 
     addDoc, 
     getDocs 
   } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-  
-  // *** NEW: Add Auth (Login) SDKs ***
-  import { 
-    getAuth, 
-    signInWithEmailAndPassword, 
-    signOut 
-  } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-
 
   // Your web app's Firebase configuration
   const firebaseConfig = {
@@ -2830,24 +2886,12 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   
-  console.log("🔥 Firebase initialized successfully");
-  console.log("Firebase app:", app);
-  
-  // *** Make Firestore and Auth globally available ***
-  // We attach them to the 'window' object so your main script can see them.
+  // *** NEW: Initialize Firestore and make it globally available ***
+  // We attach it to the 'window' object so your main script can see it.
   window.db = getFirestore(app);
   window.db_collection = collection;
   window.db_addDoc = addDoc;
   window.db_getDocs = getDocs;
-
-  // NEW: Make Auth functions global
-  window.auth = getAuth(app);
-  window.signIn = signInWithEmailAndPassword;
-  window.signOut = signOut;
-  
-  console.log("🔐 Firebase Auth initialized");
-  console.log("Auth object:", window.auth);
-  console.log("SignIn function:", window.signIn);
 </script>
 
 </body>

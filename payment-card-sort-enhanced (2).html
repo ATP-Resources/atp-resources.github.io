@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Methods Card Sort</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'abyss': '#003049',
+                        'ivory': '#FDF0D5',
+                        'coral': '#E07A5F',
+                        'sage': '#81B29A',
+                        'gold': '#F2CC8F',
+                        'slate': '#3D405B'
+                    },
+                    fontFamily: {
+                        'display': ['Lexend', 'sans-serif'],
+                        'body': ['Nunito', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Nunito', sans-serif; }
+        h1, h2, h3, h4, button { font-family: 'Lexend', sans-serif; }
+        
+        /* Text Size Classes */
+        .text-size-small { font-size: 0.875rem; }
+        .text-size-medium { font-size: 1rem; }
+        .text-size-large { font-size: 1.25rem; }
+        .text-size-small .card-text { font-size: 0.875rem; }
+        .text-size-medium .card-text { font-size: 1rem; }
+        .text-size-large .card-text { font-size: 1.25rem; }
+        
+        /* High Contrast Mode */
+        .high-contrast { background: #000 !important; }
+        .high-contrast .card { background: #fff !important; border-color: #000 !important; color: #000 !important; }
+        .high-contrast .drop-zone { background: #1a1a1a !important; border: 3px solid #fff !important; }
+        .high-contrast .category-header { background: #fff !important; color: #000 !important; }
+        .high-contrast h1, .high-contrast p, .high-contrast .text-white { color: #fff !important; }
+        .high-contrast .instructions-panel { background: #1a1a1a !important; border: 2px solid #fff !important; }
+        .high-contrast .feedback-box { background: #1a1a1a !important; border: 2px solid #fff !important; }
+        
+        /* Focus Mode */
+        .focus-mode .category-column { display: none; }
+        .focus-mode .category-column.focus-visible { display: flex; }
+        
+        /* Card Styles - Floating style with enhanced shadows */
+        .card {
+            touch-action: none;
+            transition: all 0.2s ease;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        .card:focus { outline: 3px solid #E07A5F; outline-offset: 2px; }
+        .card.selected { outline: 3px solid #E07A5F; background: #fef3c7 !important; }
+        .card.dragging { opacity: 0.5; transform: rotate(2deg) scale(1.02); }
+        .card.correct { 
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0) !important; 
+            border-left: 4px solid #10b981 !important; 
+        }
+        .card.incorrect { 
+            background: linear-gradient(135deg, #fee2e2, #fecaca) !important; 
+            border-left: 4px solid #ef4444 !important; 
+        }
+        .card.hint-flash { animation: hintPulse 0.5s ease 2; }
+        
+        @keyframes hintPulse {
+            0%, 100% { background-color: #fff; }
+            50% { background-color: #fef3c7; }
+        }
+        
+        .drop-zone { 
+            transition: all 0.2s ease;
+            min-height: 200px;
+            border-radius: 0 0 1rem 1rem;
+        }
+        .drop-zone.drag-over { 
+            background: #bfdbfe !important; 
+            outline: 3px dashed #003049;
+            transform: scale(1.01);
+        }
+        .drop-zone:focus { outline: 3px solid #E07A5F; }
+        
+        /* Progress Bar */
+        .progress-fill {
+            transition: width 0.4s ease;
+        }
+        
+        /* Celebration Animation */
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confetti 2s ease-out forwards;
+        }
+        
+        /* Modal Styles */
+        .modal-overlay {
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Speaker Button */
+        .speaker-btn {
+            transition: all 0.2s ease;
+        }
+        .speaker-btn:hover { transform: scale(1.1); }
+        .speaker-btn.speaking { color: #E07A5F; animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Glossary Tooltip */
+        .glossary-term {
+            border-bottom: 2px dotted #E07A5F;
+            cursor: help;
+        }
+        .glossary-tooltip {
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        .glossary-term:hover .glossary-tooltip,
+        .glossary-term:focus .glossary-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        /* Enhanced Feedback Box */
+        .feedback-box {
+            background: linear-gradient(135deg, #FDF0D5, #f5e6c8);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Category Headers with enhanced styling */
+        .category-header {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem 1rem 0 0;
+        }
+        
+        /* Mobile Improvements */
+        @media (max-width: 768px) {
+            .card { min-height: 70px; }
+            .mobile-category-nav { display: flex !important; }
+        }
+        @media (min-width: 769px) {
+            .mobile-category-nav { display: none !important; }
+        }
+        
+        /* Real Life Examples Panel */
+        .examples-panel {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .examples-panel.open {
+            max-height: 500px;
+        }
+        
+        /* Smooth scroll for modals */
+        .modal-content {
+            scrollbar-width: thin;
+            scrollbar-color: #E07A5F #FDF0D5;
+        }
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-content::-webkit-scrollbar-track {
+            background: #FDF0D5;
+            border-radius: 4px;
+        }
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #E07A5F;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-abyss min-h-screen flex flex-col text-size-medium">
+    
+    <!-- Student Selector Modal -->
+    <div id="student-modal" class="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="bg-ivory rounded-2xl p-8 max-w-md w-full shadow-2xl">
+            <h2 class="text-2xl font-bold text-abyss mb-4 flex items-center gap-2">
+                <svg class="w-8 h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"/>
+                </svg>
+                Welcome!
+            </h2>
+            <p class="text-slate mb-6">Who is using the app today?</p>
+            <input type="text" id="student-name-input" placeholder="Enter your name..." 
+                   class="w-full p-4 text-lg rounded-xl border-2 border-abyss/20 focus:border-coral focus:outline-none mb-4">
+            <button id="start-btn" class="w-full bg-sage hover:bg-sage/80 text-white font-bold py-4 px-6 rounded-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                Let's Start!
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Teacher Settings Modal -->
+    <div id="settings-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-ivory rounded-2xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-abyss flex items-center gap-2">
+                    <svg class="w-7 h-7 text-slate" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Teacher Settings
+                </h2>
+                <button id="close-settings" class="text-slate hover:text-coral text-2xl">&times;</button>
+            </div>
+            
+            <div class="space-y-6">
+                <!-- Difficulty Level -->
+                <div>
+                    <label class="block font-bold text-slate mb-2">Difficulty Level</label>
+                    <select id="difficulty-select" class="w-full p-3 rounded-xl border-2 border-abyss/20 focus:border-coral">
+                        <option value="1">Level 1 - Simplified (Fewer cards, 2 categories)</option>
+                        <option value="2" selected>Level 2 - Standard (All categories, simpler text)</option>
+                        <option value="3">Level 3 - Advanced (Full complexity)</option>
+                    </select>
+                </div>
+                
+                <!-- Mode -->
+                <div>
+                    <label class="block font-bold text-slate mb-2">Mode</label>
+                    <select id="mode-select" class="w-full p-3 rounded-xl border-2 border-abyss/20 focus:border-coral">
+                        <option value="learn">Learn Mode (Immediate feedback)</option>
+                        <option value="quiz" selected>Quiz Mode (Check at end)</option>
+                    </select>
+                </div>
+                
+                <!-- Text Size -->
+                <div>
+                    <label class="block font-bold text-slate mb-2">Text Size</label>
+                    <div class="flex gap-2">
+                        <button class="text-size-btn flex-1 p-3 rounded-xl border-2 border-abyss/20 hover:border-coral transition-all" data-size="small">Small</button>
+                        <button class="text-size-btn flex-1 p-3 rounded-xl border-2 border-coral bg-coral/10" data-size="medium">Medium</button>
+                        <button class="text-size-btn flex-1 p-3 rounded-xl border-2 border-abyss/20 hover:border-coral transition-all" data-size="large">Large</button>
+                    </div>
+                </div>
+                
+                <!-- Toggles -->
+                <div class="space-y-3">
+                    <label class="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
+                        <span class="font-semibold text-slate flex items-center gap-2">
+                            <svg class="w-5 h-5 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                            Audio On
+                        </span>
+                        <input type="checkbox" id="audio-toggle" checked class="w-6 h-6 accent-coral">
+                    </label>
+                    <label class="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
+                        <span class="font-semibold text-slate flex items-center gap-2">
+                            <svg class="w-5 h-5 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                            High Contrast Mode
+                        </span>
+                        <input type="checkbox" id="contrast-toggle" class="w-6 h-6 accent-coral">
+                    </label>
+                    <label class="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
+                        <span class="font-semibold text-slate flex items-center gap-2">
+                            <svg class="w-5 h-5 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                            Focus Mode (2 columns)
+                        </span>
+                        <input type="checkbox" id="focus-toggle" class="w-6 h-6 accent-coral">
+                    </label>
+                    <label class="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
+                        <span class="font-semibold text-slate flex items-center gap-2">
+                            <svg class="w-5 h-5 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                            Simpler Text
+                        </span>
+                        <input type="checkbox" id="simple-text-toggle" class="w-6 h-6 accent-coral">
+                    </label>
+                    <label class="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
+                        <span class="font-semibold text-slate flex items-center gap-2">
+                            <svg class="w-5 h-5 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+                            Show Celebrations
+                        </span>
+                        <input type="checkbox" id="celebration-toggle" checked class="w-6 h-6 accent-coral">
+                    </label>
+                    <label class="flex items-center justify-between p-3 bg-white rounded-xl shadow-sm">
+                        <span class="font-semibold text-slate flex items-center gap-2">
+                            <svg class="w-5 h-5 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Show Timer
+                        </span>
+                        <input type="checkbox" id="timer-toggle" class="w-6 h-6 accent-coral">
+                    </label>
+                </div>
+                
+                <!-- Language -->
+                <div>
+                    <label class="block font-bold text-slate mb-2">Language</label>
+                    <select id="language-select" class="w-full p-3 rounded-xl border-2 border-abyss/20 focus:border-coral">
+                        <option value="en" selected>English</option>
+                        <option value="es">Español</option>
+                    </select>
+                </div>
+                
+                <!-- Data Controls -->
+                <div class="pt-4 border-t border-abyss/20">
+                    <button id="view-progress-btn" class="w-full bg-abyss hover:bg-abyss/80 text-white font-bold py-3 px-6 rounded-xl mb-3 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        View Student Progress
+                    </button>
+                    <button id="clear-data-btn" class="w-full bg-coral/20 hover:bg-coral/30 text-coral font-bold py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        Clear All Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress/Teacher Dashboard Modal -->
+    <div id="progress-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-ivory rounded-2xl p-6 max-w-4xl w-full shadow-2xl max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-abyss flex items-center gap-2">
+                    <svg class="w-7 h-7 text-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    Student Progress Dashboard
+                </h2>
+                <button id="close-progress" class="text-slate hover:text-coral text-2xl">&times;</button>
+            </div>
+            
+            <div class="mb-4 flex gap-2 flex-wrap">
+                <select id="date-filter" class="p-2 rounded-xl border-2 border-abyss/20">
+                    <option value="all">All Time</option>
+                    <option value="7">Last 7 Days</option>
+                    <option value="30">This Month</option>
+                </select>
+                <button id="export-csv-btn" class="bg-sage hover:bg-sage/80 text-white font-bold py-2 px-4 rounded-xl transition-all flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    Export CSV
+                </button>
+            </div>
+            
+            <div class="bg-white rounded-xl p-4 mb-4 shadow-sm">
+                <p class="text-sm text-slate mb-2"><strong>Activity Tags:</strong></p>
+                <div class="flex flex-wrap gap-2">
+                    <span class="bg-sage/20 text-sage px-3 py-1 rounded-full text-sm">Independent Living: Money Management</span>
+                    <span class="bg-coral/20 text-coral px-3 py-1 rounded-full text-sm">Financial Literacy: Payment Methods</span>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full bg-white rounded-xl overflow-hidden shadow-sm">
+                    <thead class="bg-abyss text-white">
+                        <tr>
+                            <th class="p-3 text-left">Student</th>
+                            <th class="p-3 text-left">Date</th>
+                            <th class="p-3 text-left">Level</th>
+                            <th class="p-3 text-left">Score</th>
+                            <th class="p-3 text-left">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="progress-table-body">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Glossary Modal -->
+    <div id="glossary-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-ivory rounded-2xl p-6 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-abyss flex items-center gap-2">
+                    <svg class="w-7 h-7 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                    </svg>
+                    Definitions
+                </h2>
+                <button id="close-glossary" class="text-slate hover:text-coral text-2xl">&times;</button>
+            </div>
+            <div class="space-y-4" id="glossary-content">
+                <div class="bg-white p-4 rounded-xl shadow-sm">
+                    <h4 class="font-bold text-coral">Overdraft</h4>
+                    <p class="text-slate">When you spend more money than you have in your bank account. The bank may charge you a fee.</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm">
+                    <h4 class="font-bold text-coral">Interest</h4>
+                    <p class="text-slate">Extra money you pay when you borrow money, or extra money you earn when you save.</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm">
+                    <h4 class="font-bold text-coral">Rewards</h4>
+                    <p class="text-slate">Points, cash back, or miles you earn when you use certain credit cards.</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm">
+                    <h4 class="font-bold text-coral">PIN</h4>
+                    <p class="text-slate">Personal Identification Number - a 4-digit secret code you use with your debit card.</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm">
+                    <h4 class="font-bold text-coral">Credit</h4>
+                    <p class="text-slate">Your reputation for paying back money you borrow. Good credit helps you get loans.</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm">
+                    <h4 class="font-bold text-coral">Balance</h4>
+                    <p class="text-slate">The amount of money in your account, or the amount you owe on a credit card.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Explanations Modal -->
+    <div id="explanations-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-ivory rounded-2xl p-6 max-w-2xl w-full shadow-2xl max-h-[90vh] overflow-y-auto modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-abyss flex items-center gap-2">
+                    <svg class="w-7 h-7 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                    Card Explanations
+                </h2>
+                <button id="close-explanations" class="text-slate hover:text-coral text-2xl">&times;</button>
+            </div>
+            <div class="space-y-3" id="explanations-content">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Reflection Modal -->
+    <div id="reflection-modal" class="modal-overlay fixed inset-0 z-50 hidden items-center justify-center p-4">
+        <div class="bg-ivory rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h2 class="text-2xl font-bold text-abyss mb-4 flex items-center gap-2">
+                <svg class="w-7 h-7 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Reflection Time
+            </h2>
+            <div class="space-y-4">
+                <div>
+                    <p class="font-semibold text-slate mb-2" id="reflection-q1">Which payment method do you think you use most?</p>
+                    <textarea id="reflection-a1" class="w-full p-3 rounded-xl border-2 border-abyss/20 focus:border-coral focus:outline-none" rows="2" placeholder="Type your answer..."></textarea>
+                </div>
+                <div>
+                    <p class="font-semibold text-slate mb-2" id="reflection-q2">What is one thing you learned?</p>
+                    <textarea id="reflection-a2" class="w-full p-3 rounded-xl border-2 border-abyss/20 focus:border-coral focus:outline-none" rows="2" placeholder="Type your answer..."></textarea>
+                </div>
+                <button id="finish-reflection-btn" class="w-full bg-sage hover:bg-sage/80 text-white font-bold py-3 px-6 rounded-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                    Done!
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-7xl mx-auto p-4 md:p-6 flex-1">
+        
+        <!-- Top Bar -->
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-2">
+                <span id="current-student" class="text-white/80 text-sm flex items-center"></span>
+                <span id="timer-display" class="hidden text-white/60 text-sm ml-4 flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span id="timer-text">0:00</span>
+                </span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="glossary-btn" class="bg-gold/20 hover:bg-gold/40 text-gold px-3 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-2" title="View Definitions">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                    Definitions
+                </button>
+                <button id="settings-btn" class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-xl transition-all" title="Teacher Settings (Ctrl+T)">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-white" id="main-title">Payment Methods Card Sort</h1>
+            <p class="text-lg text-white/80 mt-2" id="main-subtitle">Sort each statement into the correct payment method category.</p>
+        </header>
+
+        <!-- Progress Bar -->
+        <div class="bg-white/20 rounded-full h-5 mb-4 overflow-hidden shadow-inner">
+            <div id="progress-bar" class="progress-fill bg-gradient-to-r from-sage to-gold h-full rounded-full flex items-center justify-end pr-2" style="width: 0%">
+                <span id="progress-text" class="text-xs font-bold text-abyss hidden">0%</span>
+            </div>
+        </div>
+
+        <!-- Instructions Panel -->
+        <div id="instructions-panel" class="bg-ivory rounded-2xl p-4 mb-6 instructions-panel shadow-lg">
+            <div class="flex justify-between items-start">
+                <div class="flex-1">
+                    <h3 class="font-bold text-abyss mb-2 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                        How to Play
+                    </h3>
+                    <ol class="text-slate text-sm space-y-1 list-decimal list-inside" id="instructions-list">
+                        <li>Read each card in the "Unsorted Cards" area</li>
+                        <li>Drag the card OR tap it and then tap a category</li>
+                        <li>Drop it into the category you think is correct</li>
+                        <li>When done, click "Check Answers"</li>
+                    </ol>
+                    <p class="text-slate/70 text-sm mt-2 italic" id="example-text">Example: "You need bills and coins" → Cash</p>
+                </div>
+                <div class="flex flex-col gap-2 ml-4">
+                    <button id="read-instructions-btn" class="speaker-btn bg-coral/20 hover:bg-coral/30 text-coral p-2 rounded-xl" title="Read Instructions Aloud">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                    </button>
+                    <button id="view-example-btn" class="bg-sage/20 hover:bg-sage/30 text-sage px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1" title="View Example">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                        Example
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real Life Examples Panel -->
+        <div class="mb-6">
+            <button id="toggle-examples-btn" class="text-gold hover:text-gold/80 text-sm font-semibold flex items-center gap-2">
+                <span id="examples-arrow">▶</span> Real Life Examples
+            </button>
+            <div id="examples-panel" class="examples-panel bg-ivory rounded-2xl mt-2 p-4 shadow-lg">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-white p-3 rounded-xl shadow-sm">
+                        <h4 class="font-bold text-sage flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Cash
+                        </h4>
+                        <p class="text-slate text-sm">Buying a snack at the cafeteria with dollar bills</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl shadow-sm">
+                        <h4 class="font-bold text-coral flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            Credit Card
+                        </h4>
+                        <p class="text-slate text-sm">Paying for gas and earning reward points</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl shadow-sm">
+                        <h4 class="font-bold text-abyss flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                            Online Banking
+                        </h4>
+                        <p class="text-slate text-sm">Using your phone app to pay an electric bill</p>
+                    </div>
+                    <div class="bg-white p-3 rounded-xl shadow-sm">
+                        <h4 class="font-bold text-gold flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                            Debit Card
+                        </h4>
+                        <p class="text-slate text-sm">Swiping your card at Walmart and entering your PIN</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unsorted Cards Deck -->
+        <div class="bg-ivory p-4 md:p-6 rounded-2xl shadow-2xl mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold text-abyss" id="unsorted-title">Unsorted Cards</h2>
+                <span id="cards-remaining" class="bg-abyss/10 text-abyss px-3 py-1 rounded-full text-sm font-semibold"></span>
+            </div>
+            <div id="card-deck" class="flex flex-wrap gap-4 min-h-[100px] bg-white/50 p-4 rounded-xl shadow-inner" 
+                 role="list" aria-label="Unsorted cards" tabindex="0">
+                <!-- Cards inserted by JS -->
+            </div>
+        </div>
+
+        <!-- Mobile Category Navigation -->
+        <div class="mobile-category-nav hidden justify-center gap-2 mb-4">
+            <button class="mobile-nav-btn bg-ivory text-abyss px-4 py-2 rounded-xl font-semibold flex items-center gap-1" data-show="0,1">
+                <svg class="w-5 h-5 text-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <svg class="w-5 h-5 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            </button>
+            <button class="mobile-nav-btn bg-white/20 text-white px-4 py-2 rounded-xl font-semibold flex items-center gap-1" data-show="2,3">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            </button>
+        </div>
+
+        <!-- Category Columns -->
+        <div id="categories" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            <!-- Cash Column -->
+            <div class="category-column flex flex-col focus-visible" data-index="0">
+                <h3 class="category-header flex items-center justify-center text-lg font-bold text-abyss bg-ivory p-4 gap-3">
+                    <svg class="w-8 h-8 text-sage" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span id="cat-cash-label">Cash</span>
+                </h3>
+                <div id="cash" class="drop-zone bg-ivory/80 shadow-lg p-4 flex-1 flex flex-col gap-3" 
+                     data-category="cash" role="list" aria-label="Cash category" tabindex="0">
+                </div>
+            </div>
+
+            <!-- Credit Card Column -->
+            <div class="category-column flex flex-col focus-visible" data-index="1">
+                <h3 class="category-header flex items-center justify-center text-lg font-bold text-abyss bg-ivory p-4 gap-3">
+                    <svg class="w-8 h-8 text-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                    <span id="cat-credit-label">Credit Card</span>
+                </h3>
+                <div id="credit" class="drop-zone bg-ivory/80 shadow-lg p-4 flex-1 flex flex-col gap-3" 
+                     data-category="credit" role="list" aria-label="Credit Card category" tabindex="0">
+                </div>
+            </div>
+
+            <!-- Online Banking Column -->
+            <div class="category-column flex flex-col" data-index="2">
+                <h3 class="category-header flex items-center justify-center text-lg font-bold text-abyss bg-ivory p-4 gap-3">
+                    <svg class="w-8 h-8 text-abyss" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    <span id="cat-online-label">Online Banking</span>
+                </h3>
+                <div id="online" class="drop-zone bg-ivory/80 shadow-lg p-4 flex-1 flex flex-col gap-3" 
+                     data-category="online" role="list" aria-label="Online Banking category" tabindex="0">
+                </div>
+            </div>
+
+            <!-- Debit Card Column -->
+            <div class="category-column flex flex-col" data-index="3">
+                <h3 class="category-header flex items-center justify-center text-lg font-bold text-abyss bg-ivory p-4 gap-3">
+                    <svg class="w-8 h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                    </svg>
+                    <span id="cat-debit-label">Debit Card</span>
+                </h3>
+                <div id="debit" class="drop-zone bg-ivory/80 shadow-lg p-4 flex-1 flex flex-col gap-3" 
+                     data-category="debit" role="list" aria-label="Debit Card category" tabindex="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons & Feedback -->
+        <footer class="mt-8">
+            <div class="flex flex-wrap justify-center gap-4">
+                <button id="check-btn" class="bg-sage hover:bg-sage/80 text-white font-bold py-3 px-8 rounded-2xl shadow-lg transition-all transform hover:scale-105 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    Check Answers
+                </button>
+                <button id="soft-reset-btn" class="bg-gold hover:bg-gold/80 text-abyss font-bold py-3 px-6 rounded-2xl shadow-lg transition-all transform hover:scale-105 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/></svg>
+                    Try Again
+                </button>
+                <button id="reset-btn" class="bg-coral hover:bg-coral/80 text-white font-bold py-3 px-6 rounded-2xl shadow-lg transition-all transform hover:scale-105 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    New Round
+                </button>
+            </div>
+            
+            <!-- Enhanced Feedback Area -->
+            <div id="feedback-area" class="mt-6 hidden">
+                <div class="feedback-box rounded-2xl p-6 max-w-2xl mx-auto">
+                    <!-- Main Message -->
+                    <div id="feedback-message" class="text-2xl font-bold text-center mb-4"></div>
+                    
+                    <!-- Score Display -->
+                    <div class="bg-white rounded-xl p-4 mb-4 shadow-sm">
+                        <p class="text-abyss font-bold text-lg text-center" id="score-text"></p>
+                        
+                        <!-- Visual Score Bar -->
+                        <div class="mt-3 bg-slate/10 rounded-full h-4 overflow-hidden">
+                            <div id="score-bar" class="h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Category Breakdown -->
+                    <div class="mb-4">
+                        <p class="font-semibold text-slate text-sm mb-2 text-center">Category Breakdown:</p>
+                        <div id="category-breakdown" class="flex flex-wrap justify-center gap-2"></div>
+                    </div>
+                    
+                    <!-- Action Button -->
+                    <div class="flex justify-center">
+                        <button id="show-explanations-btn" class="bg-abyss hover:bg-abyss/80 text-white px-6 py-3 rounded-xl font-semibold transition-all transform hover:scale-105 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            Show Explanations
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hint Display (for Learn Mode) -->
+            <div id="hint-display" class="mt-4 text-center hidden">
+                <p class="bg-gold/20 text-gold px-4 py-2 rounded-xl inline-block font-semibold"></p>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Keyboard Shortcuts Help -->
+    <div class="fixed bottom-4 left-4 text-white/40 text-xs hidden md:block">
+        Press <kbd class="bg-white/20 px-1 rounded">Tab</kbd> to navigate • <kbd class="bg-white/20 px-1 rounded">Enter</kbd> to select/drop • <kbd class="bg-white/20 px-1 rounded">Ctrl+T</kbd> Teacher Settings
+    </div>
+
+    <script>
+    // ============================================
+    // PAYMENT METHODS CARD SORT - ENHANCED APP
+    // ============================================
+
+    // --- CARD DATA ---
+    const cardsDataFull = [
+        { id: 'a', text: "This 'feels' the most like you are spending money.", simpleText: "You can see and touch this money.", answer: 'cash', explanation: "Cash is physical money you hold, so spending it feels more real." },
+        { id: 'b', text: "This requires a 4-digit PIN number to be entered in order to make a purchase.", simpleText: "You type a 4-number code to pay.", answer: 'debit', explanation: "Debit cards need your PIN to take money from your bank account." },
+        { id: 'c', text: "This method can be used for emergencies or unexpected expenses.", simpleText: "Good for surprise costs when you don't have cash.", answer: 'credit', explanation: "Credit cards let you borrow money for emergencies." },
+        { id: 'd', text: "It is not possible to spend more than what is in your bank account with this payment method.", simpleText: "You can only spend what you have saved.", answer: 'debit', explanation: "Debit cards only let you spend money already in your account." },
+        { id: 'e', text: "You can set up automatic payments for monthly bills like rent and utilities.", simpleText: "Your bills can pay themselves every month.", answer: 'online', explanation: "Online banking allows automatic scheduled payments." },
+        { id: 'f', text: "It can be inconvenient if you need to carry large amounts of this for a purchase.", simpleText: "It's hard to carry a lot of this around.", answer: 'cash', explanation: "Carrying large amounts of cash can be risky and inconvenient." },
+        { id: 'g', text: "You can send money to anyone using their email or phone number.", simpleText: "You can send money to friends using their email or phone.", answer: 'online', explanation: "Online banking services like Zelle or Venmo use email/phone to transfer money." },
+        { id: 'h', text: "Many people get into debt using this payment method because they tend to overspend.", simpleText: "People often owe money because they spend too much.", answer: 'credit', explanation: "Credit cards make it easy to spend more than you can afford." },
+        { id: 'i', text: "This helps build good credit when used responsibly.", simpleText: "Using this the right way helps you borrow money later.", answer: 'credit', explanation: "Paying credit card bills on time improves your credit score." },
+        { id: 'j', text: "You can get cash back at many stores without needing to visit a bank or an ATM.", simpleText: "Stores can give you cash when you buy things.", answer: 'debit', explanation: "Many stores offer cash back when you use a debit card." },
+        { id: 'k', text: "You will be charged interest if the balance is not completely paid off.", simpleText: "You pay extra money if you don't pay the full bill.", answer: 'credit', explanation: "Credit cards charge interest on unpaid balances." },
+        { id: 'l', text: "Many companies allow members to earn rewards for each purchase made with this type of payment.", simpleText: "You can earn points or prizes when you buy things.", answer: 'credit', explanation: "Many credit cards offer rewards programs." },
+        { id: 'm', text: "Using a public device or network could put your personal information at risk when this payment method is used.", simpleText: "Public WiFi can be dangerous for this.", answer: 'online', explanation: "Online banking on public networks can expose your info to hackers." },
+        { id: 'n', text: "If you try to spend more than what is already in your account, you will be charged an overdraft fee.", simpleText: "You pay a fee if you spend more than you have.", answer: 'debit', explanation: "Banks charge overdraft fees when debit purchases exceed your balance." },
+        { id: 'o', text: "You can pay bills and transfer money to other accounts or people using this method.", simpleText: "You can send money and pay bills from your phone.", answer: 'online', explanation: "Online banking lets you pay bills and transfer money digitally." },
+        { id: 'p', text: "You cannot make online purchases using this method.", simpleText: "You can't buy things on the internet with this.", answer: 'cash', explanation: "Physical cash cannot be used for online shopping." }
+    ];
+
+    // Level 1: Simplified set (fewer cards, 2 categories)
+    const cardsDataLevel1 = [
+        { id: 'a', text: "You can see and touch this money.", simpleText: "You can see and touch this money.", answer: 'cash', explanation: "Cash is physical money you hold." },
+        { id: 'f', text: "It's hard to carry a lot of this around.", simpleText: "It's hard to carry a lot of this around.", answer: 'cash', explanation: "Cash can be bulky to carry." },
+        { id: 'p', text: "You can't buy things on the internet with this.", simpleText: "You can't buy things on the internet with this.", answer: 'cash', explanation: "Cash cannot be used online." },
+        { id: 'b', text: "You swipe a card and type a 4-number code.", simpleText: "You swipe a card and type a 4-number code.", answer: 'card', explanation: "Cards use PINs or signatures." },
+        { id: 'c', text: "A small plastic card that fits in your wallet.", simpleText: "A small plastic card that fits in your wallet.", answer: 'card', explanation: "Debit and credit cards are plastic." },
+        { id: 'd', text: "The store machine reads a chip or stripe.", simpleText: "The store machine reads a chip or stripe.", answer: 'card', explanation: "Cards have chips and magnetic stripes." }
+    ];
+
+    // Translations
+    const translations = {
+        en: {
+            title: "Payment Methods Card Sort",
+            subtitle: "Sort each statement into the correct payment method category.",
+            unsorted: "Unsorted Cards",
+            cash: "Cash",
+            credit: "Credit Card",
+            online: "Online Banking",
+            debit: "Debit Card",
+            card: "Card",
+            checkAnswers: "Check Answers",
+            tryAgain: "Try Again",
+            newRound: "New Round",
+            correct: "Correct!",
+            incorrect: "Not quite right.",
+            allCorrect: "All Correct! Amazing job!",
+            someWrong: "Not Quite! Cards in red need to move.",
+            dragFirst: "Sort all cards first!",
+            cardsLeft: "cards left",
+            instructions: [
+                "Read each card in the \"Unsorted Cards\" area",
+                "Drag the card OR tap it and then tap a category",
+                "Drop it into the category you think is correct",
+                "When done, click \"Check Answers\""
+            ],
+            example: "Example: \"You need bills and coins\" → Cash",
+            reflectionQ1: "Which payment method do you think you use most?",
+            reflectionQ2: "What is one thing you learned?",
+            hint: "Hint: "
+        },
+        es: {
+            title: "Clasificación de Métodos de Pago",
+            subtitle: "Ordena cada frase en la categoría de pago correcta.",
+            unsorted: "Tarjetas Sin Ordenar",
+            cash: "Efectivo",
+            credit: "Tarjeta de Crédito",
+            online: "Banca en Línea",
+            debit: "Tarjeta de Débito",
+            card: "Tarjeta",
+            checkAnswers: "Verificar Respuestas",
+            tryAgain: "Intentar de Nuevo",
+            newRound: "Nueva Ronda",
+            correct: "¡Correcto!",
+            incorrect: "No del todo correcto.",
+            allCorrect: "¡Todo correcto! ¡Buen trabajo!",
+            someWrong: "¡Casi! Las tarjetas rojas necesitan moverse.",
+            dragFirst: "¡Primero ordena todas las tarjetas!",
+            cardsLeft: "tarjetas restantes",
+            instructions: [
+                "Lee cada tarjeta en el área de \"Tarjetas Sin Ordenar\"",
+                "Arrastra la tarjeta O tócala y luego toca una categoría",
+                "Suéltala en la categoría que crees correcta",
+                "Cuando termines, haz clic en \"Verificar Respuestas\""
+            ],
+            example: "Ejemplo: \"Necesitas billetes y monedas\" → Efectivo",
+            reflectionQ1: "¿Qué método de pago crees que usas más?",
+            reflectionQ2: "¿Qué aprendiste hoy?",
+            hint: "Pista: "
+        }
+    };
+
+    // Hints for Learn Mode
+    const hints = {
+        cash: ["Try a method with physical bills and coins.", "Think about what you'd use at a yard sale."],
+        credit: ["Try a method where you borrow money.", "Think about earning rewards or building credit."],
+        online: ["Try a method you use on your phone or computer.", "Think about paying bills from home."],
+        debit: ["Try a method that takes money directly from your bank.", "Think about using your PIN at a store."],
+        card: ["Try a method with a plastic card.", "Think about swiping or inserting at a store."]
+    };
+
+    // --- APP STATE ---
+    let state = {
+        studentName: '',
+        difficulty: 2,
+        mode: 'quiz',
+        textSize: 'medium',
+        audioOn: true,
+        highContrast: false,
+        focusMode: false,
+        simpleText: false,
+        showCelebrations: true,
+        showTimer: false,
+        language: 'en',
+        currentCards: [],
+        selectedCard: null,
+        startTime: null,
+        timerInterval: null,
+        focusColumns: [0, 1]
+    };
+
+    // --- DOM ELEMENTS ---
+    const elements = {
+        studentModal: document.getElementById('student-modal'),
+        studentNameInput: document.getElementById('student-name-input'),
+        startBtn: document.getElementById('start-btn'),
+        settingsModal: document.getElementById('settings-modal'),
+        settingsBtn: document.getElementById('settings-btn'),
+        closeSettings: document.getElementById('close-settings'),
+        progressModal: document.getElementById('progress-modal'),
+        closeProgress: document.getElementById('close-progress'),
+        viewProgressBtn: document.getElementById('view-progress-btn'),
+        glossaryModal: document.getElementById('glossary-modal'),
+        glossaryBtn: document.getElementById('glossary-btn'),
+        closeGlossary: document.getElementById('close-glossary'),
+        explanationsModal: document.getElementById('explanations-modal'),
+        closeExplanations: document.getElementById('close-explanations'),
+        showExplanationsBtn: document.getElementById('show-explanations-btn'),
+        reflectionModal: document.getElementById('reflection-modal'),
+        finishReflectionBtn: document.getElementById('finish-reflection-btn'),
+        cardDeck: document.getElementById('card-deck'),
+        dropZones: document.querySelectorAll('.drop-zone'),
+        categoryColumns: document.querySelectorAll('.category-column'),
+        checkBtn: document.getElementById('check-btn'),
+        softResetBtn: document.getElementById('soft-reset-btn'),
+        resetBtn: document.getElementById('reset-btn'),
+        feedbackArea: document.getElementById('feedback-area'),
+        feedbackMessage: document.getElementById('feedback-message'),
+        scoreText: document.getElementById('score-text'),
+        scoreBar: document.getElementById('score-bar'),
+        categoryBreakdown: document.getElementById('category-breakdown'),
+        hintDisplay: document.getElementById('hint-display'),
+        progressBar: document.getElementById('progress-bar'),
+        progressText: document.getElementById('progress-text'),
+        cardsRemaining: document.getElementById('cards-remaining'),
+        currentStudent: document.getElementById('current-student'),
+        timerDisplay: document.getElementById('timer-display'),
+        readInstructionsBtn: document.getElementById('read-instructions-btn'),
+        viewExampleBtn: document.getElementById('view-example-btn'),
+        toggleExamplesBtn: document.getElementById('toggle-examples-btn'),
+        examplesPanel: document.getElementById('examples-panel'),
+        examplesArrow: document.getElementById('examples-arrow'),
+        difficultySelect: document.getElementById('difficulty-select'),
+        modeSelect: document.getElementById('mode-select'),
+        audioToggle: document.getElementById('audio-toggle'),
+        contrastToggle: document.getElementById('contrast-toggle'),
+        focusToggle: document.getElementById('focus-toggle'),
+        simpleTextToggle: document.getElementById('simple-text-toggle'),
+        celebrationToggle: document.getElementById('celebration-toggle'),
+        timerToggle: document.getElementById('timer-toggle'),
+        languageSelect: document.getElementById('language-select'),
+        clearDataBtn: document.getElementById('clear-data-btn'),
+        exportCsvBtn: document.getElementById('export-csv-btn'),
+        dateFilter: document.getElementById('date-filter'),
+        progressTableBody: document.getElementById('progress-table-body')
+    };
+
+    // --- AUDIO (Web Speech API) ---
+    function speak(text) {
+        if (!state.audioOn || !('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.lang = state.language === 'es' ? 'es-ES' : 'en-US';
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function playSound(type) {
+        if (!state.audioOn) return;
+        
+        try {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'correct') {
+                oscillator.frequency.value = 523.25; // C5
+                gainNode.gain.value = 0.3;
+                oscillator.start();
+                setTimeout(() => {
+                    oscillator.frequency.value = 659.25; // E5
+                }, 100);
+                setTimeout(() => {
+                    oscillator.frequency.value = 783.99; // G5
+                }, 200);
+                setTimeout(() => {
+                    oscillator.stop();
+                    audioCtx.close();
+                }, 400);
+            } else if (type === 'incorrect') {
+                oscillator.frequency.value = 200;
+                gainNode.gain.value = 0.2;
+                oscillator.start();
+                setTimeout(() => {
+                    oscillator.stop();
+                    audioCtx.close();
+                }, 200);
+            } else if (type === 'celebration') {
+                oscillator.frequency.value = 523.25;
+                gainNode.gain.value = 0.3;
+                oscillator.start();
+                [659.25, 783.99, 1046.50].forEach((freq, i) => {
+                    setTimeout(() => { oscillator.frequency.value = freq; }, (i + 1) * 150);
+                });
+                setTimeout(() => {
+                    oscillator.stop();
+                    audioCtx.close();
+                }, 600);
+            }
+        } catch (e) {
+            console.log('Audio not available:', e);
+        }
+    }
+
+    // --- LOCALIZATION ---
+    function updateLanguage() {
+        const t = translations[state.language];
+        document.getElementById('main-title').textContent = t.title;
+        document.getElementById('main-subtitle').textContent = t.subtitle;
+        document.getElementById('unsorted-title').textContent = t.unsorted;
+        document.getElementById('cat-cash-label').textContent = state.difficulty === 1 ? t.cash : t.cash;
+        document.getElementById('cat-credit-label').textContent = state.difficulty === 1 ? t.card : t.credit;
+        document.getElementById('cat-online-label').textContent = t.online;
+        document.getElementById('cat-debit-label').textContent = t.debit;
+        elements.checkBtn.innerHTML = t.checkAnswers;
+        elements.softResetBtn.innerHTML = t.tryAgain;
+        elements.resetBtn.innerHTML = t.newRound;
+        document.getElementById('example-text').textContent = t.example;
+        document.getElementById('reflection-q1').textContent = t.reflectionQ1;
+        document.getElementById('reflection-q2').textContent = t.reflectionQ2;
+        
+        const instructionsList = document.getElementById('instructions-list');
+        instructionsList.innerHTML = t.instructions.map(i => `<li>${i}</li>`).join('');
+    }
+
+    // --- CARD CREATION ---
+    function getCardsForLevel() {
+        if (state.difficulty === 1) {
+            return [...cardsDataLevel1];
+        }
+        return [...cardsDataFull];
+    }
+
+    function createCardElement(cardData) {
+        const card = document.createElement('div');
+        card.id = `card-${cardData.id}`;
+        card.className = 'card border-l-4 border-abyss/30 cursor-grab';
+        card.draggable = true;
+        card.dataset.answer = cardData.answer;
+        card.dataset.explanation = cardData.explanation;
+        card.setAttribute('role', 'listitem');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('aria-label', cardData.text);
+
+        const text = state.simpleText && cardData.simpleText ? cardData.simpleText : cardData.text;
+        
+        const safeText = text.replace(/'/g, "\\'").replace(/"/g, "&quot;");
+        card.innerHTML = `
+            <span class="font-bold text-lg text-abyss/60 mr-3 flex-shrink-0">${cardData.id.toUpperCase()}</span>
+            <span class="card-text text-slate flex-1">${text}</span>
+            <button class="speaker-btn ml-2 text-abyss/40 hover:text-coral p-1 flex-shrink-0" title="Read aloud" data-text="${safeText}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+            </button>
+        `;
+        
+        // Add speaker button event listener
+        const speakerBtn = card.querySelector('.speaker-btn');
+        speakerBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            speak(text);
+            speakerBtn.classList.add('speaking');
+            setTimeout(() => speakerBtn.classList.remove('speaking'), 2000);
+        });
+
+        // Drag events
+        card.addEventListener('dragstart', dragStart);
+        card.addEventListener('dragend', dragEnd);
+        
+        // Click/tap for tap-to-move
+        card.addEventListener('click', (e) => {
+            if (e.target.classList.contains('speaker-btn')) return;
+            handleCardClick(card);
+        });
+        
+        // Keyboard support
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleCardClick(card);
+            }
+        });
+
+        return card;
+    }
+
+    // --- DRAG AND DROP ---
+    let draggedCard = null;
+
+    function dragStart(e) {
+        draggedCard = e.target.closest('.card');
+        setTimeout(() => draggedCard?.classList.add('dragging'), 0);
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', draggedCard?.id || '');
+    }
+
+    function dragEnd() {
+        if (draggedCard) {
+            draggedCard.classList.remove('dragging');
+        }
+        draggedCard = null;
+        elements.dropZones.forEach(zone => zone.classList.remove('drag-over'));
+    }
+
+    function dragOver(e) {
+        e.preventDefault();
+    }
+
+    function dragEnter(e) {
+        e.preventDefault();
+        const dropZone = e.target.closest('.drop-zone');
+        if (dropZone) {
+            dropZone.classList.add('drag-over');
+        }
+    }
+
+    function dragLeave(e) {
+        const dropZone = e.target.closest('.drop-zone');
+        if (dropZone && !dropZone.contains(e.relatedTarget)) {
+            dropZone.classList.remove('drag-over');
+        }
+    }
+
+    function drop(e) {
+        e.preventDefault();
+        const dropZone = e.target.closest('.drop-zone');
+        if (dropZone && draggedCard) {
+            handleCardPlacement(draggedCard, dropZone);
+        }
+    }
+
+    // --- TAP TO MOVE ---
+    function handleCardClick(card) {
+        // If a card is already selected, deselect it
+        if (state.selectedCard === card) {
+            card.classList.remove('selected');
+            state.selectedCard = null;
+            return;
+        }
+        
+        // If another card is selected, deselect it first
+        if (state.selectedCard) {
+            state.selectedCard.classList.remove('selected');
+        }
+        
+        // Select this card
+        card.classList.add('selected');
+        state.selectedCard = card;
+        speak("Card selected. Tap a category to place it.");
+    }
+
+    function handleZoneClick(zone) {
+        if (state.selectedCard) {
+            handleCardPlacement(state.selectedCard, zone);
+            state.selectedCard.classList.remove('selected');
+            state.selectedCard = null;
+        }
+    }
+
+    function handleCardPlacement(card, dropZone) {
+        const correctAnswer = card.dataset.answer;
+        const zoneCategory = dropZone.dataset.category;
+        
+        // Clear previous feedback
+        card.classList.remove('correct', 'incorrect', 'hint-flash');
+        
+        // In Learn Mode, give immediate feedback
+        if (state.mode === 'learn') {
+            if (correctAnswer === zoneCategory || (state.difficulty === 1 && isLevel1Match(correctAnswer, zoneCategory))) {
+                dropZone.appendChild(card);
+                card.classList.add('correct');
+                playSound('correct');
+                speak(translations[state.language].correct);
+            } else {
+                card.classList.add('hint-flash');
+                showHint(correctAnswer);
+                playSound('incorrect');
+                // Don't move the card, snap back
+                return;
+            }
+        } else {
+            // Quiz mode - just move the card
+            dropZone.appendChild(card);
+        }
+        
+        dropZone.classList.remove('drag-over');
+        updateProgress();
+        elements.hintDisplay.classList.add('hidden');
+    }
+
+    function isLevel1Match(answer, category) {
+        // Level 1 has only 'cash' and 'card' (mapped to credit zone)
+        if (answer === 'cash' && category === 'cash') return true;
+        if (answer === 'card' && category === 'credit') return true;
+        return false;
+    }
+
+    function showHint(correctCategory) {
+        const hintArray = hints[correctCategory] || hints.cash;
+        const hint = hintArray[Math.floor(Math.random() * hintArray.length)];
+        const t = translations[state.language];
+        elements.hintDisplay.querySelector('p').textContent = t.hint + hint;
+        elements.hintDisplay.classList.remove('hidden');
+        speak(hint);
+    }
+
+    // --- PROGRESS ---
+    function updateProgress() {
+        const totalCards = state.currentCards.length;
+        const cardsInDeck = elements.cardDeck.querySelectorAll('.card').length;
+        const cardsPlaced = totalCards - cardsInDeck;
+        const percent = totalCards > 0 ? Math.round((cardsPlaced / totalCards) * 100) : 0;
+        
+        elements.progressBar.style.width = `${percent}%`;
+        elements.cardsRemaining.textContent = `${cardsInDeck} ${translations[state.language].cardsLeft}`;
+        
+        // Show percentage in progress bar when > 20%
+        if (percent > 20) {
+            elements.progressText.textContent = `${percent}%`;
+            elements.progressText.classList.remove('hidden');
+        } else {
+            elements.progressText.classList.add('hidden');
+        }
+    }
+
+    // --- CHECK ANSWERS ---
+    function checkAnswers() {
+        const t = translations[state.language];
+        let correct = 0;
+        let total = 0;
+        const categoryErrors = { cash: 0, credit: 0, online: 0, debit: 0 };
+        const categoryCorrect = { cash: 0, credit: 0, online: 0, debit: 0 };
+
+        elements.dropZones.forEach(zone => {
+            const zoneCategory = zone.dataset.category;
+            const cards = zone.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                total++;
+                const answer = card.dataset.answer;
+                const isCorrect = answer === zoneCategory || (state.difficulty === 1 && isLevel1Match(answer, zoneCategory));
+                
+                if (isCorrect) {
+                    card.classList.add('correct');
+                    card.classList.remove('incorrect');
+                    correct++;
+                    categoryCorrect[zoneCategory]++;
+                } else {
+                    card.classList.add('incorrect');
+                    card.classList.remove('correct');
+                    categoryErrors[zoneCategory]++;
+                }
+            });
+        });
+
+        // Cards still in deck are incorrect
+        const deckCards = elements.cardDeck.querySelectorAll('.card');
+        deckCards.forEach(card => {
+            card.classList.add('incorrect');
+            card.classList.remove('correct');
+        });
+
+        // Show feedback
+        elements.feedbackArea.classList.remove('hidden');
+        
+        const percent = total > 0 ? Math.round(correct/total*100) : 0;
+        
+        if (deckCards.length > 0) {
+            elements.feedbackMessage.textContent = t.dragFirst;
+            elements.feedbackMessage.className = 'text-2xl font-bold text-center mb-4 text-gold';
+            elements.scoreBar.style.width = '0%';
+            elements.scoreBar.className = 'h-full rounded-full transition-all duration-500 bg-gold';
+        } else if (correct === total) {
+            elements.feedbackMessage.textContent = t.allCorrect;
+            elements.feedbackMessage.className = 'text-2xl font-bold text-center mb-4 text-sage';
+            elements.scoreBar.style.width = '100%';
+            elements.scoreBar.className = 'h-full rounded-full transition-all duration-500 bg-gradient-to-r from-sage to-emerald-400';
+            playSound('celebration');
+            if (state.showCelebrations) {
+                showCelebration();
+            }
+            saveProgress(correct, total);
+            setTimeout(() => {
+                elements.reflectionModal.classList.remove('hidden');
+                elements.reflectionModal.classList.add('flex');
+            }, 2000);
+        } else {
+            elements.feedbackMessage.textContent = t.someWrong;
+            elements.feedbackMessage.className = 'text-2xl font-bold text-center mb-4 text-coral';
+            elements.scoreBar.style.width = `${percent}%`;
+            elements.scoreBar.className = 'h-full rounded-full transition-all duration-500 bg-gradient-to-r from-coral to-gold';
+            playSound('incorrect');
+            saveProgress(correct, total);
+        }
+
+        elements.scoreText.textContent = `You got ${correct} out of ${total} correct (${percent}%)`;
+        
+        // Category breakdown with SVG icons
+        elements.categoryBreakdown.innerHTML = '';
+        const categoryIcons = {
+            cash: '<svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>Cash',
+            credit: '<svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>Credit',
+            online: '<svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>Online',
+            debit: '<svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>Debit'
+        };
+        for (const [cat, errors] of Object.entries(categoryErrors)) {
+            if (state.difficulty === 1 && (cat === 'online' || cat === 'debit')) continue;
+            const correctCount = categoryCorrect[cat];
+            const totalInCat = correctCount + errors;
+            const color = errors === 0 ? 'bg-sage/20 text-sage border border-sage/30' : 'bg-coral/20 text-coral border border-coral/30';
+            elements.categoryBreakdown.innerHTML += `
+                <span class="${color} px-3 py-1 rounded-full text-sm font-semibold flex items-center">
+                    ${categoryIcons[cat]}: ${correctCount}/${totalInCat}
+                </span>
+            `;
+        }
+    }
+
+    // --- SAVE PROGRESS ---
+    function saveProgress(correct, total) {
+        const record = {
+            student: state.studentName,
+            date: new Date().toISOString(),
+            level: state.difficulty,
+            score: `${correct}/${total}`,
+            percent: Math.round(correct/total*100),
+            time: getElapsedTime()
+        };
+        
+        const progress = JSON.parse(localStorage.getItem('paymentSortProgress') || '[]');
+        progress.push(record);
+        localStorage.setItem('paymentSortProgress', JSON.stringify(progress));
+    }
+
+    function getElapsedTime() {
+        if (!state.startTime) return '0:00';
+        const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+        const mins = Math.floor(elapsed / 60);
+        const secs = elapsed % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    // --- CELEBRATION ---
+    function showCelebration() {
+        const colors = ['#E07A5F', '#81B29A', '#F2CC8F', '#003049', '#FDF0D5'];
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti-piece';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = '100vh';
+            confetti.style.animationDelay = Math.random() * 0.5 + 's';
+            confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 2500);
+        }
+    }
+
+    // --- SHOW EXPLANATIONS ---
+    function showExplanations() {
+        const content = document.getElementById('explanations-content');
+        content.innerHTML = '';
+        
+        state.currentCards.forEach(cardData => {
+            const cardEl = document.getElementById(`card-${cardData.id}`);
+            const isCorrect = cardEl?.classList.contains('correct');
+            const categoryNames = { cash: 'Cash', credit: 'Credit Card', online: 'Online Banking', debit: 'Debit Card', card: 'Card' };
+            
+            content.innerHTML += `
+                <div class="bg-white p-4 rounded-xl shadow-sm ${isCorrect ? 'border-l-4 border-sage' : 'border-l-4 border-coral'}">
+                    <p class="font-semibold text-abyss mb-2">${cardData.id.toUpperCase()}. ${state.simpleText && cardData.simpleText ? cardData.simpleText : cardData.text}</p>
+                    <p class="text-sm text-slate"><strong>Correct:</strong> ${categoryNames[cardData.answer]}</p>
+                    <p class="text-sm text-slate/70 mt-1">${cardData.explanation}</p>
+                </div>
+            `;
+        });
+        
+        elements.explanationsModal.classList.remove('hidden');
+        elements.explanationsModal.classList.add('flex');
+    }
+
+    // --- INITIALIZE APP ---
+    function initializeApp(shuffle = true) {
+        // Clear cards
+        elements.cardDeck.innerHTML = '';
+        elements.dropZones.forEach(zone => zone.innerHTML = '');
+        elements.feedbackArea.classList.add('hidden');
+        elements.hintDisplay.classList.add('hidden');
+        
+        // Get cards for current level
+        state.currentCards = getCardsForLevel();
+        if (shuffle) {
+            state.currentCards.sort(() => Math.random() - 0.5);
+        }
+        
+        // Create card elements
+        state.currentCards.forEach(cardData => {
+            const cardElement = createCardElement(cardData);
+            elements.cardDeck.appendChild(cardElement);
+        });
+        
+        // Setup for Level 1 (hide Online and Debit columns)
+        if (state.difficulty === 1) {
+            elements.categoryColumns.forEach((col, i) => {
+                if (i >= 2) col.style.display = 'none';
+            });
+            document.getElementById('cat-credit-label').textContent = 'Card';
+        } else {
+            elements.categoryColumns.forEach(col => col.style.display = 'flex');
+            document.getElementById('cat-credit-label').textContent = translations[state.language].credit;
+        }
+        
+        updateProgress();
+        startTimer();
+    }
+
+    function softReset() {
+        // Move all cards back to deck without reshuffling
+        const allCards = document.querySelectorAll('.card');
+        allCards.forEach(card => {
+            card.classList.remove('correct', 'incorrect', 'selected', 'hint-flash');
+            elements.cardDeck.appendChild(card);
+        });
+        elements.feedbackArea.classList.add('hidden');
+        elements.hintDisplay.classList.add('hidden');
+        updateProgress();
+    }
+
+    // --- TIMER ---
+    function startTimer() {
+        state.startTime = Date.now();
+        if (state.timerInterval) clearInterval(state.timerInterval);
+        
+        if (state.showTimer) {
+            elements.timerDisplay.classList.remove('hidden');
+            state.timerInterval = setInterval(() => {
+                document.getElementById('timer-text').textContent = getElapsedTime();
+            }, 1000);
+        } else {
+            elements.timerDisplay.classList.add('hidden');
+        }
+    }
+
+    // --- APPLY SETTINGS ---
+    function applySettings() {
+        // Text size
+        document.body.classList.remove('text-size-small', 'text-size-medium', 'text-size-large');
+        document.body.classList.add(`text-size-${state.textSize}`);
+        
+        // High contrast
+        if (state.highContrast) {
+            document.body.classList.add('high-contrast');
+        } else {
+            document.body.classList.remove('high-contrast');
+        }
+        
+        // Focus mode
+        if (state.focusMode) {
+            document.body.classList.add('focus-mode');
+            updateFocusColumns();
+        } else {
+            document.body.classList.remove('focus-mode');
+            elements.categoryColumns.forEach(col => col.classList.add('focus-visible'));
+        }
+        
+        // Timer
+        if (state.showTimer) {
+            elements.timerDisplay.classList.remove('hidden');
+        } else {
+            elements.timerDisplay.classList.add('hidden');
+        }
+        
+        updateLanguage();
+    }
+
+    function updateFocusColumns() {
+        elements.categoryColumns.forEach((col, i) => {
+            if (state.focusColumns.includes(i)) {
+                col.classList.add('focus-visible');
+            } else {
+                col.classList.remove('focus-visible');
+            }
+        });
+    }
+
+    // --- PROGRESS DASHBOARD ---
+    function showProgressDashboard() {
+        const progress = JSON.parse(localStorage.getItem('paymentSortProgress') || '[]');
+        const filterValue = elements.dateFilter.value;
+        
+        let filtered = progress;
+        if (filterValue !== 'all') {
+            const days = parseInt(filterValue);
+            if (!isNaN(days)) {
+                const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
+                filtered = progress.filter(r => new Date(r.date).getTime() > cutoff);
+            }
+        }
+        
+        elements.progressTableBody.innerHTML = filtered.map(r => `
+            <tr class="border-b border-abyss/10 hover:bg-abyss/5">
+                <td class="p-3">${r.student}</td>
+                <td class="p-3">${new Date(r.date).toLocaleDateString()}</td>
+                <td class="p-3">Level ${r.level}</td>
+                <td class="p-3">${r.score} (${r.percent}%)</td>
+                <td class="p-3">${r.time}</td>
+            </tr>
+        `).join('') || '<tr><td colspan="5" class="p-4 text-center text-slate/60">No data yet</td></tr>';
+        
+        elements.progressModal.classList.remove('hidden');
+        elements.progressModal.classList.add('flex');
+    }
+
+    function exportCSV() {
+        const progress = JSON.parse(localStorage.getItem('paymentSortProgress') || '[]');
+        if (progress.length === 0) {
+            alert('No data to export');
+            return;
+        }
+        
+        const headers = ['Student', 'Date', 'Level', 'Score', 'Percent', 'Time'];
+        const rows = progress.map(r => [r.student, r.date, r.level, r.score, r.percent, r.time]);
+        const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+        
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `payment-sort-progress-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // --- EVENT LISTENERS ---
+    
+    // Student modal
+    elements.startBtn.addEventListener('click', () => {
+        const name = elements.studentNameInput.value.trim() || 'Student';
+        state.studentName = name;
+        elements.currentStudent.innerHTML = `<svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>${name}`;
+        elements.studentModal.classList.add('hidden');
+        initializeApp();
+    });
+    
+    elements.studentNameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') elements.startBtn.click();
+    });
+
+    // Settings modal
+    elements.settingsBtn.addEventListener('click', () => {
+        elements.settingsModal.classList.remove('hidden');
+        elements.settingsModal.classList.add('flex');
+    });
+    
+    elements.closeSettings.addEventListener('click', () => {
+        elements.settingsModal.classList.add('hidden');
+        elements.settingsModal.classList.remove('flex');
+    });
+
+    // Settings controls
+    elements.difficultySelect.addEventListener('change', (e) => {
+        state.difficulty = parseInt(e.target.value);
+        initializeApp();
+    });
+    
+    elements.modeSelect.addEventListener('change', (e) => {
+        state.mode = e.target.value;
+    });
+    
+    document.querySelectorAll('.text-size-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.text-size-btn').forEach(b => {
+                b.classList.remove('border-coral', 'bg-coral/10');
+                b.classList.add('border-abyss/20');
+            });
+            btn.classList.add('border-coral', 'bg-coral/10');
+            btn.classList.remove('border-abyss/20');
+            state.textSize = btn.dataset.size;
+            applySettings();
+        });
+    });
+    
+    elements.audioToggle.addEventListener('change', (e) => {
+        state.audioOn = e.target.checked;
+    });
+    
+    elements.contrastToggle.addEventListener('change', (e) => {
+        state.highContrast = e.target.checked;
+        applySettings();
+    });
+    
+    elements.focusToggle.addEventListener('change', (e) => {
+        state.focusMode = e.target.checked;
+        applySettings();
+    });
+    
+    elements.simpleTextToggle.addEventListener('change', (e) => {
+        state.simpleText = e.target.checked;
+        initializeApp();
+    });
+    
+    elements.celebrationToggle.addEventListener('change', (e) => {
+        state.showCelebrations = e.target.checked;
+    });
+    
+    elements.timerToggle.addEventListener('change', (e) => {
+        state.showTimer = e.target.checked;
+        applySettings();
+        if (state.showTimer) startTimer();
+    });
+    
+    elements.languageSelect.addEventListener('change', (e) => {
+        state.language = e.target.value;
+        updateLanguage();
+        initializeApp();
+    });
+    
+    elements.clearDataBtn.addEventListener('click', () => {
+        if (confirm('Are you sure you want to clear all student progress data?')) {
+            localStorage.removeItem('paymentSortProgress');
+            alert('Data cleared');
+        }
+    });
+
+    // Progress dashboard
+    elements.viewProgressBtn.addEventListener('click', showProgressDashboard);
+    elements.closeProgress.addEventListener('click', () => {
+        elements.progressModal.classList.add('hidden');
+        elements.progressModal.classList.remove('flex');
+    });
+    elements.dateFilter.addEventListener('change', showProgressDashboard);
+    elements.exportCsvBtn.addEventListener('click', exportCSV);
+
+    // Glossary
+    elements.glossaryBtn.addEventListener('click', () => {
+        elements.glossaryModal.classList.remove('hidden');
+        elements.glossaryModal.classList.add('flex');
+    });
+    elements.closeGlossary.addEventListener('click', () => {
+        elements.glossaryModal.classList.add('hidden');
+        elements.glossaryModal.classList.remove('flex');
+    });
+
+    // Explanations
+    elements.showExplanationsBtn.addEventListener('click', showExplanations);
+    elements.closeExplanations.addEventListener('click', () => {
+        elements.explanationsModal.classList.add('hidden');
+        elements.explanationsModal.classList.remove('flex');
+    });
+
+    // Reflection
+    elements.finishReflectionBtn.addEventListener('click', () => {
+        elements.reflectionModal.classList.add('hidden');
+        elements.reflectionModal.classList.remove('flex');
+    });
+
+    // Main buttons
+    elements.checkBtn.addEventListener('click', checkAnswers);
+    elements.softResetBtn.addEventListener('click', softReset);
+    elements.resetBtn.addEventListener('click', () => initializeApp(true));
+
+    // Instructions
+    elements.readInstructionsBtn.addEventListener('click', () => {
+        const t = translations[state.language];
+        speak(t.instructions.join('. ') + '. ' + t.example);
+    });
+    
+    elements.viewExampleBtn.addEventListener('click', () => {
+        alert('Example: "You need bills and coins to pay" goes in the Cash category because cash is physical money like dollar bills and coins.');
+    });
+
+    // Real life examples toggle
+    elements.toggleExamplesBtn.addEventListener('click', () => {
+        elements.examplesPanel.classList.toggle('open');
+        elements.examplesArrow.textContent = elements.examplesPanel.classList.contains('open') ? '▼' : '▶';
+    });
+
+    // Drop zone listeners
+    elements.dropZones.forEach(zone => {
+        zone.addEventListener('dragover', dragOver);
+        zone.addEventListener('dragenter', dragEnter);
+        zone.addEventListener('dragleave', dragLeave);
+        zone.addEventListener('drop', drop);
+        zone.addEventListener('click', () => handleZoneClick(zone));
+        
+        // Keyboard support for zones
+        zone.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleZoneClick(zone);
+            }
+        });
+    });
+
+    // Also allow dropping on card deck
+    elements.cardDeck.addEventListener('dragover', dragOver);
+    elements.cardDeck.addEventListener('dragenter', (e) => {
+        e.preventDefault();
+        elements.cardDeck.classList.add('drag-over');
+    });
+    elements.cardDeck.addEventListener('dragleave', (e) => {
+        if (!elements.cardDeck.contains(e.relatedTarget)) {
+            elements.cardDeck.classList.remove('drag-over');
+        }
+    });
+    elements.cardDeck.addEventListener('drop', (e) => {
+        e.preventDefault();
+        if (draggedCard) {
+            elements.cardDeck.appendChild(draggedCard);
+            draggedCard.classList.remove('correct', 'incorrect');
+        }
+        elements.cardDeck.classList.remove('drag-over');
+        updateProgress();
+    });
+
+    // Mobile category navigation
+    document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+                b.classList.remove('bg-ivory', 'text-abyss');
+                b.classList.add('bg-white/20', 'text-white');
+            });
+            btn.classList.add('bg-ivory', 'text-abyss');
+            btn.classList.remove('bg-white/20', 'text-white');
+            
+            const indices = btn.dataset.show.split(',').map(Number);
+            state.focusColumns = indices;
+            updateFocusColumns();
+        });
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        // Ctrl+T for teacher settings
+        if (e.ctrlKey && e.key === 't') {
+            e.preventDefault();
+            elements.settingsBtn.click();
+        }
+        
+        // Escape to close modals
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                if (modal.id !== 'student-modal') {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }
+            });
+        }
+        
+        // Arrow key navigation
+        if (e.key.startsWith('Arrow')) {
+            const focusedCard = document.activeElement;
+            if (focusedCard?.classList.contains('card')) {
+                const allCards = [...document.querySelectorAll('.card')];
+                const currentIndex = allCards.indexOf(focusedCard);
+                let newIndex = currentIndex;
+                
+                if (e.key === 'ArrowRight') newIndex = Math.min(currentIndex + 1, allCards.length - 1);
+                if (e.key === 'ArrowLeft') newIndex = Math.max(currentIndex - 1, 0);
+                
+                allCards[newIndex]?.focus();
+            }
+        }
+    });
+
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal && modal.id !== 'student-modal') {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        });
+    });
+
+    // Initial setup
+    applySettings();
+    elements.studentNameInput.focus();
+
+    </script>
+</body>
+</html>

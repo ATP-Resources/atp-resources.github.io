@@ -9,6 +9,26 @@
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: #0f172a;
+      touch-action: none;
+      margin: 0;
+    }
+    
+    /* Tubes Canvas Background */
+    #tubes-canvas {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      overflow: hidden;
+      z-index: 0;
+    }
+    
+    /* Main App Container */
+    #app-container {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
     }
     
     .icon {
@@ -33,6 +53,17 @@
     .btn-icon {
       width: 20px;
       height: auto;
+    }
+    
+    .menu-icon {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+    
+    .menu-svg-icon {
+      width: 32px;
+      height: 32px;
     }
     
     .icon-sm {
@@ -173,48 +204,41 @@
 </head>
 <body class="min-h-screen text-slate-50 flex flex-col">
 
+  <!-- Tubes Canvas Background -->
+  <canvas id="tubes-canvas"></canvas>
+
+  <!-- Main App Container -->
+  <div id="app-container">
+
   <!-- SVG Icon Definitions -->
   <svg xmlns="http://www.w3.org/2000/svg" class="hidden">
     <defs>
-      <!-- Coin Icon -->
       <symbol id="icon-coin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="9"/>
         <path d="M14.5 9.5c-.5-.5-1.5-1-2.5-1s-2 .5-2.5 1.5.5 2 2.5 2.5 3 1 2.5 2.5-1.5 1.5-2.5 1.5-2-.5-2.5-1"/>
         <path d="M12 6.5v1.5m0 8v1.5"/>
       </symbol>
-      
-      <!-- Bill/Banknote Icon -->
       <symbol id="icon-bill" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <rect x="2" y="6" width="20" height="12" rx="2"/>
         <circle cx="12" cy="12" r="3"/>
         <path d="M6 12h.01M18 12h.01"/>
       </symbol>
-      
-      <!-- Check/Correct Icon -->
       <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20 6L9 17l-5-5"/>
       </symbol>
-      
-      <!-- X/Wrong Icon -->
       <symbol id="icon-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 6L6 18M6 6l12 12"/>
       </symbol>
-      
-      <!-- Refresh/New Question Icon -->
       <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
         <path d="M21 3v5h-5"/>
         <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
         <path d="M3 21v-5h5"/>
       </symbol>
-      
-      <!-- Lightbulb/Hint Icon -->
       <symbol id="icon-hint" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M9 18h6M10 22h4"/>
         <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>
       </symbol>
-      
-      <!-- Trophy/Streak Icon -->
       <symbol id="icon-trophy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
         <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
@@ -223,41 +247,29 @@
         <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
         <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
       </symbol>
-      
-      <!-- Target/Score Icon -->
       <symbol id="icon-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
         <circle cx="12" cy="12" r="6"/>
         <circle cx="12" cy="12" r="2"/>
       </symbol>
-      
-      <!-- Info Icon -->
       <symbol id="icon-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/>
         <path d="M12 16v-4M12 8h.01"/>
       </symbol>
-      
-      <!-- Hand/Tap Icon -->
       <symbol id="icon-tap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/>
         <path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/>
         <path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/>
         <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
       </symbol>
-      
-      <!-- Wallet Icon -->
       <symbol id="icon-wallet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/>
         <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>
       </symbol>
-      
-      <!-- User/Portrait Icon -->
       <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="8" r="4"/>
         <path d="M20 21a8 8 0 1 0-16 0"/>
       </symbol>
-      
-      <!-- Receipt Icon -->
       <symbol id="icon-receipt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
         <path d="M8 7h8M8 11h8M8 15h5"/>
@@ -266,1948 +278,881 @@
   </svg>
 
   <!-- Header with banner -->
-  <header class="w-full bg-slate-900 border-b border-slate-800">
+  <header class="w-full bg-slate-900/90 border-b border-slate-800 backdrop-blur-sm">
     <div class="max-w-6xl mx-auto px-4 py-4 flex justify-center">
-      <img
-        src="https://atp-resources.github.io/assets/money/money-skills-banner.png%20(2).png"
-        alt="Mr. K's Money Skills Studio"
-        class="max-w-full h-auto"
-      />
+      <img src="https://atp-resources.github.io/assets/money/money-skills-banner.png%20(2).png" alt="Mr. K's Money Skills Studio" class="max-w-full h-auto" />
     </div>
   </header>
 
   <main class="flex-1 max-w-6xl mx-auto px-4 pb-10 pt-4">
     <!-- SPA Dashboard / Main Menu -->
-    <section
-      id="spa-menu"
-      data-view="menu"
-      class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg"
-    >
+    <section id="spa-menu" data-view="menu" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-sm">
       <div class="flex items-center gap-2 mb-4">
         <div class="p-1.5 bg-emerald-500/20 rounded-lg">
           <svg class="icon text-emerald-400"><use href="#icon-wallet"/></svg>
         </div>
-        <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300">
-          Choose an Activity
-        </h2>
+        <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300">Choose an Activity</h2>
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <!-- Quick Practice -->
-        <button
-          type="button"
-          class="spa-nav-card bg-slate-800 border border-slate-700 rounded-2xl p-4 flex items-center gap-3 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer"
-          data-view-target="quick-practice"
-        >
-          <div class="p-2 bg-blue-500/20 rounded-xl">
-            <svg class="icon text-blue-400"><use href="#icon-target"/></svg>
+        <button type="button" class="spa-nav-card bg-slate-800/90 border border-slate-700 rounded-2xl p-4 flex items-center gap-4 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer backdrop-blur-sm" data-view-target="quick-practice">
+          <div class="p-3 bg-white rounded-xl flex-shrink-0">
+            <svg class="menu-svg-icon text-blue-600"><use href="#icon-target"/></svg>
           </div>
           <div class="text-left">
-            <p class="font-semibold text-slate-50 text-sm">Quick Practice</p>
-            <p class="text-xs text-slate-400">Identify coins and bills.</p>
+            <p class="font-semibold text-slate-50 text-base">Quick Practice</p>
+            <p class="text-sm text-slate-400">Identify coins and bills.</p>
           </div>
         </button>
 
-        <!-- Match the Portrait -->
-        <button
-          type="button"
-          class="spa-nav-card bg-slate-800 border border-slate-700 rounded-2xl p-4 flex items-center gap-3 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer"
-          data-view-target="match-portrait"
-        >
-          <div class="p-2 bg-purple-500/20 rounded-xl">
-            <svg class="icon text-purple-400"><use href="#icon-user"/></svg>
+        <button type="button" class="spa-nav-card bg-slate-800/90 border border-slate-700 rounded-2xl p-4 flex items-center gap-4 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer backdrop-blur-sm" data-view-target="match-portrait">
+          <div class="p-3 bg-white rounded-xl flex-shrink-0">
+            <svg class="menu-svg-icon text-purple-600"><use href="#icon-user"/></svg>
           </div>
           <div class="text-left">
-            <p class="font-semibold text-slate-50 text-sm">Match the Portrait</p>
-            <p class="text-xs text-slate-400">Match faces to bills.</p>
+            <p class="font-semibold text-slate-50 text-base">Match the Portrait</p>
+            <p class="text-sm text-slate-400">Match faces to bills.</p>
           </div>
         </button>
 
-        <!-- Receipts -->
-        <button
-          type="button"
-          class="spa-nav-card bg-slate-800 border border-slate-700 rounded-2xl p-4 flex items-center gap-3 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer"
-          data-view-target="receipt-quiz"
-        >
-          <div class="p-2 bg-indigo-500/20 rounded-xl">
-            <svg class="icon text-indigo-400"><use href="#icon-receipt"/></svg>
+        <button type="button" class="spa-nav-card bg-slate-800/90 border border-slate-700 rounded-2xl p-4 flex items-center gap-4 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer backdrop-blur-sm" data-view-target="receipt-quiz">
+          <div class="p-3 bg-white rounded-xl flex-shrink-0">
+            <svg class="menu-svg-icon text-indigo-600"><use href="#icon-receipt"/></svg>
           </div>
           <div class="text-left">
-            <p class="font-semibold text-slate-50 text-sm">Reading Receipts</p>
-            <p class="text-xs text-slate-400">Answer questions about receipts.</p>
+            <p class="font-semibold text-slate-50 text-base">Reading Receipts</p>
+            <p class="text-sm text-slate-400">Answer questions about receipts.</p>
           </div>
         </button>
 
-        <!-- Payment Simulator -->
-        <button
-          type="button"
-          class="spa-nav-card bg-slate-800 border border-slate-700 rounded-2xl p-4 flex items-center gap-3 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer"
-          data-view-target="payment-simulator"
-        >
-          <div class="p-2 bg-emerald-500/20 rounded-xl">
-            <img src="https://atp-resources.github.io/assets/money/assets/icons/cash-register-icon.png" class="btn-icon" alt="">
+        <button type="button" class="spa-nav-card bg-slate-800/90 border border-slate-700 rounded-2xl p-4 flex items-center gap-4 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer backdrop-blur-sm" data-view-target="payment-simulator">
+          <div class="p-3 bg-white rounded-xl flex-shrink-0">
+            <img src="https://atp-resources.github.io/assets/money/assets/icons/cash-register-icon.png" class="menu-icon" alt="">
           </div>
           <div class="text-left">
-            <p class="font-semibold text-slate-50 text-sm">Payment Simulator</p>
-            <p class="text-xs text-slate-400">Pay with bills and coins.</p>
+            <p class="font-semibold text-slate-50 text-base">Payment Simulator</p>
+            <p class="text-sm text-slate-400">Pay with bills and coins.</p>
           </div>
         </button>
 
-        <!-- ATM Simulator -->
-        <button
-          type="button"
-          class="spa-nav-card bg-slate-800 border border-slate-700 rounded-2xl p-4 flex items-center gap-3 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer"
-          data-view-target="atm-simulator"
-        >
-          <div class="p-2 bg-sky-500/20 rounded-xl">
-            <img src="https://atp-resources.github.io/assets/money/assets/icons/atm-machine-icon.png" class="btn-icon" alt="">
+        <button type="button" class="spa-nav-card bg-slate-800/90 border border-slate-700 rounded-2xl p-4 flex items-center gap-4 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer backdrop-blur-sm" data-view-target="atm-simulator">
+          <div class="p-3 bg-white rounded-xl flex-shrink-0">
+            <img src="https://atp-resources.github.io/assets/money/assets/icons/atm-machine-icon.png" class="menu-icon" alt="">
           </div>
           <div class="text-left">
-            <p class="font-semibold text-slate-50 text-sm">ATM Simulator</p>
-            <p class="text-xs text-slate-400">Deposits and withdrawals.</p>
+            <p class="font-semibold text-slate-50 text-base">ATM Simulator</p>
+            <p class="text-sm text-slate-400">Deposits and withdrawals.</p>
           </div>
         </button>
 
-        <!-- Shopping Game -->
-        <button
-          type="button"
-          class="spa-nav-card bg-slate-800 border border-slate-700 rounded-2xl p-4 flex items-center gap-3 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer"
-          data-view-target="shopping-game"
-        >
-          <div class="p-2 bg-amber-500/20 rounded-xl">
-            <img src="https://atp-resources.github.io/assets/money/assets/icons/shopping-cart-icon.png" class="btn-icon" alt="">
+        <button type="button" class="spa-nav-card bg-slate-800/90 border border-slate-700 rounded-2xl p-4 flex items-center gap-4 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer backdrop-blur-sm" data-view-target="shopping-game">
+          <div class="p-3 bg-white rounded-xl flex-shrink-0">
+            <img src="https://atp-resources.github.io/assets/money/assets/icons/shopping-cart-icon.png" class="menu-icon" alt="">
           </div>
           <div class="text-left">
-            <p class="font-semibold text-slate-50 text-sm">Shopping Game</p>
-            <p class="text-xs text-slate-400">Stay on budget.</p>
+            <p class="font-semibold text-slate-50 text-base">Shopping Game</p>
+            <p class="text-sm text-slate-400">Stay on budget.</p>
           </div>
         </button>
 
-        <!-- Debit Card Trainer -->
-        <button
-          type="button"
-          class="spa-nav-card bg-slate-800 border border-slate-700 rounded-2xl p-4 flex items-center gap-3 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer"
-          data-view-target="debit-trainer"
-        >
-          <div class="p-2 bg-purple-500/20 rounded-xl">
-            <img src="https://atp-resources.github.io/assets/money/assets/icons/debit-card.png" class="btn-icon" alt="">
+        <button type="button" class="spa-nav-card bg-slate-800/90 border border-slate-700 rounded-2xl p-4 flex items-center gap-4 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer backdrop-blur-sm" data-view-target="debit-trainer">
+          <div class="p-3 bg-white rounded-xl flex-shrink-0">
+            <img src="https://atp-resources.github.io/assets/money/assets/icons/debit-card.png" class="menu-icon" alt="">
           </div>
           <div class="text-left">
-            <p class="font-semibold text-slate-50 text-sm">Debit Card Trainer</p>
-            <p class="text-xs text-slate-400">Learn about debit cards.</p>
+            <p class="font-semibold text-slate-50 text-base">Debit Card Trainer</p>
+            <p class="text-sm text-slate-400">Learn about debit cards.</p>
           </div>
         </button>
 
-        <!-- Secure Usage Quiz -->
-        <button
-          type="button"
-          class="spa-nav-card bg-slate-800 border border-slate-700 rounded-2xl p-4 flex items-center gap-3 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer"
-          data-view-target="secure-usage"
-        >
-          <div class="p-2 bg-rose-500/20 rounded-xl">
-            <img src="https://atp-resources.github.io/assets/money/assets/icons/lock-icon-secure-card-use.png" class="btn-icon" alt="">
+        <button type="button" class="spa-nav-card bg-slate-800/90 border border-slate-700 rounded-2xl p-4 flex items-center gap-4 hover:bg-slate-700 hover:border-emerald-500 transition cursor-pointer backdrop-blur-sm" data-view-target="secure-usage">
+          <div class="p-3 bg-white rounded-xl flex-shrink-0">
+            <img src="https://atp-resources.github.io/assets/money/assets/icons/lock-icon-secure-card-use.png" class="menu-icon" alt="">
           </div>
           <div class="text-left">
-            <p class="font-semibold text-slate-50 text-sm">Secure Card Usage</p>
-            <p class="text-xs text-slate-400">Keep your card safe.</p>
+            <p class="font-semibold text-slate-50 text-base">Secure Card Usage</p>
+            <p class="text-sm text-slate-400">Keep your card safe.</p>
           </div>
         </button>
       </div>
     </section>
 
     <!-- Intro -->
-    <section class="mb-6 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
+    <section data-view="menu" class="mb-6 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-sm">
       <div class="flex items-center gap-3 mb-3">
         <div class="p-2 bg-emerald-500/20 rounded-xl">
           <svg class="icon-lg text-emerald-400"><use href="#icon-wallet"/></svg>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-slate-50">
-          Welcome to Money Skills Studio
-        </h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-slate-50">Welcome to Money Skills Studio</h1>
       </div>
-      <p class="text-slate-200 text-sm sm:text-base">
-        Learn coin and bill values, practice identifying amounts, and build everyday money confidence.
-        Start by reviewing the coins and bills, then try the Quick Practice game.
-      </p>
+      <p class="text-slate-200 text-sm sm:text-base">Learn coin and bill values, practice identifying amounts, and build everyday money confidence. Start by reviewing the coins and bills, then try the Quick Practice game.</p>
     </section>
 
     <!-- Coins gallery -->
-    <section class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
+    <section data-view="menu" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-sm">
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
           <div class="p-1.5 bg-amber-500/20 rounded-lg">
             <svg class="icon text-amber-400"><use href="#icon-coin"/></svg>
           </div>
-          <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300">Coins</h2>
+          <h2 class="text-lg sm:text-xl font-semibold text-amber-300">U.S. Coins</h2>
         </div>
-        <span class="flex items-center gap-1.5 text-xs font-normal text-slate-300 bg-slate-800 px-2.5 py-1 rounded-full">
-          <svg class="icon-sm text-slate-400"><use href="#icon-tap"/></svg>
-          Tap to review
-        </span>
       </div>
-
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <!-- Penny -->
-        <article class="bg-slate-800 rounded-2xl p-3 flex flex-col items-center gap-2 shadow hover:bg-slate-700 transition-colors">
-          <img
-            src="https://atp-resources.github.io/assets/money/assets/money/coins/penny.png"
-            alt="Penny - 1 cent"
-            class="w-20 h-20 object-contain"
-          />
-          <div class="text-center">
-            <p class="font-semibold text-slate-50">Penny</p>
-            <p class="text-sm text-slate-300">1 cent - $0.01</p>
-          </div>
-        </article>
-
-        <!-- Nickel -->
-        <article class="bg-slate-800 rounded-2xl p-3 flex flex-col items-center gap-2 shadow hover:bg-slate-700 transition-colors">
-          <img
-            src="https://atp-resources.github.io/assets/money/assets/money/coins/nickel.png"
-            alt="Nickel - 5 cents"
-            class="w-20 h-20 object-contain"
-          />
-          <div class="text-center">
-            <p class="font-semibold text-slate-50">Nickel</p>
-            <p class="text-sm text-slate-300">5 cents - $0.05</p>
-          </div>
-        </article>
-
-        <!-- Dime -->
-        <article class="bg-slate-800 rounded-2xl p-3 flex flex-col items-center gap-2 shadow hover:bg-slate-700 transition-colors">
-          <img
-            src="https://atp-resources.github.io/assets/money/assets/money/coins/dime.png"
-            alt="Dime - 10 cents"
-            class="w-20 h-20 object-contain"
-          />
-          <div class="text-center">
-            <p class="font-semibold text-slate-50">Dime</p>
-            <p class="text-sm text-slate-300">10 cents - $0.10</p>
-          </div>
-        </article>
-
-        <!-- Quarter -->
-        <article class="bg-slate-800 rounded-2xl p-3 flex flex-col items-center gap-2 shadow hover:bg-slate-700 transition-colors">
-          <img
-            src="https://atp-resources.github.io/assets/money/assets/money/coins/quarter.png"
-            alt="Quarter - 25 cents"
-            class="w-20 h-20 object-contain"
-          />
-          <div class="text-center">
-            <p class="font-semibold text-slate-50">Quarter</p>
-            <p class="text-sm text-slate-300">25 cents - $0.25</p>
-          </div>
-        </article>
+        <div class="coin-card bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center backdrop-blur-sm">
+          <img src="https://atp-resources.github.io/assets/money/coins/penny-front.png" alt="Penny" class="w-16 h-16 mx-auto mb-2 object-contain">
+          <p class="font-semibold text-slate-100">Penny</p>
+          <p class="text-emerald-400">1¢</p>
+        </div>
+        <div class="coin-card bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center backdrop-blur-sm">
+          <img src="https://atp-resources.github.io/assets/money/coins/nickel-front.png" alt="Nickel" class="w-16 h-16 mx-auto mb-2 object-contain">
+          <p class="font-semibold text-slate-100">Nickel</p>
+          <p class="text-emerald-400">5¢</p>
+        </div>
+        <div class="coin-card bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center backdrop-blur-sm">
+          <img src="https://atp-resources.github.io/assets/money/coins/dime-front.png" alt="Dime" class="w-16 h-16 mx-auto mb-2 object-contain">
+          <p class="font-semibold text-slate-100">Dime</p>
+          <p class="text-emerald-400">10¢</p>
+        </div>
+        <div class="coin-card bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center backdrop-blur-sm">
+          <img src="https://atp-resources.github.io/assets/money/coins/quarter-front.png" alt="Quarter" class="w-16 h-16 mx-auto mb-2 object-contain">
+          <p class="font-semibold text-slate-100">Quarter</p>
+          <p class="text-emerald-400">25¢</p>
+        </div>
       </div>
     </section>
 
     <!-- Bills gallery -->
-    <section class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
+    <section data-view="menu" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg backdrop-blur-sm">
       <div class="flex items-center gap-2 mb-4">
-        <div class="p-1.5 bg-emerald-500/20 rounded-lg">
-          <svg class="icon text-emerald-400"><use href="#icon-bill"/></svg>
+        <div class="p-1.5 bg-green-500/20 rounded-lg">
+          <svg class="icon text-green-400"><use href="#icon-bill"/></svg>
         </div>
-        <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300">Bills</h2>
+        <h2 class="text-lg sm:text-xl font-semibold text-green-300">U.S. Bills</h2>
       </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- $1 -->
-        <article class="bg-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row gap-3 items-center shadow hover:bg-slate-700 transition-colors">
-          <img
-            src="https://atp-resources.github.io/assets/money/assets/money/coins/assets/money/bills/Bill_1_full.png"
-            alt="One dollar bill"
-            class="w-full sm:w-40 h-auto object-contain"
-          />
-          <div>
-            <p class="font-semibold text-slate-50 text-lg">$1 Bill</p>
-            <p class="text-sm text-slate-300">One dollar - good for small items like snacks or pencils.</p>
-          </div>
-        </article>
-
-        <!-- $5 -->
-        <article class="bg-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row gap-3 items-center shadow hover:bg-slate-700 transition-colors">
-          <img
-            src="https://atp-resources.github.io/assets/money/assets/money/coins/assets/money/bills/Bill_5_full.png"
-            alt="Five dollar bill"
-            class="w-full sm:w-40 h-auto object-contain"
-          />
-          <div>
-            <p class="font-semibold text-slate-50 text-lg">$5 Bill</p>
-            <p class="text-sm text-slate-300">Five dollars - worth five one dollar bills.</p>
-          </div>
-        </article>
-
-        <!-- $10 -->
-        <article class="bg-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row gap-3 items-center shadow hover:bg-slate-700 transition-colors">
-          <img
-            src="https://atp-resources.github.io/assets/money/assets/money/coins/assets/money/bills/Bill_10_full.png"
-            alt="Ten dollar bill"
-            class="w-full sm:w-40 h-auto object-contain"
-          />
-          <div>
-            <p class="font-semibold text-slate-50 text-lg">$10 Bill</p>
-            <p class="text-sm text-slate-300">Ten dollars - can equal two five dollar bills.</p>
-          </div>
-        </article>
-
-        <!-- $20 -->
-        <article class="bg-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row gap-3 items-center shadow hover:bg-slate-700 transition-colors">
-          <img
-            src="https://atp-resources.github.io/assets/money/assets/money/coins/assets/money/bills/Bill_20_full.png"
-            alt="Twenty dollar bill"
-            class="w-full sm:w-40 h-auto object-contain"
-          />
-          <div>
-            <p class="font-semibold text-slate-50 text-lg">$20 Bill</p>
-            <p class="text-sm text-slate-300">Twenty dollars - can equal two ten dollar bills or four fives.</p>
-          </div>
-        </article>
-
-        <!-- $50 -->
-        <article class="bg-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row gap-3 items-center shadow hover:bg-slate-700 transition-colors">
-          <img
-            src="https://atp-resources.github.io/assets/money/assets/money/coins/assets/money/bills/Bill_50_full.png"
-            alt="Fifty dollar bill"
-            class="w-full sm:w-40 h-auto object-contain"
-          />
-          <div>
-            <p class="font-semibold text-slate-50 text-lg">$50 Bill</p>
-            <p class="text-sm text-slate-300">Fifty dollars - equal to five ten dollar bills.</p>
-          </div>
-        </article>
-
-        <!-- $100 -->
-        <article class="bg-slate-800 rounded-2xl p-3 flex flex-col sm:flex-row gap-3 items-center shadow hover:bg-slate-700 transition-colors">
-          <img
-            src="https://atp-resources.github.io/assets/money/assets/money/coins/assets/money/bills/Bill_100_full.png"
-            alt="One hundred dollar bill"
-            class="w-full sm:w-40 h-auto object-contain"
-          />
-          <div>
-            <p class="font-semibold text-slate-50 text-lg">$100 Bill</p>
-            <p class="text-sm text-slate-300">One hundred dollars - equal to ten ten dollar bills.</p>
-          </div>
-        </article>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="bill-card bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center backdrop-blur-sm">
+          <img src="https://atp-resources.github.io/assets/money/bills/1-dollar-bill-front.png" alt="$1" class="w-full mb-2">
+          <p class="text-emerald-400 font-bold">$1</p>
+        </div>
+        <div class="bill-card bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center backdrop-blur-sm">
+          <img src="https://atp-resources.github.io/assets/money/bills/5-dollar-bill-front.png" alt="$5" class="w-full mb-2">
+          <p class="text-emerald-400 font-bold">$5</p>
+        </div>
+        <div class="bill-card bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center backdrop-blur-sm">
+          <img src="https://atp-resources.github.io/assets/money/bills/10-dollar-bill-front.png" alt="$10" class="w-full mb-2">
+          <p class="text-emerald-400 font-bold">$10</p>
+        </div>
+        <div class="bill-card bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center backdrop-blur-sm">
+          <img src="https://atp-resources.github.io/assets/money/bills/20-dollar-bill-front.png" alt="$20" class="w-full mb-2">
+          <p class="text-emerald-400 font-bold">$20</p>
+        </div>
+        <div class="bill-card bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center backdrop-blur-sm">
+          <img src="https://atp-resources.github.io/assets/money/bills/50-dollar-bill-front.png" alt="$50" class="w-full mb-2">
+          <p class="text-emerald-400 font-bold">$50</p>
+        </div>
+        <div class="bill-card bg-slate-800/90 border border-slate-700 rounded-xl p-3 text-center backdrop-blur-sm">
+          <img src="https://atp-resources.github.io/assets/money/bills/100-dollar-bill-front.png" alt="$100" class="w-full mb-2">
+          <p class="text-emerald-400 font-bold">$100</p>
+        </div>
       </div>
     </section>
 
-    <!-- Quick Practice Game -->
-    <section id="quick-practice" data-view="quick-practice" class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
-      <!-- Back to Menu button -->
-      <div class="mb-4">
-        <button
-          type="button"
-          class="back-to-menu inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs sm:text-sm font-semibold border border-slate-600 transition"
-        >
-          <svg class="icon-sm text-slate-300"><use href="#icon-refresh"/></svg>
-          <span>Back to Menu</span>
-        </button>
-      </div>
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+    <!-- Quick Practice Section -->
+    <section id="quick-practice" data-view="quick-practice" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg hidden backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
           <div class="p-1.5 bg-blue-500/20 rounded-lg">
             <svg class="icon text-blue-400"><use href="#icon-target"/></svg>
           </div>
-          <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300">Quick Practice</h2>
+          <h2 class="text-lg sm:text-xl font-semibold text-blue-300">Quick Practice</h2>
         </div>
-        <div class="flex gap-2">
-          <button
-            id="hintBtn"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-amber-500 hover:bg-amber-400 text-slate-900 text-sm font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled
-          >
-            <svg class="icon-sm"><use href="#icon-hint"/></svg>
-            Hint
-          </button>
-          <button
-            id="newQuestionBtn"
-            class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 text-sm font-semibold transition"
-          >
-            <svg class="icon-sm"><use href="#icon-refresh"/></svg>
-            New Question
-          </button>
+        <button type="button" class="back-to-menu icon-button px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-full text-sm transition">
+          <svg class="icon-sm"><use href="#icon-x"/></svg>
+          Back to Menu
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-4 mb-6">
+        <div class="stat-box flex items-center gap-2 bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 backdrop-blur-sm">
+          <svg class="icon text-amber-400"><use href="#icon-target"/></svg>
+          <span class="text-slate-300 text-sm">Score:</span>
+          <span id="score" class="text-emerald-400 font-bold">0</span>
+        </div>
+        <div class="stat-box flex items-center gap-2 bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 backdrop-blur-sm">
+          <svg class="icon text-rose-400"><use href="#icon-x"/></svg>
+          <span class="text-slate-300 text-sm">Missed:</span>
+          <span id="missed" class="text-rose-400 font-bold">0</span>
+        </div>
+        <div class="stat-box flex items-center gap-2 bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 backdrop-blur-sm">
+          <svg class="icon text-purple-400"><use href="#icon-trophy"/></svg>
+          <span class="text-slate-300 text-sm">Streak:</span>
+          <span id="streak" class="text-purple-400 font-bold">0</span>
         </div>
       </div>
-
-      <div id="questionContainer" class="flex items-center gap-2 mb-4">
-        <svg class="icon text-slate-400 flex-shrink-0"><use href="#icon-info"/></svg>
-        <p id="questionText" class="text-lg font-medium text-slate-50">
-          Click "New Question" to start.
-        </p>
-      </div>
-
-      <div id="practiceGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4"></div>
-
-      <div id="feedbackContainer" class="hidden items-center gap-2 mb-3">
-        <div id="feedbackIcon" class="p-1 rounded-full"></div>
-        <p id="feedbackText" class="text-base font-semibold"></p>
-      </div>
-      
-      <div class="flex flex-wrap gap-6 mt-3">
-        <div id="scoreContainer" class="hidden items-center gap-2">
-          <svg class="icon text-slate-400"><use href="#icon-target"/></svg>
-          <p id="scoreText" class="text-sm text-slate-300"></p>
+      <div class="flex justify-center mb-6">
+        <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-6 flex flex-col items-center backdrop-blur-sm">
+          <img id="moneyImage" src="" alt="Money" class="max-w-xs sm:max-w-sm rounded-lg mb-4" />
+          <p id="feedback" class="text-slate-300 text-center font-medium min-h-[1.5rem]"></p>
         </div>
-        <div id="streakContainer" class="hidden items-center gap-2">
-          <svg class="icon text-amber-400"><use href="#icon-trophy"/></svg>
-          <p id="streakText" class="text-sm text-amber-300"></p>
-        </div>
+      </div>
+      <div id="answerButtons" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4"></div>
+      <div class="flex justify-center gap-3 mt-4">
+        <button type="button" id="hintBtn" class="icon-button px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-full text-sm font-semibold transition">
+          <svg class="icon-sm"><use href="#icon-hint"/></svg>
+          Hint
+        </button>
+        <button type="button" id="newQuestionBtn" class="icon-button px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full text-sm font-semibold transition">
+          <svg class="icon-sm"><use href="#icon-refresh"/></svg>
+          New Question
+        </button>
       </div>
     </section>
 
-    <!-- Match the Portrait -->
-    <section id="match-portrait" data-view="match-portrait" class="mt-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
-      <!-- Back to Menu button -->
-      <div class="mb-4">
-        <button
-          type="button"
-          class="back-to-menu inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs sm:text-sm font-semibold border border-slate-600 transition"
-        >
-          <svg class="icon-sm text-slate-300"><use href="#icon-refresh"/></svg>
-          <span>Back to Menu</span>
-        </button>
-      </div>
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
+    <!-- Match the Portrait Section -->
+    <section id="match-portrait" data-view="match-portrait" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg hidden backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2">
           <div class="p-1.5 bg-purple-500/20 rounded-lg">
             <svg class="icon text-purple-400"><use href="#icon-user"/></svg>
           </div>
-          <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300">
-            Match the Portrait
-          </h2>
+          <h2 class="text-lg sm:text-xl font-semibold text-purple-300">Match the Portrait</h2>
         </div>
-        <button
-          id="portraitNewQuestionBtn"
-          class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 text-sm font-semibold transition"
-        >
-          <svg class="icon-sm"><use href="#icon-refresh"/></svg>
-          New Portrait
+        <button type="button" class="back-to-menu icon-button px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-full text-sm transition">
+          <svg class="icon-sm"><use href="#icon-x"/></svg>
+          Back to Menu
         </button>
       </div>
-
-      <p class="text-sm text-slate-300 mb-4">
-        Look at the portrait on the left. Tap the bill that matches.
-      </p>
-
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-        <!-- Portrait display -->
-        <div class="sm:col-span-1 flex justify-center">
-          <div class="bg-slate-800 rounded-2xl p-3 shadow flex flex-col items-center gap-3 w-full max-w-xs">
-            <p class="text-sm font-semibold text-slate-200">Who is on this bill?</p>
-            <img
-              id="portraitImage"
-              src=""
-              alt="Bill portrait"
-              class="w-32 h-32 object-contain"
-            />
-          </div>
-        </div>
-
-        <!-- Options -->
-        <div class="sm:col-span-2">
-          <div
-            id="portraitOptionsGrid"
-            class="grid grid-cols-1 sm:grid-cols-3 gap-4"
-          >
-            <!-- Options will be injected here -->
-          </div>
-        </div>
+      <p class="text-slate-300 mb-6">Tap the bill that shows the person's portrait named below.</p>
+      <div class="text-center mb-6">
+        <p class="text-slate-400 text-sm">Find this person:</p>
+        <p id="portrait-target" class="text-2xl font-bold text-emerald-300 mt-1">Loading...</p>
       </div>
-
-      <div id="portraitFeedbackContainer" class="hidden items-center gap-2 mt-4">
-        <div id="portraitFeedbackIcon" class="p-1 rounded-full"></div>
-        <p id="portraitFeedbackText" class="text-base font-semibold"></p>
+      <div id="portrait-bills" class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6"></div>
+      <div id="portrait-feedback" class="text-center mb-4 font-semibold min-h-[1.5rem]"></div>
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <div class="stat-box flex items-center gap-2 bg-slate-800/90 border border-slate-700 rounded-lg px-3 py-2 backdrop-blur-sm">
+          <svg class="icon text-amber-400"><use href="#icon-target"/></svg>
+          <span class="text-slate-300 text-sm">Score:</span>
+          <span id="portrait-score" class="text-emerald-400 font-bold">0</span>
+        </div>
+        <button type="button" id="new-portrait-btn" class="icon-button px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-full text-sm font-semibold transition">
+          <svg class="icon-sm"><use href="#icon-refresh"/></svg>
+          New Match
+        </button>
       </div>
     </section>
 
     <!-- Receipt Quiz Section -->
-    <section id="receipt-quiz" data-view="receipt-quiz" class="mt-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
-      <!-- Back to Menu button -->
-      <div class="mb-4">
-        <button
-          type="button"
-          class="back-to-menu inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs sm:text-sm font-semibold border border-slate-600 transition"
-        >
-          <svg class="icon-sm text-slate-300"><use href="#icon-refresh"/></svg>
-          <span>Back to Menu</span>
+    <section id="receipt-quiz" data-view="receipt-quiz" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg hidden backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 bg-indigo-500/20 rounded-lg">
+            <svg class="icon text-indigo-400"><use href="#icon-receipt"/></svg>
+          </div>
+          <h2 class="text-lg sm:text-xl font-semibold text-indigo-300">Reading Receipts</h2>
+        </div>
+        <button type="button" class="back-to-menu icon-button px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-full text-sm transition">
+          <svg class="icon-sm"><use href="#icon-x"/></svg>
+          Back to Menu
         </button>
       </div>
-      <div class="flex items-center gap-2 mb-4">
-        <div class="p-1.5 bg-indigo-500/20 rounded-lg">
-          <svg class="icon text-indigo-400"><use href="#icon-receipt"/></svg>
+      <p class="text-slate-300 mb-6">Review each receipt and answer the questions about it.</p>
+      <div id="receipt-cards">
+        <div class="receipt-card">
+          <h3>7-Eleven Receipt</h3>
+          <img src="https://atp-resources.github.io/assets/money/receipts/711-receipt.webp" alt="7-Eleven Receipt" class="receipt-image" />
+          <ul class="question-list">
+            <li>
+              <p>1. What is the total on this receipt?</p>
+              <div class="options" data-receipt="711" data-question="1">
+                <label><input type="radio" name="711-q1" value="A" /> $5.45</label>
+                <label><input type="radio" name="711-q1" value="B" /> $7.82</label>
+                <label><input type="radio" name="711-q1" value="C" /> $8.50</label>
+              </div>
+            </li>
+            <li>
+              <p>2. How much was the tax?</p>
+              <div class="options" data-receipt="711" data-question="2">
+                <label><input type="radio" name="711-q2" value="A" /> $0.47</label>
+                <label><input type="radio" name="711-q2" value="B" /> $0.82</label>
+                <label><input type="radio" name="711-q2" value="C" /> $1.00</label>
+              </div>
+            </li>
+          </ul>
+          <button type="button" class="check-receipt" data-receipt="711">
+            <svg class="icon-sm"><use href="#icon-check"/></svg>
+            Check Answers
+          </button>
+          <div class="receipt-feedback hidden" id="feedback-711"></div>
         </div>
-        <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300">Reading Receipts Practice</h2>
+        <div class="receipt-card">
+          <h3>Best Buy Receipt</h3>
+          <img src="https://atp-resources.github.io/assets/money/receipts/best-buy-receipt.webp" alt="Best Buy Receipt" class="receipt-image" />
+          <ul class="question-list">
+            <li>
+              <p>1. What is the total on this receipt?</p>
+              <div class="options" data-receipt="bestbuy" data-question="1">
+                <label><input type="radio" name="bestbuy-q1" value="A" /> $12.99</label>
+                <label><input type="radio" name="bestbuy-q1" value="B" /> $13.77</label>
+                <label><input type="radio" name="bestbuy-q1" value="C" /> $15.00</label>
+              </div>
+            </li>
+            <li>
+              <p>2. How much was the tax?</p>
+              <div class="options" data-receipt="bestbuy" data-question="2">
+                <label><input type="radio" name="bestbuy-q2" value="A" /> $0.58</label>
+                <label><input type="radio" name="bestbuy-q2" value="B" /> $0.78</label>
+                <label><input type="radio" name="bestbuy-q2" value="C" /> $1.00</label>
+              </div>
+            </li>
+          </ul>
+          <button type="button" class="check-receipt" data-receipt="bestbuy">
+            <svg class="icon-sm"><use href="#icon-check"/></svg>
+            Check Answers
+          </button>
+          <div class="receipt-feedback hidden" id="feedback-bestbuy"></div>
+        </div>
+        <div class="receipt-card">
+          <h3>Costco Receipt</h3>
+          <img src="https://atp-resources.github.io/assets/money/receipts/costco-receipt.webp" alt="Costco Receipt" class="receipt-image" />
+          <ul class="question-list">
+            <li>
+              <p>1. What is the total on this receipt?</p>
+              <div class="options" data-receipt="costco" data-question="1">
+                <label><input type="radio" name="costco-q1" value="A" /> $94.45</label>
+                <label><input type="radio" name="costco-q1" value="B" /> $100.62</label>
+                <label><input type="radio" name="costco-q1" value="C" /> $105.00</label>
+              </div>
+            </li>
+            <li>
+              <p>2. How much was the tax?</p>
+              <div class="options" data-receipt="costco" data-question="2">
+                <label><input type="radio" name="costco-q2" value="A" /> $5.47</label>
+                <label><input type="radio" name="costco-q2" value="B" /> $6.17</label>
+                <label><input type="radio" name="costco-q2" value="C" /> $7.00</label>
+              </div>
+            </li>
+          </ul>
+          <button type="button" class="check-receipt" data-receipt="costco">
+            <svg class="icon-sm"><use href="#icon-check"/></svg>
+            Check Answers
+          </button>
+          <div class="receipt-feedback hidden" id="feedback-costco"></div>
+        </div>
+        <div class="receipt-card">
+          <h3>CVS Receipt</h3>
+          <img src="https://atp-resources.github.io/assets/money/receipts/cvs-receipt.webp" alt="CVS Receipt" class="receipt-image" />
+          <ul class="question-list">
+            <li>
+              <p>1. What is the total on this receipt?</p>
+              <div class="options" data-receipt="cvs" data-question="1">
+                <label><input type="radio" name="cvs-q1" value="A" /> $12.48</label>
+                <label><input type="radio" name="cvs-q1" value="B" /> $14.24</label>
+                <label><input type="radio" name="cvs-q1" value="C" /> $15.00</label>
+              </div>
+            </li>
+            <li>
+              <p>2. How much was the tax?</p>
+              <div class="options" data-receipt="cvs" data-question="2">
+                <label><input type="radio" name="cvs-q2" value="A" /> $0.76</label>
+                <label><input type="radio" name="cvs-q2" value="B" /> $1.00</label>
+                <label><input type="radio" name="cvs-q2" value="C" /> $1.14</label>
+              </div>
+            </li>
+          </ul>
+          <button type="button" class="check-receipt" data-receipt="cvs">
+            <svg class="icon-sm"><use href="#icon-check"/></svg>
+            Check Answers
+          </button>
+          <div class="receipt-feedback hidden" id="feedback-cvs"></div>
+        </div>
+        <div class="receipt-card">
+          <h3>Lowe's Receipt</h3>
+          <img src="https://atp-resources.github.io/assets/money/receipts/lowes-receipt.webp" alt="Lowe's Receipt" class="receipt-image" />
+          <ul class="question-list">
+            <li>
+              <p>1. What is the total on this receipt?</p>
+              <div class="options" data-receipt="lowes" data-question="1">
+                <label><input type="radio" name="lowes-q1" value="A" /> $22.87</label>
+                <label><input type="radio" name="lowes-q1" value="B" /> $24.69</label>
+                <label><input type="radio" name="lowes-q1" value="C" /> $26.00</label>
+              </div>
+            </li>
+            <li>
+              <p>2. How much was the tax?</p>
+              <div class="options" data-receipt="lowes" data-question="2">
+                <label><input type="radio" name="lowes-q2" value="A" /> $1.37</label>
+                <label><input type="radio" name="lowes-q2" value="B" /> $1.82</label>
+                <label><input type="radio" name="lowes-q2" value="C" /> $2.00</label>
+              </div>
+            </li>
+          </ul>
+          <button type="button" class="check-receipt" data-receipt="lowes">
+            <svg class="icon-sm"><use href="#icon-check"/></svg>
+            Check Answers
+          </button>
+          <div class="receipt-feedback hidden" id="feedback-lowes"></div>
+        </div>
+        <div class="receipt-card">
+          <h3>Target Receipt</h3>
+          <img src="https://atp-resources.github.io/assets/money/receipts/target-receipt.webp" alt="Target Receipt" class="receipt-image" />
+          <ul class="question-list">
+            <li>
+              <p>1. What is the total on this receipt?</p>
+              <div class="options" data-receipt="target" data-question="1">
+                <label><input type="radio" name="target-q1" value="A" /> $32.47</label>
+                <label><input type="radio" name="target-q1" value="B" /> $35.06</label>
+                <label><input type="radio" name="target-q1" value="C" /> $38.00</label>
+              </div>
+            </li>
+            <li>
+              <p>2. How much was the tax?</p>
+              <div class="options" data-receipt="target" data-question="2">
+                <label><input type="radio" name="target-q2" value="A" /> $1.99</label>
+                <label><input type="radio" name="target-q2" value="B" /> $2.59</label>
+                <label><input type="radio" name="target-q2" value="C" /> $3.00</label>
+              </div>
+            </li>
+          </ul>
+          <button type="button" class="check-receipt" data-receipt="target">
+            <svg class="icon-sm"><use href="#icon-check"/></svg>
+            Check Answers
+          </button>
+          <div class="receipt-feedback hidden" id="feedback-target"></div>
+        </div>
+        <div class="receipt-card">
+          <h3>Walmart Receipt</h3>
+          <img src="https://atp-resources.github.io/assets/money/receipts/walmart-receipt.webp" alt="Walmart Receipt" class="receipt-image" />
+          <ul class="question-list">
+            <li>
+              <p>1. What is the total on this receipt?</p>
+              <div class="options" data-receipt="walmart" data-question="1">
+                <label><input type="radio" name="walmart-q1" value="A" /> $45.23</label>
+                <label><input type="radio" name="walmart-q1" value="B" /> $48.51</label>
+                <label><input type="radio" name="walmart-q1" value="C" /> $50.00</label>
+              </div>
+            </li>
+            <li>
+              <p>2. How much was the tax?</p>
+              <div class="options" data-receipt="walmart" data-question="2">
+                <label><input type="radio" name="walmart-q2" value="A" /> $2.73</label>
+                <label><input type="radio" name="walmart-q2" value="B" /> $3.28</label>
+                <label><input type="radio" name="walmart-q2" value="C" /> $4.00</label>
+              </div>
+            </li>
+          </ul>
+          <button type="button" class="check-receipt" data-receipt="walmart">
+            <svg class="icon-sm"><use href="#icon-check"/></svg>
+            Check Answers
+          </button>
+          <div class="receipt-feedback hidden" id="feedback-walmart"></div>
+        </div>
       </div>
-      <p class="text-slate-300 text-sm mb-6">
-        Look at each receipt and answer the questions.
-      </p>
-
-      <!-- Receipt 1 - 7 Eleven -->
-      <article class="receipt-card" data-receipt="7eleven">
-        <h3>Receipt 1 - 7 Eleven</h3>
-        <img src="https://atp-resources.github.io/assets/money/assets/receipts/7-11_Receipt_.png"
-             alt="7 Eleven store receipt"
-             class="receipt-image">
-
-        <ol class="question-list">
-          <li>
-            <p>1. What was the total amount charged?</p>
-            <div class="options" data-question-id="7e-1">
-              <label><input type="radio" name="q-7e-1" value="A"> A) $13.00</label>
-              <label><input type="radio" name="q-7e-1" value="B"> B) $14.00</label>
-              <label><input type="radio" name="q-7e-1" value="C"> C) $15.00</label>
-              <label><input type="radio" name="q-7e-1" value="D"> D) $12.00</label>
-            </div>
-          </li>
-
-          <li>
-            <p>2. Which item had a promotion?</p>
-            <div class="options" data-question-id="7e-2">
-              <label><input type="radio" name="q-7e-2" value="A"> A) Sweet Tea</label>
-              <label><input type="radio" name="q-7e-2" value="B"> B) EnergyXS</label>
-              <label><input type="radio" name="q-7e-2" value="C"> C) Doritos</label>
-              <label><input type="radio" name="q-7e-2" value="D"> D) Maestro</label>
-            </div>
-          </li>
-
-          <li>
-            <p>3. How was the payment made?</p>
-            <div class="options" data-question-id="7e-3">
-              <label><input type="radio" name="q-7e-3" value="A"> A) Cash</label>
-              <label><input type="radio" name="q-7e-3" value="B"> B) VISA</label>
-              <label><input type="radio" name="q-7e-3" value="C"> C) Debit card</label>
-              <label><input type="radio" name="q-7e-3" value="D"> D) Gift card</label>
-            </div>
-          </li>
-        </ol>
-
-        <button type="button" class="check-receipt">Check this receipt</button>
-        <p class="feedback" aria-live="polite"></p>
-      </article>
-
-      <!-- Receipt 2 - Best Buy -->
-      <article class="receipt-card" data-receipt="bestbuy">
-        <h3>Receipt 2 - Best Buy</h3>
-        <img src="https://atp-resources.github.io/assets/money/assets/receipts/Best_Buy_Receipt_.png"
-             alt="Best Buy store receipt"
-             class="receipt-image">
-
-        <ol class="question-list">
-          <li>
-            <p>1. What is the subtotal before tax?</p>
-            <div class="options" data-question-id="bb-1">
-              <label><input type="radio" name="q-bb-1" value="A"> A) $233.89</label>
-              <label><input type="radio" name="q-bb-1" value="B"> B) $2574.78</label>
-              <label><input type="radio" name="q-bb-1" value="C"> C) $2353.89</label>
-              <label><input type="radio" name="q-bb-1" value="D"> D) $220.89</label>
-            </div>
-          </li>
-
-          <li>
-            <p>2. Which item cost $29.99?</p>
-            <div class="options" data-question-id="bb-2">
-              <label><input type="radio" name="q-bb-2" value="A"> A) HDMI cables</label>
-              <label><input type="radio" name="q-bb-2" value="B"> B) OLED TV</label>
-              <label><input type="radio" name="q-bb-2" value="C"> C) Logitech Mouse</label>
-              <label><input type="radio" name="q-bb-2" value="D"> D) TV stand</label>
-            </div>
-          </li>
-
-          <li>
-            <p>3. What type of card was used?</p>
-            <div class="options" data-question-id="bb-3">
-              <label><input type="radio" name="q-bb-3" value="A"> A) MasterCard</label>
-              <label><input type="radio" name="q-bb-3" value="B"> B) Discover</label>
-              <label><input type="radio" name="q-bb-3" value="C"> C) VISA</label>
-              <label><input type="radio" name="q-bb-3" value="D"> D) American Express</label>
-            </div>
-          </li>
-        </ol>
-
-        <button type="button" class="check-receipt">Check this receipt</button>
-        <p class="feedback" aria-live="polite"></p>
-      </article>
-
-      <!-- Receipt 3 - Costco -->
-      <article class="receipt-card" data-receipt="costco">
-        <h3>Receipt 3 - Costco</h3>
-        <img src="https://atp-resources.github.io/assets/money/assets/receipts/Costco_Receipt_.png"
-             alt="Costco store receipt"
-             class="receipt-image">
-
-        <ol class="question-list">
-          <li>
-            <p>1. What was the total amount charged?</p>
-            <div class="options" data-question-id="co-1">
-              <label><input type="radio" name="q-co-1" value="A"> A) $102.67</label>
-              <label><input type="radio" name="q-co-1" value="B"> B) $576.89</label>
-              <label><input type="radio" name="q-co-1" value="C"> C) $679.56</label>
-              <label><input type="radio" name="q-co-1" value="D"> D) $679.00</label>
-            </div>
-          </li>
-
-          <li>
-            <p>2. How many bananas were purchased?</p>
-            <div class="options" data-question-id="co-2">
-              <label><input type="radio" name="q-co-2" value="A"> A) 1</label>
-              <label><input type="radio" name="q-co-2" value="B"> B) 2</label>
-              <label><input type="radio" name="q-co-2" value="C"> C) 3</label>
-              <label><input type="radio" name="q-co-2" value="D"> D) 4</label>
-            </div>
-          </li>
-
-          <li>
-            <p>3. What was the total tax?</p>
-            <div class="options" data-question-id="co-3">
-              <label><input type="radio" name="q-co-3" value="A"> A) $10.23</label>
-              <label><input type="radio" name="q-co-3" value="B"> B) $3.30</label>
-              <label><input type="radio" name="q-co-3" value="C"> C) $89.90</label>
-              <label><input type="radio" name="q-co-3" value="D"> D) $102.67</label>
-            </div>
-          </li>
-        </ol>
-
-        <button type="button" class="check-receipt">Check this receipt</button>
-        <p class="feedback" aria-live="polite"></p>
-      </article>
-
-      <!-- Receipt 4 - CVS -->
-      <article class="receipt-card" data-receipt="cvs">
-        <h3>Receipt 4 - CVS Pharmacy</h3>
-        <img src="https://atp-resources.github.io/assets/money/assets/receipts/CVS_Receipt_.png"
-             alt="CVS pharmacy receipt"
-             class="receipt-image">
-
-        <ol class="question-list">
-          <li>
-            <p>1. What was the subtotal?</p>
-            <div class="options" data-question-id="cv-1">
-              <label><input type="radio" name="q-cv-1" value="A"> A) $30.52</label>
-              <label><input type="radio" name="q-cv-1" value="B"> B) $33.50</label>
-              <label><input type="radio" name="q-cv-1" value="C"> C) $2.98</label>
-              <label><input type="radio" name="q-cv-1" value="D"> D) $17.98</label>
-            </div>
-          </li>
-
-          <li>
-            <p>2. How many items were purchased?</p>
-            <div class="options" data-question-id="cv-2">
-              <label><input type="radio" name="q-cv-2" value="A"> A) 2</label>
-              <label><input type="radio" name="q-cv-2" value="B"> B) 3</label>
-              <label><input type="radio" name="q-cv-2" value="C"> C) 4</label>
-              <label><input type="radio" name="q-cv-2" value="D"> D) 5</label>
-            </div>
-          </li>
-
-          <li>
-            <p>3. How much tax was charged?</p>
-            <div class="options" data-question-id="cv-3">
-              <label><input type="radio" name="q-cv-3" value="A"> A) $7.89</label>
-              <label><input type="radio" name="q-cv-3" value="B"> B) $2.98</label>
-              <label><input type="radio" name="q-cv-3" value="C"> C) $4.65</label>
-              <label><input type="radio" name="q-cv-3" value="D"> D) $8.24</label>
-            </div>
-          </li>
-        </ol>
-
-        <button type="button" class="check-receipt">Check this receipt</button>
-        <p class="feedback" aria-live="polite"></p>
-      </article>
-
-      <!-- Receipt 5 - Lowe's -->
-      <article class="receipt-card" data-receipt="lowes">
-        <h3>Receipt 5 - Lowe's</h3>
-        <img src="https://atp-resources.github.io/assets/money/assets/receipts/Lowes_Receipt_.png"
-             alt="Lowe's store receipt"
-             class="receipt-image">
-
-        <ol class="question-list">
-          <li>
-            <p>1. What was the total amount including tax?</p>
-            <div class="options" data-question-id="lo-1">
-              <label><input type="radio" name="q-lo-1" value="A"> A) $203.61</label>
-              <label><input type="radio" name="q-lo-1" value="B"> B) $213.84</label>
-              <label><input type="radio" name="q-lo-1" value="C"> C) $10.23</label>
-              <label><input type="radio" name="q-lo-1" value="D"> D) $89.00</label>
-            </div>
-          </li>
-
-          <li>
-            <p>2. How many rose plants were purchased?</p>
-            <div class="options" data-question-id="lo-2">
-              <label><input type="radio" name="q-lo-2" value="A"> A) 1</label>
-              <label><input type="radio" name="q-lo-2" value="B"> B) 5</label>
-              <label><input type="radio" name="q-lo-2" value="C"> C) 10</label>
-              <label><input type="radio" name="q-lo-2" value="D"> D) 20</label>
-            </div>
-          </li>
-
-          <li>
-            <p>3. What type of card was used?</p>
-            <div class="options" data-question-id="lo-3">
-              <label><input type="radio" name="q-lo-3" value="A"> A) MasterCard</label>
-              <label><input type="radio" name="q-lo-3" value="B"> B) Debit</label>
-              <label><input type="radio" name="q-lo-3" value="C"> C) Chase VISA</label>
-              <label><input type="radio" name="q-lo-3" value="D"> D) Cash</label>
-            </div>
-          </li>
-        </ol>
-
-        <button type="button" class="check-receipt">Check this receipt</button>
-        <p class="feedback" aria-live="polite"></p>
-      </article>
-
-      <!-- Receipt 6 - Target -->
-      <article class="receipt-card" data-receipt="target">
-        <h3>Receipt 6 - Target</h3>
-        <img src="https://atp-resources.github.io/assets/money/assets/receipts/Target_Receipt_.png"
-             alt="Target store receipt"
-             class="receipt-image">
-
-        <ol class="question-list">
-          <li>
-            <p>1. What was the total after tax?</p>
-            <div class="options" data-question-id="ta-1">
-              <label><input type="radio" name="q-ta-1" value="A"> A) $533.89</label>
-              <label><input type="radio" name="q-ta-1" value="B"> B) $49.89</label>
-              <label><input type="radio" name="q-ta-1" value="C"> C) $585.74</label>
-              <label><input type="radio" name="q-ta-1" value="D"> D) $585.00</label>
-            </div>
-          </li>
-
-          <li>
-            <p>2. How many items are listed?</p>
-            <div class="options" data-question-id="ta-2">
-              <label><input type="radio" name="q-ta-2" value="A"> A) 2</label>
-              <label><input type="radio" name="q-ta-2" value="B"> B) 3</label>
-              <label><input type="radio" name="q-ta-2" value="C"> C) 4</label>
-              <label><input type="radio" name="q-ta-2" value="D"> D) 5</label>
-            </div>
-          </li>
-
-          <li>
-            <p>3. What was the discount amount?</p>
-            <div class="options" data-question-id="ta-3">
-              <label><input type="radio" name="q-ta-3" value="A"> A) $20</label>
-              <label><input type="radio" name="q-ta-3" value="B"> B) $50</label>
-              <label><input type="radio" name="q-ta-3" value="C"> C) $100</label>
-              <label><input type="radio" name="q-ta-3" value="D"> D) No discount</label>
-            </div>
-          </li>
-        </ol>
-
-        <button type="button" class="check-receipt">Check this receipt</button>
-        <p class="feedback" aria-live="polite"></p>
-      </article>
-
-      <!-- Receipt 7 - Walmart -->
-      <article class="receipt-card" data-receipt="walmart">
-        <h3>Receipt 7 - Walmart</h3>
-        <img src="https://atp-resources.github.io/assets/money/assets/receipts/Walmart_Receipt_.png"
-             alt="Walmart store receipt"
-             class="receipt-image">
-
-        <ol class="question-list">
-          <li>
-            <p>1. What was the total amount charged?</p>
-            <div class="options" data-question-id="wa-1">
-              <label><input type="radio" name="q-wa-1" value="A"> A) $27.27</label>
-              <label><input type="radio" name="q-wa-1" value="B"> B) $23.09</label>
-              <label><input type="radio" name="q-wa-1" value="C"> C) $29.00</label>
-              <label><input type="radio" name="q-wa-1" value="D"> D) $1.24</label>
-            </div>
-          </li>
-
-          <li>
-            <p>2. How many items were sold?</p>
-            <div class="options" data-question-id="wa-2">
-              <label><input type="radio" name="q-wa-2" value="A"> A) 3</label>
-              <label><input type="radio" name="q-wa-2" value="B"> B) 4</label>
-              <label><input type="radio" name="q-wa-2" value="C"> C) 5</label>
-              <label><input type="radio" name="q-wa-2" value="D"> D) 6</label>
-            </div>
-          </li>
-
-          <li>
-            <p>3. What was the TAX 1 amount?</p>
-            <div class="options" data-question-id="wa-3">
-              <label><input type="radio" name="q-wa-3" value="A"> A) $4.90</label>
-              <label><input type="radio" name="q-wa-3" value="B"> B) $7.89</label>
-              <label><input type="radio" name="q-wa-3" value="C"> C) $2.90</label>
-              <label><input type="radio" name="q-wa-3" value="D"> D) $1.28</label>
-            </div>
-          </li>
-        </ol>
-
-        <button type="button" class="check-receipt">Check this receipt</button>
-        <p class="feedback" aria-live="polite"></p>
-      </article>
     </section>
 
     <!-- Payment Simulator Section -->
-    <section id="payment-simulator" data-view="payment-simulator" class="mt-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
-      <!-- Back to Menu button -->
-      <div class="mb-4">
-        <button
-          type="button"
-          class="back-to-menu inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs sm:text-sm font-semibold border border-slate-600 transition"
-        >
-          <svg class="icon-sm text-slate-300"><use href="#icon-refresh"/></svg>
-          <span>Back to Menu</span>
+    <section id="payment-simulator" data-view="payment-simulator" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg hidden backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 bg-cyan-500/20 rounded-lg">
+            <img src="https://atp-resources.github.io/assets/money/assets/icons/cash-register-icon.png" class="icon" alt="">
+          </div>
+          <h2 class="text-lg sm:text-xl font-semibold text-cyan-300">Payment Simulator</h2>
+        </div>
+        <button type="button" class="back-to-menu icon-button px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-full text-sm transition">
+          <svg class="icon-sm"><use href="#icon-x"/></svg>
+          Back to Menu
         </button>
       </div>
-      <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300 mb-4">
-        <img src="https://atp-resources.github.io/assets/money/assets/icons/cash-register-icon.png"
-             class="section-icon" alt="">
-        Payment Simulator
-      </h2>
-      <p class="text-slate-300 text-sm mb-4">
-        Select bills and coins to match the amount.
-      </p>
-      
-      <div class="bg-slate-800 rounded-xl p-4 mb-4">
-        <p class="text-slate-400 text-sm mb-2">Amount to Pay:</p>
+      <p class="text-slate-300 mb-6">Practice paying the exact amount using bills and coins. Select the money you want to use.</p>
+      <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 mb-6 text-center backdrop-blur-sm">
+        <p class="text-slate-400 text-sm mb-1">Amount to Pay:</p>
         <p id="pay-target" class="text-3xl font-bold text-emerald-400">$0.00</p>
       </div>
-      
-      <div class="bg-slate-800 rounded-xl p-4 mb-4">
+      <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 mb-6 backdrop-blur-sm">
         <p class="text-slate-400 text-sm mb-2">Your Payment:</p>
-        <p id="pay-current" class="text-2xl font-semibold text-slate-200">$0.00</p>
+        <p id="pay-current" class="text-2xl font-bold text-slate-200 mb-2">$0.00</p>
+        <div id="pay-selected" class="flex flex-wrap gap-2 min-h-[40px]"></div>
       </div>
-      
-      <p class="text-slate-300 text-sm mb-3">Select bills and coins to add to your payment:</p>
-      
-      <div id="pay-options" class="grid grid-cols-5 gap-2 mb-4">
-        <!-- Payment options will be populated by JS -->
+      <div class="mb-6">
+        <p class="text-slate-400 text-sm mb-3">Select Bills:</p>
+        <div id="pay-bills" class="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-4"></div>
+        <p class="text-slate-400 text-sm mb-3">Select Coins:</p>
+        <div id="pay-coins" class="grid grid-cols-4 gap-2"></div>
       </div>
-      
-      <div id="pay-feedback" class="mb-4 p-3 rounded-lg hidden"></div>
-      
-      <div class="sim-controls flex gap-3">
-        <button type="button" id="pay-reset" class="icon-button px-4 py-2 rounded-full bg-rose-600 hover:bg-rose-500 text-white font-semibold transition">
-          <img src="https://atp-resources.github.io/assets/money/assets/icons/red-x-icon.png" class="btn-icon" alt="">
-          Reset
+      <div id="pay-feedback" class="hidden mb-4 p-3 rounded-lg font-semibold"></div>
+      <div class="flex flex-wrap justify-center gap-3">
+        <button type="button" id="pay-clear" class="icon-button px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-full text-sm font-semibold transition">
+          <svg class="icon-sm"><use href="#icon-x"/></svg>
+          Clear
         </button>
-
-        <button type="button" id="pay-new" class="icon-button px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold transition">
-          <img src="https://atp-resources.github.io/assets/money/assets/icons/receipt-icon.png" class="btn-icon" alt="">
-          New amount
+        <button type="button" id="pay-check" class="icon-button px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full text-sm font-semibold transition">
+          <svg class="icon-sm"><use href="#icon-check"/></svg>
+          Check Payment
+        </button>
+        <button type="button" id="pay-new" class="icon-button px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-full text-sm font-semibold transition">
+          <svg class="icon-sm"><use href="#icon-refresh"/></svg>
+          New Amount
         </button>
       </div>
     </section>
 
     <!-- ATM Simulator Section -->
-    <section id="atm-simulator" data-view="atm-simulator" class="mt-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
-      <!-- Back to Menu button -->
-      <div class="mb-4">
-        <button
-          type="button"
-          class="back-to-menu inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs sm:text-sm font-semibold border border-slate-600 transition"
-        >
-          <svg class="icon-sm text-slate-300"><use href="#icon-refresh"/></svg>
-          <span>Back to Menu</span>
+    <section id="atm-simulator" data-view="atm-simulator" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg hidden backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 bg-teal-500/20 rounded-lg">
+            <img src="https://atp-resources.github.io/assets/money/assets/icons/atm-machine-icon.png" class="icon" alt="">
+          </div>
+          <h2 class="text-lg sm:text-xl font-semibold text-teal-300">ATM Simulator</h2>
+        </div>
+        <button type="button" class="back-to-menu icon-button px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-full text-sm transition">
+          <svg class="icon-sm"><use href="#icon-x"/></svg>
+          Back to Menu
         </button>
       </div>
-      <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300 mb-4">
-        <img src="https://atp-resources.github.io/assets/money/assets/icons/atm-machine-icon.png"
-             class="section-icon" alt="">
-        ATM Simulator
-      </h2>
-      <p class="text-slate-300 text-sm mb-4">
-        Enter an amount to withdraw or deposit.
-      </p>
-      
-      <div class="bg-slate-800 rounded-xl p-4 mb-4">
-        <p class="text-slate-400 text-sm mb-2">Current Balance:</p>
-        <p id="atm-balance" class="text-3xl font-bold text-emerald-400">$500.00</p>
+      <p class="text-slate-300 mb-6">Practice making deposits and withdrawals. Remember, you can only withdraw what you have!</p>
+      <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 mb-6 text-center backdrop-blur-sm">
+        <p class="text-slate-400 text-sm mb-1">Account Balance:</p>
+        <p id="atm-balance" class="text-3xl font-bold text-emerald-400">$100.00</p>
       </div>
-      
-      <div class="mb-4">
-        <label class="text-slate-300 text-sm block mb-2">Select Action:</label>
-        <div class="flex gap-3">
-          <label class="flex items-center gap-2 text-slate-200 cursor-pointer">
-            <input type="radio" name="atm-action" value="withdraw" checked class="accent-emerald-500">
-            Withdraw
+      <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 mb-6 backdrop-blur-sm">
+        <div class="flex gap-4 mb-4">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="atm-action" value="withdraw" checked class="accent-teal-500">
+            <span class="text-slate-200">Withdraw</span>
           </label>
-          <label class="flex items-center gap-2 text-slate-200 cursor-pointer">
-            <input type="radio" name="atm-action" value="deposit" class="accent-emerald-500">
-            Deposit
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="radio" name="atm-action" value="deposit" class="accent-teal-500">
+            <span class="text-slate-200">Deposit</span>
           </label>
         </div>
+        <div class="flex gap-2 items-center mb-4">
+          <span class="text-slate-400">$</span>
+          <input type="number" id="atm-amount" placeholder="0.00" min="0" step="0.01" class="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-slate-100 focus:outline-none focus:border-teal-500">
+        </div>
+        <div id="atm-feedback" class="hidden mb-4 p-3 rounded-lg font-semibold"></div>
+        <button type="button" id="atm-submit" class="w-full icon-button justify-center px-4 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-lg font-semibold transition">
+          <svg class="icon-sm"><use href="#icon-check"/></svg>
+          Submit
+        </button>
       </div>
-      
-      <div class="mb-4">
-        <label for="atm-amount" class="text-slate-300 text-sm block mb-2">Amount:</label>
-        <input type="number" id="atm-amount" min="0" step="0.01" placeholder="Enter amount"
-               class="w-full px-4 py-2 rounded-lg bg-slate-700 text-slate-100 border border-slate-600 focus:border-emerald-500 focus:outline-none">
+      <div class="grid grid-cols-4 gap-2">
+        <button type="button" class="atm-quick bg-slate-700 hover:bg-slate-600 rounded-lg p-2 text-slate-100 text-sm transition" data-amount="10">$10</button>
+        <button type="button" class="atm-quick bg-slate-700 hover:bg-slate-600 rounded-lg p-2 text-slate-100 text-sm transition" data-amount="20">$20</button>
+        <button type="button" class="atm-quick bg-slate-700 hover:bg-slate-600 rounded-lg p-2 text-slate-100 text-sm transition" data-amount="50">$50</button>
+        <button type="button" class="atm-quick bg-slate-700 hover:bg-slate-600 rounded-lg p-2 text-slate-100 text-sm transition" data-amount="100">$100</button>
       </div>
-      
-      <div id="atm-feedback" class="mb-4 p-3 rounded-lg hidden"></div>
-      
-      <button type="button" id="atm-submit" class="icon-button px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold transition">
-        <img src="https://atp-resources.github.io/assets/money/assets/icons/wallet-icon.png" class="btn-icon" alt="">
-        Do ATM action
-      </button>
     </section>
 
     <!-- Shopping Game Section -->
-    <section id="shopping-game" data-view="shopping-game" class="mt-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
-      <!-- Back to Menu button -->
-      <div class="mb-4">
-        <button
-          type="button"
-          class="back-to-menu inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs sm:text-sm font-semibold border border-slate-600 transition"
-        >
-          <svg class="icon-sm text-slate-300"><use href="#icon-refresh"/></svg>
-          <span>Back to Menu</span>
+    <section id="shopping-game" data-view="shopping-game" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg hidden backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 bg-pink-500/20 rounded-lg">
+            <img src="https://atp-resources.github.io/assets/money/assets/icons/shopping-cart-icon.png" class="icon" alt="">
+          </div>
+          <h2 class="text-lg sm:text-xl font-semibold text-pink-300">Shopping Game</h2>
+        </div>
+        <button type="button" class="back-to-menu icon-button px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-full text-sm transition">
+          <svg class="icon-sm"><use href="#icon-x"/></svg>
+          Back to Menu
         </button>
       </div>
-      <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300 mb-4">
-        <img src="https://atp-resources.github.io/assets/money/assets/icons/shopping-cart-icon.png"
-             class="section-icon" alt="">
-        Shopping Game
-      </h2>
-      <p class="text-slate-300 text-sm mb-4">
-        Add items to your cart. Stay within budget!
-      </p>
-      
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <div class="bg-slate-800 rounded-xl p-4">
-          <p class="text-slate-400 text-sm mb-2">Your Budget:</p>
+      <p class="text-slate-300 mb-6">Try to fill your cart while staying within your budget!</p>
+      <div class="grid grid-cols-2 gap-4 mb-6">
+        <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 text-center backdrop-blur-sm">
+          <p class="text-slate-400 text-sm mb-1">Budget:</p>
           <p id="shop-budget" class="text-2xl font-bold text-emerald-400">$50.00</p>
         </div>
-        <div class="bg-slate-800 rounded-xl p-4">
-          <p class="text-slate-400 text-sm mb-2">Cart Total:</p>
+        <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 text-center backdrop-blur-sm">
+          <p class="text-slate-400 text-sm mb-1">Cart Total:</p>
           <p id="shop-total" class="text-2xl font-bold text-slate-200">$0.00</p>
         </div>
       </div>
-      
-      <p class="text-slate-300 text-sm mb-3">Click items to add to your cart:</p>
-      
-      <div id="shop-items" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-        <!-- Shopping items will be populated by JS -->
+      <div class="mb-6">
+        <p class="text-slate-400 text-sm mb-3">Available Items:</p>
+        <div id="shop-items" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
       </div>
-      
-      <div class="bg-slate-800 rounded-xl p-4 mb-4">
-        <p class="text-slate-400 text-sm mb-2">Items in Cart:</p>
-        <div id="shop-cart" class="text-slate-200 text-sm">
+      <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 mb-6 backdrop-blur-sm">
+        <p class="text-slate-400 text-sm mb-2">Your Cart:</p>
+        <div id="shop-cart" class="min-h-[40px]">
           <p class="text-slate-500 italic">Cart is empty</p>
         </div>
       </div>
-      
-      <div id="shop-feedback" class="mb-4 p-3 rounded-lg hidden"></div>
-      
-      <button type="button" id="shop-check" class="icon-button px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold transition">
-        <img src="https://atp-resources.github.io/assets/money/assets/icons/shopping-bag-icon.png" class="btn-icon" alt="">
-        Check my cart
-      </button>
+      <div id="shop-feedback" class="hidden mb-4 p-3 rounded-lg font-semibold"></div>
+      <div class="flex justify-center">
+        <button type="button" id="shop-check" class="icon-button px-4 py-2 bg-pink-600 hover:bg-pink-500 text-white rounded-full text-sm font-semibold transition">
+          <svg class="icon-sm"><use href="#icon-check"/></svg>
+          Check Out
+        </button>
+      </div>
     </section>
 
     <!-- Debit Card Trainer Section -->
-    <section id="debit-trainer" data-view="debit-trainer" class="mt-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
-      <!-- Back to Menu button -->
-      <div class="mb-4">
-        <button
-          type="button"
-          class="back-to-menu inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs sm:text-sm font-semibold border border-slate-600 transition"
-        >
-          <svg class="icon-sm text-slate-300"><use href="#icon-refresh"/></svg>
-          <span>Back to Menu</span>
+    <section id="debit-trainer" data-view="debit-trainer" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg hidden backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 bg-orange-500/20 rounded-lg">
+            <img src="https://atp-resources.github.io/assets/money/assets/icons/debit-card.png" class="icon" alt="">
+          </div>
+          <h2 class="text-lg sm:text-xl font-semibold text-orange-300">Debit Card Trainer</h2>
+        </div>
+        <button type="button" class="back-to-menu icon-button px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-full text-sm transition">
+          <svg class="icon-sm"><use href="#icon-x"/></svg>
+          Back to Menu
         </button>
       </div>
-      <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300 mb-4">
-        <img src="https://atp-resources.github.io/assets/money/assets/icons/debit-card.png"
-             class="section-icon" alt="">
-        Debit Card Trainer
-      </h2>
-      <p class="text-slate-300 text-sm mb-4">
-        Answer questions about debit cards.
-      </p>
-      
-      <div class="bg-slate-800 rounded-xl p-4 mb-4">
-        <img src="https://atp-resources.github.io/assets/money/assets/icons/sample-debit-card.png" 
-             alt="Sample debit card" 
-             class="w-full max-w-md mx-auto rounded-lg mb-4">
+      <p class="text-slate-300 mb-6">Learn about using a debit card safely and responsibly.</p>
+      <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 mb-6 backdrop-blur-sm">
+        <h3 class="text-lg font-semibold text-orange-300 mb-3">What is a Debit Card?</h3>
+        <p class="text-slate-300 text-sm mb-3">A debit card lets you pay for things using money from your bank account. It looks like a credit card, but the money comes directly from your account right away.</p>
+        <ul class="text-slate-300 text-sm space-y-2">
+          <li class="flex gap-2">
+            <svg class="icon-sm text-emerald-400 flex-shrink-0 mt-0.5"><use href="#icon-check"/></svg>
+            <span>You can only spend what you have in your account</span>
+          </li>
+          <li class="flex gap-2">
+            <svg class="icon-sm text-emerald-400 flex-shrink-0 mt-0.5"><use href="#icon-check"/></svg>
+            <span>Keep your PIN secret - never share it!</span>
+          </li>
+          <li class="flex gap-2">
+            <svg class="icon-sm text-emerald-400 flex-shrink-0 mt-0.5"><use href="#icon-check"/></svg>
+            <span>Check your account balance regularly</span>
+          </li>
+        </ul>
       </div>
-      
-      <ol class="question-list space-y-4">
-        <li>
-          <p class="text-slate-200 font-medium mb-2">1. Where is the card number located?</p>
+      <div class="space-y-4">
+        <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 backdrop-blur-sm">
+          <p class="text-slate-100 font-medium mb-3">1. Where does the money come from when you use a debit card?</p>
           <div class="options" data-question-id="dc-1">
-            <label><input type="radio" name="q-dc-1" value="A"> A) On the back of the card</label>
-            <label><input type="radio" name="q-dc-1" value="B"> B) On the front, usually in the middle</label>
-            <label><input type="radio" name="q-dc-1" value="C"> C) On the magnetic stripe</label>
-            <label><input type="radio" name="q-dc-1" value="D"> D) Inside the chip</label>
+            <label><input type="radio" name="dc-1" value="A" /> A loan from the bank</label>
+            <label><input type="radio" name="dc-1" value="B" /> Your bank account</label>
+            <label><input type="radio" name="dc-1" value="C" /> Your parents' wallet</label>
           </div>
-        </li>
-        
-        <li>
-          <p class="text-slate-200 font-medium mb-2">2. What is a PIN used for?</p>
+        </div>
+        <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 backdrop-blur-sm">
+          <p class="text-slate-100 font-medium mb-3">2. What should you do with your PIN number?</p>
           <div class="options" data-question-id="dc-2">
-            <label><input type="radio" name="q-dc-2" value="A"> A) To decorate your card</label>
-            <label><input type="radio" name="q-dc-2" value="B"> B) To verify your identity when making purchases</label>
-            <label><input type="radio" name="q-dc-2" value="C"> C) To increase your credit limit</label>
-            <label><input type="radio" name="q-dc-2" value="D"> D) To call customer service</label>
+            <label><input type="radio" name="dc-2" value="A" /> Share it with friends</label>
+            <label><input type="radio" name="dc-2" value="B" /> Keep it secret</label>
+            <label><input type="radio" name="dc-2" value="C" /> Write it on the card</label>
           </div>
-        </li>
-        
-        <li>
-          <p class="text-slate-200 font-medium mb-2">3. What should you do if your card is lost or stolen?</p>
+        </div>
+        <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 backdrop-blur-sm">
+          <p class="text-slate-100 font-medium mb-3">3. Can you spend more than what's in your account?</p>
           <div class="options" data-question-id="dc-3">
-            <label><input type="radio" name="q-dc-3" value="A"> A) Wait a few days to see if it turns up</label>
-            <label><input type="radio" name="q-dc-3" value="B"> B) Report it to your bank immediately</label>
-            <label><input type="radio" name="q-dc-3" value="C"> C) Post about it on social media</label>
-            <label><input type="radio" name="q-dc-3" value="D"> D) Nothing, the card will deactivate itself</label>
+            <label><input type="radio" name="dc-3" value="A" /> Yes, always</label>
+            <label><input type="radio" name="dc-3" value="B" /> No, you can only spend what you have</label>
+            <label><input type="radio" name="dc-3" value="C" /> Only on weekends</label>
           </div>
-        </li>
-      </ol>
-      
-      <div id="debit-feedback" class="feedback mt-4 p-3 rounded-lg hidden"></div>
-      
-      <button type="button" class="quiz-check icon-button mt-4 px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold transition" data-quiz-id="debit-trainer">
-        <img src="https://atp-resources.github.io/assets/money/assets/icons/check-mark-icon.png" class="btn-icon" alt="">
-        Check Debit Card Answers
-      </button>
+        </div>
+      </div>
+      <div id="debit-feedback" class="hidden mt-4 p-3 rounded-lg font-semibold"></div>
+      <div class="flex justify-center mt-6">
+        <button type="button" class="quiz-check icon-button px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-full text-sm font-semibold transition" data-quiz-id="debit-trainer">
+          <svg class="icon-sm"><use href="#icon-check"/></svg>
+          Check Answers
+        </button>
+      </div>
     </section>
 
     <!-- Secure Usage Quiz Section -->
-    <section id="secure-usage" data-view="secure-usage" class="mt-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg">
-      <!-- Back to Menu button -->
-      <div class="mb-4">
-        <button
-          type="button"
-          class="back-to-menu inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs sm:text-sm font-semibold border border-slate-600 transition"
-        >
-          <svg class="icon-sm text-slate-300"><use href="#icon-refresh"/></svg>
-          <span>Back to Menu</span>
+    <section id="secure-usage" data-view="secure-usage" class="mb-8 bg-slate-900/80 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg hidden backdrop-blur-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <div class="p-1.5 bg-red-500/20 rounded-lg">
+            <img src="https://atp-resources.github.io/assets/money/assets/icons/lock-icon-secure-card-use.png" class="icon" alt="">
+          </div>
+          <h2 class="text-lg sm:text-xl font-semibold text-red-300">Secure Card Usage</h2>
+        </div>
+        <button type="button" class="back-to-menu icon-button px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-100 rounded-full text-sm transition">
+          <svg class="icon-sm"><use href="#icon-x"/></svg>
+          Back to Menu
         </button>
       </div>
-      <h2 class="text-xl sm:text-2xl font-semibold text-emerald-300 mb-4">
-        <img src="https://atp-resources.github.io/assets/money/assets/icons/lock-icon-secure-card-use.png"
-             class="section-icon" alt="">
-        Secure Debit Card Usage Quiz
-      </h2>
-      <p class="text-slate-300 text-sm mb-4">
-        Answer questions about keeping your card safe.
-      </p>
-      
-      <ol class="question-list space-y-4">
-        <li>
-          <p class="text-slate-200 font-medium mb-2">1. Is it safe to share your PIN with a friend?</p>
+      <p class="text-slate-300 mb-6">Learn how to keep your money and cards safe from bad people.</p>
+      <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 mb-6 backdrop-blur-sm">
+        <h3 class="text-lg font-semibold text-red-300 mb-3">Safety Tips</h3>
+        <ul class="text-slate-300 text-sm space-y-2">
+          <li class="flex gap-2">
+            <svg class="icon-sm text-red-400 flex-shrink-0 mt-0.5"><use href="#icon-x"/></svg>
+            <span>Never share your PIN with anyone</span>
+          </li>
+          <li class="flex gap-2">
+            <svg class="icon-sm text-red-400 flex-shrink-0 mt-0.5"><use href="#icon-x"/></svg>
+            <span>Don't let others watch you enter your PIN</span>
+          </li>
+          <li class="flex gap-2">
+            <svg class="icon-sm text-emerald-400 flex-shrink-0 mt-0.5"><use href="#icon-check"/></svg>
+            <span>Cover the keypad when entering your PIN</span>
+          </li>
+          <li class="flex gap-2">
+            <svg class="icon-sm text-emerald-400 flex-shrink-0 mt-0.5"><use href="#icon-check"/></svg>
+            <span>Tell a trusted adult if your card is lost</span>
+          </li>
+        </ul>
+      </div>
+      <div class="space-y-4">
+        <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 backdrop-blur-sm">
+          <p class="text-slate-100 font-medium mb-3">1. Someone asks for your PIN. What do you do?</p>
           <div class="options" data-question-id="su-1">
-            <label><input type="radio" name="q-su-1" value="A"> A) Yes, if you trust them</label>
-            <label><input type="radio" name="q-su-1" value="B"> B) No, never share your PIN with anyone</label>
-            <label><input type="radio" name="q-su-1" value="C"> C) Only for emergencies</label>
-            <label><input type="radio" name="q-su-1" value="D"> D) Yes, it's just a number</label>
+            <label><input type="radio" name="su-1" value="A" /> Tell them if they seem nice</label>
+            <label><input type="radio" name="su-1" value="B" /> Never tell anyone your PIN</label>
+            <label><input type="radio" name="su-1" value="C" /> Only tell friends</label>
           </div>
-        </li>
-        
-        <li>
-          <p class="text-slate-200 font-medium mb-2">2. What should you do when entering your PIN at a store?</p>
+        </div>
+        <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 backdrop-blur-sm">
+          <p class="text-slate-100 font-medium mb-3">2. You notice someone watching while you type your PIN. What should you do?</p>
           <div class="options" data-question-id="su-2">
-            <label><input type="radio" name="q-su-2" value="A"> A) Say the numbers out loud so you don't forget</label>
-            <label><input type="radio" name="q-su-2" value="B"> B) Let others see to make sure you're typing correctly</label>
-            <label><input type="radio" name="q-su-2" value="C"> C) Cover the keypad with your hand while entering</label>
-            <label><input type="radio" name="q-su-2" value="D"> D) Write it on the receipt for reference</label>
+            <label><input type="radio" name="su-2" value="A" /> Keep typing, it's fine</label>
+            <label><input type="radio" name="su-2" value="B" /> Type faster</label>
+            <label><input type="radio" name="su-2" value="C" /> Cover the keypad and wait for them to look away</label>
           </div>
-        </li>
-        
-        <li>
-          <p class="text-slate-200 font-medium mb-2">3. You receive an email asking for your card number and PIN. What should you do?</p>
+        </div>
+        <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 backdrop-blur-sm">
+          <p class="text-slate-100 font-medium mb-3">3. You lost your debit card. What should you do first?</p>
           <div class="options" data-question-id="su-3">
-            <label><input type="radio" name="q-su-3" value="A"> A) Reply with the information if it looks official</label>
-            <label><input type="radio" name="q-su-3" value="B"> B) Delete the email - legitimate banks never ask for this via email</label>
-            <label><input type="radio" name="q-su-3" value="C"> C) Forward it to your friends for advice</label>
-            <label><input type="radio" name="q-su-3" value="D"> D) Click all links to verify it's real</label>
+            <label><input type="radio" name="su-3" value="A" /> Wait and see if someone returns it</label>
+            <label><input type="radio" name="su-3" value="B" /> Tell a trusted adult right away</label>
+            <label><input type="radio" name="su-3" value="C" /> Post about it on social media</label>
           </div>
-        </li>
-        
-        <li>
-          <p class="text-slate-200 font-medium mb-2">4. How often should you check your bank statements?</p>
+        </div>
+        <div class="bg-slate-800/90 border border-slate-700 rounded-xl p-4 backdrop-blur-sm">
+          <p class="text-slate-100 font-medium mb-3">4. What's the safest way to enter your PIN at a store?</p>
           <div class="options" data-question-id="su-4">
-            <label><input type="radio" name="q-su-4" value="A"> A) Once a year</label>
-            <label><input type="radio" name="q-su-4" value="B"> B) Never, the bank tracks everything</label>
-            <label><input type="radio" name="q-su-4" value="C"> C) Regularly (weekly or monthly) to catch any errors or fraud</label>
-            <label><input type="radio" name="q-su-4" value="D"> D) Only when something seems wrong</label>
+            <label><input type="radio" name="su-4" value="A" /> Type it really slowly</label>
+            <label><input type="radio" name="su-4" value="B" /> Say the numbers out loud to remember</label>
+            <label><input type="radio" name="su-4" value="C" /> Cover the keypad with your hand</label>
           </div>
-        </li>
-      </ol>
-      
-      <div id="secure-feedback" class="feedback mt-4 p-3 rounded-lg hidden"></div>
-      
-      <button type="button" class="quiz-check icon-button mt-4 px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-semibold transition" data-quiz-id="secure-usage">
-        <img src="https://atp-resources.github.io/assets/money/assets/icons/check-mark-icon.png" class="btn-icon" alt="">
-        Check Security Answers
-      </button>
+        </div>
+      </div>
+      <div id="secure-feedback" class="hidden mt-4 p-3 rounded-lg font-semibold"></div>
+      <div class="flex justify-center mt-6">
+        <button type="button" class="quiz-check icon-button px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-full text-sm font-semibold transition" data-quiz-id="secure-usage">
+          <svg class="icon-sm"><use href="#icon-check"/></svg>
+          Check Answers
+        </button>
+      </div>
     </section>
   </main>
+  </div>
 
-  <footer class="w-full py-4 text-center text-xs text-slate-400 border-t border-slate-800">
-    <div class="flex items-center justify-center gap-2">
-      <svg class="icon-sm text-slate-500"><use href="#icon-wallet"/></svg>
-      <span>Mr. K's Money Skills Studio - Practice only - Not real money</span>
-    </div>
-  </footer>
+  <!-- Tubes Cursor Script -->
+  <script type="module">
+    import TubesCursor from "https://cdn.jsdelivr.net/npm/threejs-components@0.0.19/build/cursors/tubes1.min.js";
+    const canvas = document.getElementById('tubes-canvas');
+    const app = TubesCursor(canvas, {
+      tubes: {
+        colors: ["#10b981", "#6366f1", "#f59e0b"],
+        lights: {
+          intensity: 200,
+          colors: ["#34d399", "#818cf8", "#fbbf24", "#f472b6"]
+        }
+      }
+    });
+    canvas.addEventListener('click', () => {
+      const colors = randomColors(3);
+      const lightsColors = randomColors(4);
+      app.tubes.setColors(colors);
+      app.tubes.setLightsColors(lightsColors);
+    });
+    function randomColors(count) {
+      return new Array(count).fill(0).map(() => "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0'));
+    }
+  </script>
 
   <script>
-    // Base URL for GitHub-hosted images
-    const BASE_URL = "https://atp-resources.github.io/assets/money";
-
-    const items = [
-      { id: "penny", label: "Penny", display: "Penny - 1¢", valueText: "1 cent", image: `${BASE_URL}/assets/money/coins/penny.png`, type: "coin" },
-      { id: "nickel", label: "Nickel", display: "Nickel - 5¢", valueText: "5 cents", image: `${BASE_URL}/assets/money/coins/nickel.png`, type: "coin" },
-      { id: "dime", label: "Dime", display: "Dime - 10¢", valueText: "10 cents", image: `${BASE_URL}/assets/money/coins/dime.png`, type: "coin" },
-      { id: "quarter", label: "Quarter", display: "Quarter - 25¢", valueText: "25 cents", image: `${BASE_URL}/assets/money/coins/quarter.png`, type: "coin" },
-      { id: "1", label: "$1 Bill", display: "$1 Bill", valueText: "$1.00", image: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_1_full.png`, type: "bill" },
-      { id: "5", label: "$5 Bill", display: "$5 Bill", valueText: "$5.00", image: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_5_full.png`, type: "bill" },
-      { id: "10", label: "$10 Bill", display: "$10 Bill", valueText: "$10.00", image: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_10_full.png`, type: "bill" },
-      { id: "20", label: "$20 Bill", display: "$20 Bill", valueText: "$20.00", image: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_20_full.png`, type: "bill" },
-      { id: "50", label: "$50 Bill", display: "$50 Bill", valueText: "$50.00", image: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_50_full.png`, type: "bill" },
-      { id: "100", label: "$100 Bill", display: "$100 Bill", valueText: "$100.00", image: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_100_full.png`, type: "bill" }
+    const baseURL = "https://atp-resources.github.io/assets/money/";
+    const coinsURL = baseURL + "coins/";
+    const billsURL = baseURL + "bills/";
+    const moneyItems = [
+      { name: "Penny", value: "1¢", img: coinsURL + "penny-front.png", hint: "The smallest coin, copper colored." },
+      { name: "Nickel", value: "5¢", img: coinsURL + "nickel-front.png", hint: "Larger than a penny, silver color." },
+      { name: "Dime", value: "10¢", img: coinsURL + "dime-front.png", hint: "The smallest silver coin." },
+      { name: "Quarter", value: "25¢", img: coinsURL + "quarter-front.png", hint: "The largest common coin." },
+      { name: "$1 Bill", value: "$1", img: billsURL + "1-dollar-bill-front.png", hint: "George Washington is on this bill." },
+      { name: "$5 Bill", value: "$5", img: billsURL + "5-dollar-bill-front.png", hint: "Abraham Lincoln is on this bill." },
+      { name: "$10 Bill", value: "$10", img: billsURL + "10-dollar-bill-front.png", hint: "Alexander Hamilton is on this bill." },
+      { name: "$20 Bill", value: "$20", img: billsURL + "20-dollar-bill-front.png", hint: "Andrew Jackson is on this bill." },
+      { name: "$50 Bill", value: "$50", img: billsURL + "50-dollar-bill-front.png", hint: "Ulysses S. Grant is on this bill." },
+      { name: "$100 Bill", value: "$100", img: billsURL + "100-dollar-bill-front.png", hint: "Benjamin Franklin is on this bill." }
     ];
+    let score = 0, missed = 0, streak = 0, currentItem = null, answeredThisRound = false, usedIndices = [];
+    const moneyImage = document.getElementById("moneyImage"), answerButtons = document.getElementById("answerButtons"), feedbackEl = document.getElementById("feedback"), scoreEl = document.getElementById("score"), missedEl = document.getElementById("missed"), streakEl = document.getElementById("streak"), hintBtn = document.getElementById("hintBtn"), newQuestionBtn = document.getElementById("newQuestionBtn");
+    function shuffleArray(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+    function getUnusedIndex() { const available = moneyItems.map((_, i) => i).filter(i => !usedIndices.includes(i)); if (available.length === 0) { usedIndices = []; return Math.floor(Math.random() * moneyItems.length); } return available[Math.floor(Math.random() * available.length)]; }
+    function loadQuestion() { answeredThisRound = false; const idx = getUnusedIndex(); usedIndices.push(idx); currentItem = moneyItems[idx]; moneyImage.src = currentItem.img; moneyImage.alt = currentItem.name; feedbackEl.textContent = ""; feedbackEl.className = "text-slate-300 text-center font-medium min-h-[1.5rem]"; let options = shuffleArray(moneyItems).slice(0, 4); if (!options.find(o => o.name === currentItem.name)) { options[Math.floor(Math.random() * 4)] = currentItem; } options = shuffleArray(options); answerButtons.innerHTML = ""; options.forEach(opt => { const btn = document.createElement("button"); btn.type = "button"; btn.className = "bg-slate-700 hover:bg-slate-600 rounded-xl px-4 py-3 text-slate-100 font-medium transition"; btn.textContent = `${opt.name} (${opt.value})`; btn.addEventListener("click", () => checkAnswer(opt, btn)); answerButtons.appendChild(btn); }); }
+    function checkAnswer(selected, btn) { if (answeredThisRound) return; answeredThisRound = true; const buttons = answerButtons.querySelectorAll("button"); buttons.forEach(b => { b.disabled = true; b.classList.remove("hover:bg-slate-600"); }); if (selected.name === currentItem.name) { score++; streak++; btn.classList.remove("bg-slate-700"); btn.classList.add("bg-emerald-600", "text-white"); feedbackEl.textContent = "Correct!"; feedbackEl.className = "text-emerald-400 text-center font-medium min-h-[1.5rem]"; } else { missed++; streak = 0; btn.classList.remove("bg-slate-700"); btn.classList.add("bg-rose-600", "text-white"); feedbackEl.textContent = `Incorrect. The answer was ${currentItem.name} (${currentItem.value}).`; feedbackEl.className = "text-rose-400 text-center font-medium min-h-[1.5rem]"; buttons.forEach(b => { if (b.textContent.startsWith(currentItem.name)) { b.classList.remove("bg-slate-700"); b.classList.add("bg-emerald-600/50"); } }); } scoreEl.textContent = score; missedEl.textContent = missed; streakEl.textContent = streak; }
+    function showHint() { if (currentItem && !answeredThisRound) { feedbackEl.textContent = "Hint: " + currentItem.hint; feedbackEl.className = "text-amber-400 text-center font-medium min-h-[1.5rem]"; } }
+    if (hintBtn) hintBtn.addEventListener("click", showHint);
+    if (newQuestionBtn) newQuestionBtn.addEventListener("click", loadQuestion);
+    loadQuestion();
 
-    const practiceGrid = document.getElementById("practiceGrid");
-    const questionText = document.getElementById("questionText");
-    const questionContainer = document.getElementById("questionContainer");
-    const feedbackContainer = document.getElementById("feedbackContainer");
-    const feedbackIcon = document.getElementById("feedbackIcon");
-    const feedbackText = document.getElementById("feedbackText");
-    const scoreContainer = document.getElementById("scoreContainer");
-    const scoreText = document.getElementById("scoreText");
-    const streakContainer = document.getElementById("streakContainer");
-    const streakText = document.getElementById("streakText");
-    const newQuestionBtn = document.getElementById("newQuestionBtn");
-    const hintBtn = document.getElementById("hintBtn");
-
-    let currentAnswerId = null;
-    let currentAnswer = null;
-    let lastAnswerId = null;
-    let scoreCorrect = 0;
-    let scoreTotal = 0;
-    let streak = 0;
-    let bestStreak = 0;
-    let answered = false;
-
-    function shuffle(array) {
-      const arr = [...array];
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
-    function buildGrid(options) {
-      practiceGrid.innerHTML = "";
-      options.forEach(item => {
-        const card = document.createElement("button");
-        card.type = "button";
-        card.className =
-          "group bg-slate-800 rounded-2xl p-3 flex flex-col items-center gap-2 shadow focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all hover:bg-slate-700";
-        card.dataset.id = item.id;
-
-        const typeIcon = item.type === "coin" ? "#icon-coin" : "#icon-bill";
-        const typeColor = item.type === "coin" ? "text-amber-400" : "text-emerald-400";
-        const imgClass = item.type === "coin" ? "w-20 h-20 object-contain" : "w-full h-16 object-contain";
-
-        card.innerHTML = `
-          <img src="${item.image}" alt="${item.display}" class="${imgClass}" />
-          <div class="flex items-center gap-1.5">
-            <svg class="icon-sm ${typeColor}"><use href="${typeIcon}"/></svg>
-            <span class="text-sm font-semibold text-slate-50">${item.label}</span>
-          </div>
-          <span class="text-xs text-slate-300">${item.valueText}</span>
-        `;
-
-        card.addEventListener("click", () => handleChoice(item.id, card));
-        practiceGrid.appendChild(card);
-      });
-    }
-
-    function disableAllCards() {
-      const cards = practiceGrid.querySelectorAll("button");
-      cards.forEach(card => {
-        card.disabled = true;
-        card.classList.add("cursor-not-allowed", "opacity-75");
-      });
-    }
-
-    function showFeedback(isCorrect, message) {
-      feedbackContainer.classList.remove("hidden");
-      feedbackContainer.classList.add("flex");
-      
-      if (isCorrect) {
-        feedbackIcon.className = "p-1 rounded-full bg-emerald-500/20";
-        feedbackIcon.innerHTML = '<svg class="icon-sm text-emerald-400"><use href="#icon-check"/></svg>';
-        feedbackText.className = "text-base font-semibold text-emerald-300";
-      } else {
-        feedbackIcon.className = "p-1 rounded-full bg-rose-500/20";
-        feedbackIcon.innerHTML = '<svg class="icon-sm text-rose-400"><use href="#icon-x"/></svg>';
-        feedbackText.className = "text-base font-semibold text-rose-300";
-      }
-      
-      feedbackText.textContent = message;
-    }
-
-    function showHint() {
-      if (!currentAnswerId || answered) return;
-      
-      const cards = practiceGrid.querySelectorAll("button");
-      cards.forEach(card => {
-        if (card.dataset.id === currentAnswerId) {
-          card.classList.add("ring-2", "ring-amber-400");
-          card.classList.add("animate-pulse");
-          setTimeout(() => {
-            card.classList.remove("animate-pulse");
-          }, 1500);
-        }
-      });
-      
-      hintBtn.disabled = true;
-    }
-
-    function updateQuestionIcon(type) {
-      const iconUse = questionContainer.querySelector("svg use");
-      if (type === "coin") {
-        iconUse.setAttribute("href", "#icon-coin");
-        questionContainer.querySelector("svg").className = "icon text-amber-400 flex-shrink-0";
-      } else if (type === "bill") {
-        iconUse.setAttribute("href", "#icon-bill");
-        questionContainer.querySelector("svg").className = "icon text-emerald-400 flex-shrink-0";
-      } else {
-        iconUse.setAttribute("href", "#icon-info");
-        questionContainer.querySelector("svg").className = "icon text-slate-400 flex-shrink-0";
-      }
-    }
-
-    function newQuestion() {
-      feedbackContainer.classList.add("hidden");
-      feedbackContainer.classList.remove("flex");
-      answered = false;
-      hintBtn.disabled = false;
-
-      let availableItems = items.filter(i => i.id !== lastAnswerId);
-      if (availableItems.length === 0) availableItems = items;
-      
-      const answer = availableItems[Math.floor(Math.random() * availableItems.length)];
-      currentAnswerId = answer.id;
-      currentAnswer = answer;
-      lastAnswerId = answer.id;
-
-      const typeText = answer.type === "coin" ? "coin" : "bill";
-      questionText.textContent = `Find the ${answer.label} (${answer.valueText}). Tap the correct ${typeText}.`;
-      updateQuestionIcon(answer.type);
-
-      const others = shuffle(items.filter(i => i.id !== answer.id)).slice(0, 3);
-      const choices = shuffle([answer, ...others]);
-
-      buildGrid(choices);
-    }
-
-    function handleChoice(id, cardElement) {
-      if (!currentAnswerId || answered) return;
-      
-      answered = true;
-      scoreTotal += 1;
-      hintBtn.disabled = true;
-
-      scoreContainer.classList.remove("hidden");
-      scoreContainer.classList.add("flex");
-
-      if (id === currentAnswerId) {
-        scoreCorrect += 1;
-        streak += 1;
-        if (streak > bestStreak) bestStreak = streak;
-        
-        showFeedback(true, "Correct! Nice work.");
-        cardElement.classList.add("ring-4", "ring-emerald-400");
-        
-        if (streak >= 3) {
-          streakContainer.classList.remove("hidden");
-          streakContainer.classList.add("flex");
-          streakText.textContent = `${streak} in a row (Best: ${bestStreak})`;
-        }
-      } else {
-        streak = 0;
-        showFeedback(false, `Not quite. The correct answer was ${currentAnswer.label}.`);
-        cardElement.classList.add("ring-4", "ring-rose-400");
-        
-        const cards = practiceGrid.querySelectorAll("button");
-        cards.forEach(card => {
-          if (card.dataset.id === currentAnswerId) {
-            card.classList.add("ring-4", "ring-emerald-400");
-          }
-        });
-        
-        if (bestStreak > 0) {
-          streakContainer.classList.remove("hidden");
-          streakContainer.classList.add("flex");
-          streakText.textContent = `Best streak: ${bestStreak}`;
-        }
-      }
-
-      scoreText.textContent = `${scoreCorrect} correct out of ${scoreTotal}`;
-      disableAllCards();
-      currentAnswerId = null;
-    }
-
-    newQuestionBtn.addEventListener("click", newQuestion);
-    hintBtn.addEventListener("click", showHint);
-
-    // ============================
-    // Match the Portrait game
-    // ============================
-
-    const portraitItems = [
-      {
-        id: "1",
-        label: "$1 Bill",
-        imagePortrait: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_1_portrait.png`,
-        imageFull: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_1_full.png`
-      },
-      {
-        id: "5",
-        label: "$5 Bill",
-        imagePortrait: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_5_portrait.png`,
-        imageFull: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_5_full.png`
-      },
-      {
-        id: "10",
-        label: "$10 Bill",
-        imagePortrait: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_10_portrait.png`,
-        imageFull: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_10_full.png`
-      },
-      {
-        id: "20",
-        label: "$20 Bill",
-        imagePortrait: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_20_portrait.png`,
-        imageFull: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_20_full.png`
-      },
-      {
-        id: "50",
-        label: "$50 Bill",
-        imagePortrait: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_50_portrait.png`,
-        imageFull: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_50_full.png`
-      },
-      {
-        id: "100",
-        label: "$100 Bill",
-        imagePortrait: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_100_portrait.png`,
-        imageFull: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_100_full.png`
-      }
+    const portraits = [
+      { name: "George Washington", bill: "$1 Bill", img: billsURL + "1-dollar-bill-front.png" },
+      { name: "Abraham Lincoln", bill: "$5 Bill", img: billsURL + "5-dollar-bill-front.png" },
+      { name: "Alexander Hamilton", bill: "$10 Bill", img: billsURL + "10-dollar-bill-front.png" },
+      { name: "Andrew Jackson", bill: "$20 Bill", img: billsURL + "20-dollar-bill-front.png" },
+      { name: "Ulysses S. Grant", bill: "$50 Bill", img: billsURL + "50-dollar-bill-front.png" },
+      { name: "Benjamin Franklin", bill: "$100 Bill", img: billsURL + "100-dollar-bill-front.png" }
     ];
+    let portraitScore = 0, currentPortrait = null, portraitAnswered = false, usedPortraitIndices = [];
+    const portraitTarget = document.getElementById("portrait-target"), portraitBills = document.getElementById("portrait-bills"), portraitFeedback = document.getElementById("portrait-feedback"), portraitScoreEl = document.getElementById("portrait-score"), newPortraitBtn = document.getElementById("new-portrait-btn");
+    function getUnusedPortraitIndex() { const available = portraits.map((_, i) => i).filter(i => !usedPortraitIndices.includes(i)); if (available.length === 0) { usedPortraitIndices = []; return Math.floor(Math.random() * portraits.length); } return available[Math.floor(Math.random() * available.length)]; }
+    function loadPortraitQuestion() { portraitAnswered = false; const idx = getUnusedPortraitIndex(); usedPortraitIndices.push(idx); currentPortrait = portraits[idx]; portraitTarget.textContent = currentPortrait.name; portraitFeedback.textContent = ""; portraitFeedback.className = "text-center mb-4 font-semibold min-h-[1.5rem]"; let options = shuffleArray(portraits).slice(0, 4); if (!options.find(o => o.name === currentPortrait.name)) { options[Math.floor(Math.random() * 4)] = currentPortrait; } options = shuffleArray(options); portraitBills.innerHTML = ""; options.forEach(opt => { const btn = document.createElement("button"); btn.type = "button"; btn.className = "bg-slate-800/90 border-2 border-slate-700 rounded-xl p-3 hover:border-purple-500 transition cursor-pointer backdrop-blur-sm"; btn.innerHTML = `<img src="${opt.img}" alt="${opt.bill}" class="w-full rounded-lg mb-2"><p class="text-emerald-400 font-bold text-sm">${opt.bill}</p>`; btn.addEventListener("click", () => checkPortraitAnswer(opt, btn)); portraitBills.appendChild(btn); }); }
+    function checkPortraitAnswer(selected, btn) { if (portraitAnswered) return; portraitAnswered = true; const buttons = portraitBills.querySelectorAll("button"); buttons.forEach(b => { b.disabled = true; b.classList.remove("hover:border-purple-500"); }); if (selected.name === currentPortrait.name) { portraitScore++; btn.classList.remove("border-slate-700"); btn.classList.add("border-emerald-500", "bg-emerald-900/30"); portraitFeedback.textContent = "Correct!"; portraitFeedback.className = "text-emerald-400 text-center mb-4 font-semibold"; } else { btn.classList.remove("border-slate-700"); btn.classList.add("border-rose-500", "bg-rose-900/30"); portraitFeedback.textContent = `Incorrect. ${currentPortrait.name} is on the ${currentPortrait.bill}.`; portraitFeedback.className = "text-rose-400 text-center mb-4 font-semibold"; buttons.forEach(b => { const billText = b.querySelector("p").textContent; if (billText === currentPortrait.bill) { b.classList.remove("border-slate-700"); b.classList.add("border-emerald-500/50", "bg-emerald-900/20"); } }); } portraitScoreEl.textContent = portraitScore; }
+    if (newPortraitBtn) newPortraitBtn.addEventListener("click", loadPortraitQuestion);
+    loadPortraitQuestion();
 
-    const portraitImage = document.getElementById("portraitImage");
-    const portraitOptionsGrid = document.getElementById("portraitOptionsGrid");
-    const portraitFeedbackContainer = document.getElementById("portraitFeedbackContainer");
-    const portraitFeedbackIcon = document.getElementById("portraitFeedbackIcon");
-    const portraitFeedbackText = document.getElementById("portraitFeedbackText");
-    const portraitNewQuestionBtn = document.getElementById("portraitNewQuestionBtn");
+    const receiptAnswers = { "711": { "1": "B", "2": "A" }, "bestbuy": { "1": "B", "2": "B" }, "costco": { "1": "B", "2": "B" }, "cvs": { "1": "B", "2": "C" }, "lowes": { "1": "B", "2": "B" }, "target": { "1": "B", "2": "B" }, "walmart": { "1": "B", "2": "B" } };
+    document.querySelectorAll(".check-receipt").forEach(btn => { btn.addEventListener("click", () => { const receiptId = btn.dataset.receipt; const answers = receiptAnswers[receiptId]; if (!answers) return; let correct = 0; let total = Object.keys(answers).length; let allAnswered = true; Object.entries(answers).forEach(([questionNum, correctAnswer]) => { const optionsDiv = document.querySelector(`[data-receipt="${receiptId}"][data-question="${questionNum}"]`); if (!optionsDiv) return; const selectedInput = optionsDiv.querySelector("input:checked"); const labels = optionsDiv.querySelectorAll("label"); labels.forEach(label => { label.classList.remove("correct", "incorrect"); }); if (!selectedInput) { allAnswered = false; return; } const selectedValue = selectedInput.value; const selectedLabel = selectedInput.parentElement; if (selectedValue === correctAnswer) { correct++; selectedLabel.classList.add("correct"); } else { selectedLabel.classList.add("incorrect"); labels.forEach(label => { const input = label.querySelector("input"); if (input && input.value === correctAnswer) { label.classList.add("correct"); } }); } }); const feedbackEl = document.getElementById(`feedback-${receiptId}`); if (feedbackEl) { feedbackEl.classList.remove("hidden"); if (!allAnswered) { feedbackEl.textContent = "Please answer all questions."; feedbackEl.className = "receipt-feedback partial"; } else if (correct === total) { feedbackEl.textContent = "Perfect! All correct!"; feedbackEl.className = "receipt-feedback success"; } else { feedbackEl.textContent = `You got ${correct} out of ${total} correct.`; feedbackEl.className = "receipt-feedback " + (correct > 0 ? "partial" : "error"); } const inputs = btn.closest(".receipt-card").querySelectorAll("input"); inputs.forEach(input => input.disabled = true); btn.disabled = true; } }); });
 
-    let currentPortraitAnswerId = null;
-    let portraitAnswered = false;
-
-    function newPortraitQuestion() {
-      portraitFeedbackContainer.classList.add("hidden");
-      portraitFeedbackContainer.classList.remove("flex");
-      portraitAnswered = false;
-
-      // Pick one portrait
-      const answer = portraitItems[Math.floor(Math.random() * portraitItems.length)];
-      currentPortraitAnswerId = answer.id;
-
-      portraitImage.src = answer.imagePortrait;
-
-      // Pick two other bills for incorrect options
-      const others = shuffle(
-        portraitItems.filter((item) => item.id !== answer.id)
-      ).slice(0, 2);
-
-      const options = shuffle([answer, ...others]);
-
-      buildPortraitOptions(options);
-    }
-
-    function buildPortraitOptions(options) {
-      portraitOptionsGrid.innerHTML = "";
-
-      options.forEach((item) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className =
-          "group bg-slate-800 rounded-2xl p-2 flex flex-col items-center gap-2 shadow focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all hover:bg-slate-700";
-        btn.dataset.id = item.id;
-
-        btn.innerHTML = `
-          <img src="${item.imageFull}" alt="${item.label}" class="w-full h-24 object-contain mx-auto" />
-          <div class="flex items-center gap-1.5">
-            <svg class="icon-sm text-emerald-400"><use href="#icon-bill"/></svg>
-            <span class="text-sm font-semibold text-slate-50">${item.label}</span>
-          </div>
-        `;
-
-        btn.addEventListener("click", () => handlePortraitChoice(item.id, btn));
-        portraitOptionsGrid.appendChild(btn);
-      });
-    }
-
-    function disableAllPortraitCards() {
-      const cards = portraitOptionsGrid.querySelectorAll("button");
-      cards.forEach(card => {
-        card.disabled = true;
-        card.classList.add("cursor-not-allowed", "opacity-75");
-      });
-    }
-
-    function showPortraitFeedback(isCorrect, message) {
-      portraitFeedbackContainer.classList.remove("hidden");
-      portraitFeedbackContainer.classList.add("flex");
-      
-      if (isCorrect) {
-        portraitFeedbackIcon.className = "p-1 rounded-full bg-emerald-500/20";
-        portraitFeedbackIcon.innerHTML = '<svg class="icon-sm text-emerald-400"><use href="#icon-check"/></svg>';
-        portraitFeedbackText.className = "text-base font-semibold text-emerald-300";
-      } else {
-        portraitFeedbackIcon.className = "p-1 rounded-full bg-rose-500/20";
-        portraitFeedbackIcon.innerHTML = '<svg class="icon-sm text-rose-400"><use href="#icon-x"/></svg>';
-        portraitFeedbackText.className = "text-base font-semibold text-rose-300";
-      }
-      
-      portraitFeedbackText.textContent = message;
-    }
-
-    function handlePortraitChoice(id, buttonElement) {
-      if (!currentPortraitAnswerId || portraitAnswered) return;
-
-      portraitAnswered = true;
-
-      if (id === currentPortraitAnswerId) {
-        showPortraitFeedback(true, "Great match! That is the correct bill.");
-        buttonElement.classList.add("ring-4", "ring-emerald-400");
-      } else {
-        showPortraitFeedback(false, "Not quite. Look closely at the portrait and try again with a new question.");
-        buttonElement.classList.add("ring-4", "ring-rose-400");
-        
-        // Highlight the correct answer
-        const cards = portraitOptionsGrid.querySelectorAll("button");
-        cards.forEach(card => {
-          if (card.dataset.id === currentPortraitAnswerId) {
-            card.classList.add("ring-4", "ring-emerald-400");
-          }
-        });
-      }
-
-      disableAllPortraitCards();
-      currentPortraitAnswerId = null;
-    }
-
-    if (portraitNewQuestionBtn) {
-      portraitNewQuestionBtn.addEventListener("click", newPortraitQuestion);
-    }
-
-    // ============================
-    // Receipt Quiz Game
-    // ============================
-
-    // Answer keys for each receipt
-    const receiptAnswers = {
-      "7eleven": {
-        "7e-1": "B", // $14.00
-        "7e-2": "B", // EnergyXS (had promotion)
-        "7e-3": "B"  // VISA
-      },
-      "bestbuy": {
-        "bb-1": "C", // $2353.89
-        "bb-2": "C", // Logitech Mouse
-        "bb-3": "C"  // VISA
-      },
-      "costco": {
-        "co-1": "C", // $679.56
-        "co-2": "A", // 1 banana
-        "co-3": "D"  // $102.67 tax
-      },
-      "cvs": {
-        "cv-1": "A", // $30.52
-        "cv-2": "C", // 4 items
-        "cv-3": "B"  // $2.98
-      },
-      "lowes": {
-        "lo-1": "B", // $213.84
-        "lo-2": "C", // 10 rose plants
-        "lo-3": "C"  // Chase VISA
-      },
-      "target": {
-        "ta-1": "C", // $585.74
-        "ta-2": "B", // 3 items
-        "ta-3": "B"  // $50 discount
-      },
-      "walmart": {
-        "wa-1": "A", // $27.27
-        "wa-2": "B", // 4 items
-        "wa-3": "C"  // $2.90 TAX 1
-      }
-    };
-
-    // Initialize receipt quiz
-    function initReceiptQuiz() {
-      const receiptCards = document.querySelectorAll('.receipt-card');
-      
-      receiptCards.forEach(card => {
-        const checkBtn = card.querySelector('.check-receipt');
-        const feedbackEl = card.querySelector('.feedback');
-        const receiptId = card.dataset.receipt;
-        
-        checkBtn.addEventListener('click', () => {
-          checkReceiptAnswers(card, receiptId, feedbackEl);
-        });
-      });
-    }
-
-    function checkReceiptAnswers(card, receiptId, feedbackEl) {
-      const answers = receiptAnswers[receiptId];
-      if (!answers) return;
-      
-      let correct = 0;
-      let total = Object.keys(answers).length;
-      let allAnswered = true;
-      
-      Object.entries(answers).forEach(([questionId, correctAnswer]) => {
-        const optionsDiv = card.querySelector(`[data-question-id="${questionId}"]`);
-        if (!optionsDiv) return;
-        
-        const selectedInput = optionsDiv.querySelector('input:checked');
-        const labels = optionsDiv.querySelectorAll('label');
-        
-        // Remove previous styling
-        labels.forEach(label => {
-          label.classList.remove('correct', 'incorrect');
-        });
-        
-        if (!selectedInput) {
-          allAnswered = false;
-          return;
-        }
-        
-        const selectedValue = selectedInput.value;
-        const selectedLabel = selectedInput.parentElement;
-        
-        if (selectedValue === correctAnswer) {
-          correct++;
-          selectedLabel.classList.add('correct');
-        } else {
-          selectedLabel.classList.add('incorrect');
-          // Highlight the correct answer
-          labels.forEach(label => {
-            const input = label.querySelector('input');
-            if (input && input.value === correctAnswer) {
-              label.classList.add('correct');
-            }
-          });
-        }
-      });
-      
-      // Show feedback
-      if (!allAnswered) {
-        feedbackEl.textContent = "Please answer all questions before checking.";
-        feedbackEl.className = "feedback receipt-feedback partial";
-      } else if (correct === total) {
-        feedbackEl.textContent = `🎉 Perfect! You got all ${total} questions correct!`;
-        feedbackEl.className = "feedback receipt-feedback success";
-      } else if (correct > 0) {
-        feedbackEl.textContent = `Good effort! You got ${correct} out of ${total} correct. Check the highlighted answers.`;
-        feedbackEl.className = "feedback receipt-feedback partial";
-      } else {
-        feedbackEl.textContent = `Keep practicing! You got ${correct} out of ${total}. The correct answers are highlighted in green.`;
-        feedbackEl.className = "feedback receipt-feedback error";
-      }
-      
-      // Disable further changes after checking
-      const inputs = card.querySelectorAll('input[type="radio"]');
-      inputs.forEach(input => {
-        input.disabled = true;
-      });
-      
-      // Disable the check button
-      const checkBtn = card.querySelector('.check-receipt');
-      checkBtn.disabled = true;
-      checkBtn.textContent = "Checked ✓";
-    }
-
-    // Initialize receipt quiz when page loads
-    initReceiptQuiz();
-
-    // ============================
-    // Payment Simulator
-    // ============================
-    const payTarget = document.getElementById('pay-target');
-    const payCurrent = document.getElementById('pay-current');
-    const payOptions = document.getElementById('pay-options');
-    const payFeedback = document.getElementById('pay-feedback');
-    const payResetBtn = document.getElementById('pay-reset');
-    const payNewBtn = document.getElementById('pay-new');
-
-    let targetAmount = 0;
-    let currentPayment = 0;
-
-    const paymentDenominations = [
-      { label: '$20', value: 2000, image: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_20_full.png`, type: 'bill' },
-      { label: '$10', value: 1000, image: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_10_full.png`, type: 'bill' },
-      { label: '$5', value: 500, image: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_5_full.png`, type: 'bill' },
-      { label: '$1', value: 100, image: `${BASE_URL}/assets/money/coins/assets/money/bills/Bill_1_full.png`, type: 'bill' },
-      { label: '25¢', value: 25, image: `${BASE_URL}/assets/money/coins/quarter.png`, type: 'coin' },
-      { label: '10¢', value: 10, image: `${BASE_URL}/assets/money/coins/dime.png`, type: 'coin' },
-      { label: '5¢', value: 5, image: `${BASE_URL}/assets/money/coins/nickel.png`, type: 'coin' },
-      { label: '1¢', value: 1, image: `${BASE_URL}/assets/money/coins/penny.png`, type: 'coin' }
-    ];
-
-    function initPaymentSimulator() {
-      payOptions.innerHTML = '';
-      paymentDenominations.forEach(denom => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'bg-slate-700 hover:bg-slate-600 rounded-lg p-2 flex flex-col items-center gap-1 transition';
-        const imgClass = denom.type === 'coin' ? 'w-10 h-10' : 'w-12 h-8';
-        btn.innerHTML = `
-          <img src="${denom.image}" alt="${denom.label}" class="${imgClass} object-contain">
-          <span class="text-xs text-slate-300">${denom.label}</span>
-        `;
-        btn.addEventListener('click', () => addPayment(denom.value));
-        payOptions.appendChild(btn);
-      });
-    }
-
-    function addPayment(amount) {
-      currentPayment += amount;
-      updatePaymentDisplay();
-      checkPayment();
-    }
-
-    function updatePaymentDisplay() {
-      payCurrent.textContent = '$' + (currentPayment / 100).toFixed(2);
-    }
-
-    function checkPayment() {
-      if (currentPayment === targetAmount) {
-        payFeedback.textContent = 'Perfect! You paid the exact amount!';
-        payFeedback.className = 'mb-4 p-3 rounded-lg bg-emerald-900/50 text-emerald-300 font-semibold';
-        payFeedback.classList.remove('hidden');
-      } else if (currentPayment > targetAmount) {
-        const change = ((currentPayment - targetAmount) / 100).toFixed(2);
-        payFeedback.textContent = `You overpaid! You'll get $${change} in change.`;
-        payFeedback.className = 'mb-4 p-3 rounded-lg bg-amber-900/50 text-amber-300 font-semibold';
-        payFeedback.classList.remove('hidden');
-      } else {
-        payFeedback.classList.add('hidden');
-      }
-    }
-
-    function newPaymentAmount() {
-      // Generate random amount between $1.00 and $25.00
-      targetAmount = Math.floor(Math.random() * 2400) + 100;
-      // Round to nearest cent
-      targetAmount = Math.round(targetAmount);
-      payTarget.textContent = '$' + (targetAmount / 100).toFixed(2);
-      resetPayment();
-    }
-
-    function resetPayment() {
-      currentPayment = 0;
-      updatePaymentDisplay();
-      payFeedback.classList.add('hidden');
-    }
-
-    if (payResetBtn) payResetBtn.addEventListener('click', resetPayment);
-    if (payNewBtn) payNewBtn.addEventListener('click', newPaymentAmount);
+    const payTarget = document.getElementById('pay-target'), payCurrent = document.getElementById('pay-current'), paySelected = document.getElementById('pay-selected'), payBills = document.getElementById('pay-bills'), payCoins = document.getElementById('pay-coins'), payFeedback = document.getElementById('pay-feedback'), payClear = document.getElementById('pay-clear'), payCheck = document.getElementById('pay-check'), payNew = document.getElementById('pay-new');
+    let targetAmount = 0, currentPayment = 0, selectedMoney = [];
+    const paymentBills = [ { name: '$1', value: 100, img: billsURL + '1-dollar-bill-front.png' }, { name: '$5', value: 500, img: billsURL + '5-dollar-bill-front.png' }, { name: '$10', value: 1000, img: billsURL + '10-dollar-bill-front.png' }, { name: '$20', value: 2000, img: billsURL + '20-dollar-bill-front.png' }, { name: '$50', value: 5000, img: billsURL + '50-dollar-bill-front.png' }, { name: '$100', value: 10000, img: billsURL + '100-dollar-bill-front.png' } ];
+    const paymentCoins = [ { name: '1¢', value: 1, img: coinsURL + 'penny-front.png' }, { name: '5¢', value: 5, img: coinsURL + 'nickel-front.png' }, { name: '10¢', value: 10, img: coinsURL + 'dime-front.png' }, { name: '25¢', value: 25, img: coinsURL + 'quarter-front.png' } ];
+    function initPaymentSimulator() { payBills.innerHTML = ''; paymentBills.forEach(bill => { const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'bg-slate-700 hover:bg-slate-600 rounded-lg p-2 transition'; btn.innerHTML = `<img src="${bill.img}" alt="${bill.name}" class="w-full rounded">`; btn.addEventListener('click', () => addPayment(bill)); payBills.appendChild(btn); }); payCoins.innerHTML = ''; paymentCoins.forEach(coin => { const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'bg-slate-700 hover:bg-slate-600 rounded-lg p-2 transition flex flex-col items-center'; btn.innerHTML = `<img src="${coin.img}" alt="${coin.name}" class="w-12 h-12 object-contain"><span class="text-xs text-slate-300 mt-1">${coin.name}</span>`; btn.addEventListener('click', () => addPayment(coin)); payCoins.appendChild(btn); }); generateNewAmount(); }
+    function generateNewAmount() { targetAmount = Math.floor(Math.random() * 4900) + 100; payTarget.textContent = '$' + (targetAmount / 100).toFixed(2); clearPayment(); }
+    function addPayment(item) { selectedMoney.push(item); currentPayment += item.value; updatePaymentDisplay(); }
+    function clearPayment() { selectedMoney = []; currentPayment = 0; updatePaymentDisplay(); payFeedback.classList.add('hidden'); }
+    function updatePaymentDisplay() { payCurrent.textContent = '$' + (currentPayment / 100).toFixed(2); if (selectedMoney.length === 0) { paySelected.innerHTML = '<span class="text-slate-500 italic text-sm">No money selected</span>'; } else { paySelected.innerHTML = selectedMoney.map(item => `<span class="inline-block bg-slate-700 rounded px-2 py-1 text-xs">${item.name}</span>`).join(''); } if (currentPayment > targetAmount) { payCurrent.className = 'text-2xl font-bold text-amber-400 mb-2'; } else if (currentPayment === targetAmount) { payCurrent.className = 'text-2xl font-bold text-emerald-400 mb-2'; } else { payCurrent.className = 'text-2xl font-bold text-slate-200 mb-2'; } }
+    function checkPayment() { if (currentPayment === targetAmount) { payFeedback.textContent = 'Perfect! You paid the exact amount!'; payFeedback.className = 'mb-4 p-3 rounded-lg bg-emerald-900/50 text-emerald-300 font-semibold'; } else if (currentPayment > targetAmount) { const change = ((currentPayment - targetAmount) / 100).toFixed(2); payFeedback.textContent = `You overpaid! You would get $${change} back in change.`; payFeedback.className = 'mb-4 p-3 rounded-lg bg-amber-900/50 text-amber-300 font-semibold'; } else { const needed = ((targetAmount - currentPayment) / 100).toFixed(2); payFeedback.textContent = `Not enough! You still need $${needed} more.`; payFeedback.className = 'mb-4 p-3 rounded-lg bg-rose-900/50 text-rose-300 font-semibold'; } payFeedback.classList.remove('hidden'); }
+    if (payClear) payClear.addEventListener('click', clearPayment);
+    if (payCheck) payCheck.addEventListener('click', checkPayment);
+    if (payNew) payNew.addEventListener('click', generateNewAmount);
     initPaymentSimulator();
-    newPaymentAmount();
 
-    // ============================
-    // ATM Simulator
-    // ============================
-    const atmBalance = document.getElementById('atm-balance');
-    const atmAmount = document.getElementById('atm-amount');
-    const atmFeedback = document.getElementById('atm-feedback');
-    const atmSubmit = document.getElementById('atm-submit');
-
-    let balance = 50000; // $500.00 in cents
-
-    function updateATMBalance() {
-      atmBalance.textContent = '$' + (balance / 100).toFixed(2);
-    }
-
-    function doATMAction() {
-      const action = document.querySelector('input[name="atm-action"]:checked').value;
-      const amountInput = parseFloat(atmAmount.value);
-      
-      if (isNaN(amountInput) || amountInput <= 0) {
-        atmFeedback.textContent = 'Please enter a valid amount.';
-        atmFeedback.className = 'mb-4 p-3 rounded-lg bg-rose-900/50 text-rose-300 font-semibold';
-        atmFeedback.classList.remove('hidden');
-        return;
-      }
-
-      const amountCents = Math.round(amountInput * 100);
-
-      if (action === 'withdraw') {
-        if (amountCents > balance) {
-          atmFeedback.textContent = 'Insufficient funds! You cannot withdraw more than your balance.';
-          atmFeedback.className = 'mb-4 p-3 rounded-lg bg-rose-900/50 text-rose-300 font-semibold';
-        } else {
-          balance -= amountCents;
-          atmFeedback.textContent = `Withdrew $${(amountCents / 100).toFixed(2)}. Don't forget to take your cash!`;
-          atmFeedback.className = 'mb-4 p-3 rounded-lg bg-emerald-900/50 text-emerald-300 font-semibold';
-        }
-      } else {
-        balance += amountCents;
-        atmFeedback.textContent = `Deposited $${(amountCents / 100).toFixed(2)}. Your new balance is updated.`;
-        atmFeedback.className = 'mb-4 p-3 rounded-lg bg-emerald-900/50 text-emerald-300 font-semibold';
-      }
-
-      atmFeedback.classList.remove('hidden');
-      updateATMBalance();
-      atmAmount.value = '';
-    }
-
+    let balance = 10000;
+    const atmBalance = document.getElementById('atm-balance'), atmAmount = document.getElementById('atm-amount'), atmFeedback = document.getElementById('atm-feedback'), atmSubmit = document.getElementById('atm-submit');
+    function updateATMBalance() { atmBalance.textContent = '$' + (balance / 100).toFixed(2); }
+    document.querySelectorAll('.atm-quick').forEach(btn => { btn.addEventListener('click', () => { atmAmount.value = btn.dataset.amount; }); });
+    function doATMAction() { const action = document.querySelector('input[name="atm-action"]:checked').value; const amountCents = Math.round(parseFloat(atmAmount.value || 0) * 100); if (amountCents <= 0) { atmFeedback.textContent = 'Please enter a valid amount.'; atmFeedback.className = 'mb-4 p-3 rounded-lg bg-amber-900/50 text-amber-300 font-semibold'; atmFeedback.classList.remove('hidden'); return; } if (action === 'withdraw') { if (amountCents > balance) { atmFeedback.textContent = 'Insufficient funds! You cannot withdraw more than your balance.'; atmFeedback.className = 'mb-4 p-3 rounded-lg bg-rose-900/50 text-rose-300 font-semibold'; } else { balance -= amountCents; atmFeedback.textContent = `Withdrew $${(amountCents / 100).toFixed(2)}. Your new balance is updated.`; atmFeedback.className = 'mb-4 p-3 rounded-lg bg-emerald-900/50 text-emerald-300 font-semibold'; } } else { balance += amountCents; atmFeedback.textContent = `Deposited $${(amountCents / 100).toFixed(2)}. Your new balance is updated.`; atmFeedback.className = 'mb-4 p-3 rounded-lg bg-emerald-900/50 text-emerald-300 font-semibold'; } atmFeedback.classList.remove('hidden'); updateATMBalance(); atmAmount.value = ''; }
     if (atmSubmit) atmSubmit.addEventListener('click', doATMAction);
 
-    // ============================
-    // Shopping Game
-    // ============================
-    const shopBudget = document.getElementById('shop-budget');
-    const shopTotal = document.getElementById('shop-total');
-    const shopItems = document.getElementById('shop-items');
-    const shopCart = document.getElementById('shop-cart');
-    const shopFeedback = document.getElementById('shop-feedback');
-    const shopCheck = document.getElementById('shop-check');
-
-    let budget = 5000; // $50.00 in cents
-    let cartTotal = 0;
-    let cartItems = [];
-
-    const shoppingProducts = [
-      { name: 'Apple', price: 125 },
-      { name: 'Bread', price: 299 },
-      { name: 'Milk', price: 449 },
-      { name: 'Eggs', price: 399 },
-      { name: 'Cheese', price: 549 },
-      { name: 'Chips', price: 349 },
-      { name: 'Juice', price: 299 },
-      { name: 'Cereal', price: 499 }
-    ];
-
-    function initShoppingGame() {
-      shopItems.innerHTML = '';
-      shoppingProducts.forEach(product => {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'bg-slate-700 hover:bg-slate-600 rounded-lg p-3 text-center transition';
-        btn.innerHTML = `
-          <p class="text-slate-100 font-medium">${product.name}</p>
-          <p class="text-emerald-400 text-sm">$${(product.price / 100).toFixed(2)}</p>
-        `;
-        btn.addEventListener('click', () => addToCart(product));
-        shopItems.appendChild(btn);
-      });
-    }
-
-    function addToCart(product) {
-      cartItems.push(product);
-      cartTotal += product.price;
-      updateCartDisplay();
-    }
-
-    function updateCartDisplay() {
-      shopTotal.textContent = '$' + (cartTotal / 100).toFixed(2);
-      
-      if (cartItems.length === 0) {
-        shopCart.innerHTML = '<p class="text-slate-500 italic">Cart is empty</p>';
-      } else {
-        shopCart.innerHTML = cartItems.map(item => 
-          `<span class="inline-block bg-slate-700 rounded px-2 py-1 text-xs mr-1 mb-1">${item.name}</span>`
-        ).join('');
-      }
-
-      // Update total color based on budget
-      if (cartTotal > budget) {
-        shopTotal.className = 'text-2xl font-bold text-rose-400';
-      } else {
-        shopTotal.className = 'text-2xl font-bold text-slate-200';
-      }
-    }
-
-    function checkCart() {
-      if (cartItems.length === 0) {
-        shopFeedback.textContent = 'Your cart is empty! Add some items first.';
-        shopFeedback.className = 'mb-4 p-3 rounded-lg bg-amber-900/50 text-amber-300 font-semibold';
-      } else if (cartTotal <= budget) {
-        const remaining = ((budget - cartTotal) / 100).toFixed(2);
-        shopFeedback.textContent = `Great job! You stayed within budget with $${remaining} to spare!`;
-        shopFeedback.className = 'mb-4 p-3 rounded-lg bg-emerald-900/50 text-emerald-300 font-semibold';
-      } else {
-        const over = ((cartTotal - budget) / 100).toFixed(2);
-        shopFeedback.textContent = `Oops! You're $${over} over budget. Try removing some items.`;
-        shopFeedback.className = 'mb-4 p-3 rounded-lg bg-rose-900/50 text-rose-300 font-semibold';
-      }
-      shopFeedback.classList.remove('hidden');
-    }
-
+    const shopBudget = document.getElementById('shop-budget'), shopTotal = document.getElementById('shop-total'), shopItems = document.getElementById('shop-items'), shopCart = document.getElementById('shop-cart'), shopFeedback = document.getElementById('shop-feedback'), shopCheck = document.getElementById('shop-check');
+    let budget = 5000, cartTotal = 0, cartItems = [];
+    const shoppingProducts = [ { name: 'Apple', price: 125 }, { name: 'Bread', price: 299 }, { name: 'Milk', price: 449 }, { name: 'Eggs', price: 399 }, { name: 'Cheese', price: 549 }, { name: 'Chips', price: 349 }, { name: 'Juice', price: 299 }, { name: 'Cereal', price: 499 } ];
+    function initShoppingGame() { shopItems.innerHTML = ''; shoppingProducts.forEach(product => { const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'bg-slate-700 hover:bg-slate-600 rounded-lg p-3 text-center transition'; btn.innerHTML = `<p class="text-slate-100 font-medium">${product.name}</p><p class="text-emerald-400 text-sm">$${(product.price / 100).toFixed(2)}</p>`; btn.addEventListener('click', () => addToCart(product)); shopItems.appendChild(btn); }); }
+    function addToCart(product) { cartItems.push(product); cartTotal += product.price; updateCartDisplay(); }
+    function updateCartDisplay() { shopTotal.textContent = '$' + (cartTotal / 100).toFixed(2); if (cartItems.length === 0) { shopCart.innerHTML = '<p class="text-slate-500 italic">Cart is empty</p>'; } else { shopCart.innerHTML = cartItems.map(item => `<span class="inline-block bg-slate-700 rounded px-2 py-1 text-xs mr-1 mb-1">${item.name}</span>`).join(''); } if (cartTotal > budget) { shopTotal.className = 'text-2xl font-bold text-rose-400'; } else { shopTotal.className = 'text-2xl font-bold text-slate-200'; } }
+    function checkCart() { if (cartItems.length === 0) { shopFeedback.textContent = 'Your cart is empty! Add some items first.'; shopFeedback.className = 'mb-4 p-3 rounded-lg bg-amber-900/50 text-amber-300 font-semibold'; } else if (cartTotal <= budget) { const remaining = ((budget - cartTotal) / 100).toFixed(2); shopFeedback.textContent = `Great job! You stayed within budget with $${remaining} to spare!`; shopFeedback.className = 'mb-4 p-3 rounded-lg bg-emerald-900/50 text-emerald-300 font-semibold'; } else { const over = ((cartTotal - budget) / 100).toFixed(2); shopFeedback.textContent = `Oops! You're $${over} over budget. Try removing some items.`; shopFeedback.className = 'mb-4 p-3 rounded-lg bg-rose-900/50 text-rose-300 font-semibold'; } shopFeedback.classList.remove('hidden'); }
     if (shopCheck) shopCheck.addEventListener('click', checkCart);
     initShoppingGame();
 
-    // ============================
-    // Debit Card & Security Quizzes
-    // ============================
-    const quizAnswers = {
-      'debit-trainer': {
-        'dc-1': 'B',
-        'dc-2': 'B',
-        'dc-3': 'B'
-      },
-      'secure-usage': {
-        'su-1': 'B',
-        'su-2': 'C',
-        'su-3': 'B',
-        'su-4': 'C'
-      }
-    };
-
-    function initQuizzes() {
-      const quizButtons = document.querySelectorAll('.quiz-check');
-      
-      quizButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const quizId = btn.dataset.quizId;
-          checkQuizAnswers(quizId);
-        });
-      });
-    }
-
-    function checkQuizAnswers(quizId) {
-      const section = document.getElementById(quizId);
-      const answers = quizAnswers[quizId];
-      if (!section || !answers) return;
-
-      let correct = 0;
-      let total = Object.keys(answers).length;
-      let allAnswered = true;
-
-      Object.entries(answers).forEach(([questionId, correctAnswer]) => {
-        const optionsDiv = section.querySelector(`[data-question-id="${questionId}"]`);
-        if (!optionsDiv) return;
-
-        const selectedInput = optionsDiv.querySelector('input:checked');
-        const labels = optionsDiv.querySelectorAll('label');
-
-        // Remove previous styling
-        labels.forEach(label => {
-          label.classList.remove('correct', 'incorrect');
-        });
-
-        if (!selectedInput) {
-          allAnswered = false;
-          return;
-        }
-
-        const selectedValue = selectedInput.value;
-        const selectedLabel = selectedInput.parentElement;
-
-        if (selectedValue === correctAnswer) {
-          correct++;
-          selectedLabel.classList.add('correct');
-        } else {
-          selectedLabel.classList.add('incorrect');
-          // Highlight the correct answer
-          labels.forEach(label => {
-            const input = label.querySelector('input');
-            if (input && input.value === correctAnswer) {
-              label.classList.add('correct');
-            }
-          });
-        }
-      });
-
-      // Show feedback
-      const feedbackId = quizId === 'debit-trainer' ? 'debit-feedback' : 'secure-feedback';
-      const feedbackEl = document.getElementById(feedbackId);
-      
-      if (feedbackEl) {
-        feedbackEl.classList.remove('hidden');
-        
-        if (!allAnswered) {
-          feedbackEl.textContent = 'Please answer all questions before checking.';
-          feedbackEl.className = 'feedback mt-4 p-3 rounded-lg bg-amber-900/50 text-amber-300 font-semibold';
-        } else if (correct === total) {
-          feedbackEl.textContent = `Perfect! You got all ${total} questions correct!`;
-          feedbackEl.className = 'feedback mt-4 p-3 rounded-lg bg-emerald-900/50 text-emerald-300 font-semibold';
-        } else if (correct > 0) {
-          feedbackEl.textContent = `Good effort! You got ${correct} out of ${total} correct.`;
-          feedbackEl.className = 'feedback mt-4 p-3 rounded-lg bg-amber-900/50 text-amber-300 font-semibold';
-        } else {
-          feedbackEl.textContent = `Keep practicing! You got ${correct} out of ${total}. The correct answers are in green.`;
-          feedbackEl.className = 'feedback mt-4 p-3 rounded-lg bg-rose-900/50 text-rose-300 font-semibold';
-        }
-
-        // Disable further changes
-        const inputs = section.querySelectorAll('input[type="radio"]');
-        inputs.forEach(input => {
-          input.disabled = true;
-        });
-      }
-    }
-
+    const quizAnswers = { 'debit-trainer': { 'dc-1': 'B', 'dc-2': 'B', 'dc-3': 'B' }, 'secure-usage': { 'su-1': 'B', 'su-2': 'C', 'su-3': 'B', 'su-4': 'C' } };
+    function initQuizzes() { const quizButtons = document.querySelectorAll('.quiz-check'); quizButtons.forEach(btn => { btn.addEventListener('click', () => { const quizId = btn.dataset.quizId; checkQuizAnswers(quizId); }); }); }
+    function checkQuizAnswers(quizId) { const section = document.getElementById(quizId); const answers = quizAnswers[quizId]; if (!section || !answers) return; let correct = 0; let total = Object.keys(answers).length; let allAnswered = true; Object.entries(answers).forEach(([questionId, correctAnswer]) => { const optionsDiv = section.querySelector(`[data-question-id="${questionId}"]`); if (!optionsDiv) return; const selectedInput = optionsDiv.querySelector('input:checked'); const labels = optionsDiv.querySelectorAll('label'); labels.forEach(label => { label.classList.remove('correct', 'incorrect'); }); if (!selectedInput) { allAnswered = false; return; } const selectedValue = selectedInput.value; const selectedLabel = selectedInput.parentElement; if (selectedValue === correctAnswer) { correct++; selectedLabel.classList.add('correct'); } else { selectedLabel.classList.add('incorrect'); labels.forEach(label => { const input = label.querySelector('input'); if (input && input.value === correctAnswer) { label.classList.add('correct'); } }); } }); const feedbackId = quizId === 'debit-trainer' ? 'debit-feedback' : 'secure-feedback'; const feedbackEl = document.getElementById(feedbackId); if (feedbackEl) { feedbackEl.classList.remove('hidden'); if (!allAnswered) { feedbackEl.textContent = 'Please answer all questions before checking.'; feedbackEl.className = 'feedback mt-4 p-3 rounded-lg bg-amber-900/50 text-amber-300 font-semibold'; } else if (correct === total) { feedbackEl.textContent = `Perfect! You got all ${total} questions correct!`; feedbackEl.className = 'feedback mt-4 p-3 rounded-lg bg-emerald-900/50 text-emerald-300 font-semibold'; } else if (correct > 0) { feedbackEl.textContent = `Good effort! You got ${correct} out of ${total} correct.`; feedbackEl.className = 'feedback mt-4 p-3 rounded-lg bg-amber-900/50 text-amber-300 font-semibold'; } else { feedbackEl.textContent = `Keep practicing! You got ${correct} out of ${total}. The correct answers are in green.`; feedbackEl.className = 'feedback mt-4 p-3 rounded-lg bg-rose-900/50 text-rose-300 font-semibold'; } const inputs = section.querySelectorAll('input[type="radio"]'); inputs.forEach(input => { input.disabled = true; }); } }
     initQuizzes();
   </script>
 
   <script>
-    // Simple SPA view system: menu plus sections with data-view attributes
     window.addEventListener("DOMContentLoaded", function () {
-      // All sections that act like pages
       const views = Array.from(document.querySelectorAll("[data-view]"));
       if (!views.length) return;
-
-      const menuView = views.find(v => v.dataset.view === "menu");
-
-      function showView(name) {
-        views.forEach(section => {
-          if (section.dataset.view === name) {
-            section.classList.remove("hidden");
-          } else {
-            section.classList.add("hidden");
-          }
-        });
-
-        // Scroll to top so students always start at the top of the section
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-
-      // Hide all sections except the main menu on first load
-      if (menuView) {
-        views.forEach(section => {
-          if (section !== menuView) {
-            section.classList.add("hidden");
-          }
-        });
-        // Make sure the menu is visible
-        menuView.classList.remove("hidden");
-      }
-
-      // Listen for clicks on any element that has data-view-target (menu cards)
-      document.addEventListener("click", function (event) {
-        const navButton = event.target.closest("[data-view-target]");
-        if (navButton) {
-          const targetName = navButton.dataset.viewTarget;
-          if (targetName) {
-            showView(targetName);
-          }
-          return;
-        }
-
-        // Back to Menu buttons
-        const backButton = event.target.closest(".back-to-menu");
-        if (backButton) {
-          showView("menu");
-        }
-      });
+      function showView(name) { views.forEach(section => { if (section.dataset.view === name) { section.classList.remove("hidden"); } else { section.classList.add("hidden"); } }); window.scrollTo({ top: 0, behavior: "smooth" }); }
+      views.forEach(section => { if (section.dataset.view !== "menu") { section.classList.add("hidden"); } });
+      document.addEventListener("click", function (event) { const navButton = event.target.closest("[data-view-target]"); if (navButton) { const targetName = navButton.dataset.viewTarget; if (targetName) { showView(targetName); } return; } const backButton = event.target.closest(".back-to-menu"); if (backButton) { showView("menu"); } });
     });
   </script>
 </body>

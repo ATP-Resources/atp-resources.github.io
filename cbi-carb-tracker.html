@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CBI Carb Tracker — Katella ATP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --crimson: #8B1A1A;
+  --crimson-2: #A82020;
+  --crimson-light: rgba(139,26,26,0.08);
+  --gold: #B8851A;
+  --gold-light: rgba(184,133,26,0.10);
+  --bg: #F5F3EF;
+  --bg-2: #EDEAE4;
+  --surface: rgba(255,255,255,0.82);
+  --surface-solid: #FFFFFF;
+  --surface-2: rgba(255,255,255,0.55);
+  --glass-border: rgba(255,255,255,0.6);
+  --border: rgba(0,0,0,0.07);
+  --border-2: rgba(0,0,0,0.1);
+  --text: #111111;
+  --text-2: #444444;
+  --text-3: #888888;
+  --green: #1A6640;
+  --green-bg: rgba(26,102,64,0.10);
+  --green-border: rgba(26,102,64,0.20);
+  --amber: #92620A;
+  --amber-bg: rgba(146,98,10,0.10);
+  --amber-border: rgba(146,98,10,0.20);
+  --orange: #B84800;
+  --orange-bg: rgba(184,72,0,0.10);
+  --orange-border: rgba(184,72,0,0.22);
+  --red: #991A1A;
+  --red-bg: rgba(153,26,26,0.09);
+  --red-border: rgba(153,26,26,0.20);
+  --purple: #5B2D8A;
+  --purple-bg: rgba(91,45,138,0.09);
+  --purple-border: rgba(91,45,138,0.20);
+  --blue: #1A4E8A;
+  --blue-bg: rgba(26,78,138,0.09);
+  --blue-border: rgba(26,78,138,0.20);
+  --r: 18px;
+  --r-sm: 12px;
+  --r-lg: 24px;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow: 0 2px 8px rgba(0,0,0,0.07), 0 8px 24px rgba(0,0,0,0.05);
+  --shadow-lg: 0 4px 16px rgba(0,0,0,0.09), 0 16px 48px rgba(0,0,0,0.07);
+  --nav-h: 80px;
+  --header-h: 72px;
+}
+
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  padding-bottom: calc(var(--nav-h) + 16px);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Background gradient mesh */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 0% 0%, rgba(184,133,26,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 100% 100%, rgba(139,26,26,0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══════════════════════════════════════════════
+   LUCIDE SVG ICON SYSTEM
+═══════════════════════════════════════════════ */
+.icon { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.icon svg { stroke-width: 1.75; }
+
+/* ═══════════════════════════════════════════════
+   HEADER
+═══════════════════════════════════════════════ */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 16px 20px 12px;
+  background: rgba(245,243,239,0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.header-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-3); margin-bottom: 2px; }
+.header-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: var(--text); line-height: 1; }
+.header-date { font-size: 13px; font-weight: 500; color: var(--text-3); margin-top: 3px; }
+
+/* ═══════════════════════════════════════════════
+   FLOATING GLASS NAV DOCK
+═══════════════════════════════════════════════ */
+.nav-dock {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(20,20,20,0.88);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
+  border-radius: 28px;
+  padding: 8px 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.08);
+  min-width: 300px;
+  max-width: 380px;
+  width: calc(100vw - 48px);
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 6px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 20px;
+  transition: background 0.18s ease, transform 0.12s ease;
+  min-height: 52px;
+  min-width: 44px;
+  color: rgba(255,255,255,0.45);
+}
+.nav-btn.active {
+  background: rgba(255,255,255,0.14);
+  color: #FFFFFF;
+}
+.nav-btn:active { transform: scale(0.92); }
+.nav-btn svg { width: 20px; height: 20px; }
+.nav-label { font-size: 10px; font-weight: 600; letter-spacing: 0.2px; white-space: nowrap; }
+
+/* ═══════════════════════════════════════════════
+   SCREENS
+═══════════════════════════════════════════════ */
+.screen { display: none; padding: 16px 16px 8px; position: relative; z-index: 1; }
+.screen.active { display: block; }
+
+/* ═══════════════════════════════════════════════
+   GLASS CARD
+═══════════════════════════════════════════════ */
+.card {
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--r);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.card + .card { margin-top: 10px; }
+.card-pad { padding: 16px; }
+.card-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 14px 16px 8px;
+}
+
+/* ═══════════════════════════════════════════════
+   HOME SCREEN
+═══════════════════════════════════════════════ */
+.home-student-card {
+  background: linear-gradient(135deg, var(--crimson) 0%, #6B1010 100%);
+  border-radius: var(--r-lg);
+  padding: 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 20px rgba(139,26,26,0.28), 0 1px 4px rgba(139,26,26,0.2);
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+.home-student-card::after {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+}
+.student-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  border: 2px solid rgba(255,255,255,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; color: white;
+  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace;
+}
+.student-info { flex: 1; }
+.student-name { font-size: 20px; font-weight: 800; color: white; letter-spacing: -0.3px; }
+.student-sub { font-size: 12px; color: rgba(255,255,255,0.65); font-weight: 500; margin-top: 2px; }
+.student-change-btn {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--r);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-sm);
+  padding: 16px;
+}
+.stat-label { font-size: 11px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+.stat-value { font-size: 36px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text); line-height: 1; letter-spacing: -1px; }
+.stat-unit { font-size: 13px; font-weight: 500; color: var(--text-3); margin-top: 2px; }
+
+.quick-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.qa-btn {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r);
+  padding: 14px 12px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  text-align: left;
+}
+.qa-btn:active { transform: scale(0.96); box-shadow: none; }
+.qa-icon-wrap {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+}
+.qa-btn-label { font-size: 13px; font-weight: 700; color: var(--text); line-height: 1.2; }
+.qa-btn-sub { font-size: 11px; color: var(--text-3); font-weight: 500; }
+
+/* ═══════════════════════════════════════════════
+   LOOKUP SCREEN
+═══════════════════════════════════════════════ */
+.search-glass {
+  position: relative;
+  margin-bottom: 12px;
+}
+.search-glass input {
+  width: 100%;
+  padding: 13px 16px 13px 44px;
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text);
+  outline: none;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.search-glass input:focus {
+  border-color: rgba(139,26,26,0.3);
+  box-shadow: 0 0 0 3px rgba(139,26,26,0.08), var(--shadow-sm);
+}
+.search-glass input::placeholder { color: var(--text-3); }
+.search-glass-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  color: var(--text-3); pointer-events: none;
+}
+
+.chip-row {
+  display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 10px;
+  scrollbar-width: none;
+}
+.chip-row::-webkit-scrollbar { display: none; }
+.chip {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border-2);
+  background: var(--surface);
+  font-size: 12px; font-weight: 600; color: var(--text-2);
+  cursor: pointer; white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+}
+.chip.active {
+  background: var(--crimson);
+  border-color: var(--crimson);
+  color: white;
+  box-shadow: 0 2px 8px rgba(139,26,26,0.25);
+}
+
+.carb-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.legend-pill {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; color: var(--text-3);
+  padding: 3px 8px; border-radius: 10px; background: var(--surface);
+  border: 1px solid var(--border);
+}
+.legend-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+.results-meta { font-size: 12px; font-weight: 500; color: var(--text-3); margin-bottom: 8px; padding: 0 2px; }
+
+/* food list card */
+.food-list-wrap { background: var(--surface); border-radius: var(--r); border: 1px solid var(--glass-border); box-shadow: var(--shadow); overflow: hidden; }
+.food-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s ease;
+}
+.food-row:last-child { border-bottom: none; }
+.food-row:active { background: var(--bg-2); }
+.food-row-info { flex: 1; min-width: 0; }
+.food-row-name { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.2; }
+.food-row-meta { font-size: 11px; font-weight: 500; color: var(--text-3); margin-top: 2px; }
+.food-row-note { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.food-row-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════════
+   CARB BADGES
+═══════════════════════════════════════════════ */
+.cbadge {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 12px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  min-width: 48px; text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.cb-low    { background: var(--green-bg);   color: var(--green);  border: 1px solid var(--green-border); }
+.cb-modlo  { background: var(--amber-bg);   color: var(--amber);  border: 1px solid var(--amber-border); }
+.cb-mod    { background: var(--orange-bg);  color: var(--orange); border: 1px solid var(--orange-border); }
+.cb-high   { background: var(--red-bg);     color: var(--red);    border: 1px solid var(--red-border); }
+.cb-vhigh  { background: rgba(120,0,0,0.1); color: #7A0000;       border: 1px solid rgba(120,0,0,0.2); font-weight: 800; }
+
+/* ═══════════════════════════════════════════════
+   ADD BUTTON
+═══════════════════════════════════════════════ */
+.add-circle {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--crimson); color: white; border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(139,26,26,0.25);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.add-circle:active { transform: scale(0.88); box-shadow: none; }
+.add-circle svg { width: 16px; height: 16px; }
+
+/* ═══════════════════════════════════════════════
+   LOG SCREEN
+═══════════════════════════════════════════════ */
+.log-total-hero {
+  background: linear-gradient(135deg, var(--crimson) 0%, #6B1010 100%);
+  border-radius: var(--r-lg);
+  padding: 24px 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 20px rgba(139,26,26,0.28);
+  border: 1px solid rgba(255,255,255,0.08);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.log-total-hero::before {
+  content: '';
+  position: absolute;
+  bottom: -40px; left: -20px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.04);
+}
+.log-total-label { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 4px; }
+.log-total-num { font-size: 64px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: white; line-height: 1; letter-spacing: -2px; }
+.log-total-unit { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.65); margin-top: 2px; }
+.log-total-date { font-size: 11px; color: rgba(255,255,255,0.45); font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
+
+/* timeline log */
+.timeline-entry {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.timeline-entry:last-child { border-bottom: none; }
+.timeline-time {
+  font-size: 11px; font-family: 'JetBrains Mono', monospace;
+  font-weight: 500; color: var(--text-3); flex-shrink: 0;
+  width: 50px; padding-top: 1px;
+}
+.timeline-dot-col { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; padding-top: 4px; }
+.timeline-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--crimson); flex-shrink: 0; }
+.timeline-line { width: 1px; background: var(--border); flex: 1; margin-top: 4px; min-height: 16px; }
+.timeline-info { flex: 1; min-width: 0; }
+.timeline-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.timeline-rest { font-size: 12px; color: var(--text-3); font-weight: 500; margin-top: 1px; }
+.timeline-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.timeline-carbs { font-size: 16px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--crimson); }
+.del-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  transition: transform 0.1s;
+}
+.del-btn:active { transform: scale(0.88); }
+.del-btn svg { width: 12px; height: 12px; }
+
+.export-btn {
+  width: 100%; padding: 14px; margin-bottom: 12px;
+  background: var(--gold);
+  color: white; border: none;
+  border-radius: var(--r);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(184,133,26,0.28);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform 0.12s, box-shadow 0.12s;
+}
+.export-btn:active { transform: scale(0.97); box-shadow: none; }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-3); }
+.empty-icon-wrap { width: 56px; height: 56px; border-radius: 16px; background: var(--bg-2); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+.empty-title { font-size: 15px; font-weight: 600; color: var(--text-2); }
+.empty-sub { font-size: 13px; margin-top: 4px; }
+
+/* ═══════════════════════════════════════════════
+   CARE PLAN SCREEN
+═══════════════════════════════════════════════ */
+.kp-banner {
+  background: linear-gradient(135deg, #7A0000 0%, #A82020 100%);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 20px rgba(120,0,0,0.28);
+  border: 1px solid rgba(255,255,255,0.08);
+  position: relative; overflow: hidden;
+}
+.kp-banner::after { content:''; position:absolute; top:-20px; right:-20px; width:100px; height:100px; border-radius:50%; background:rgba(255,255,255,0.05); }
+.kp-banner-eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 3px; }
+.kp-banner-name { font-size: 24px; font-weight: 800; color: white; letter-spacing: -0.4px; }
+.kp-banner-type { font-size: 13px; color: rgba(255,255,255,0.65); font-weight: 500; margin-top: 3px; }
+
+/* Emergency quick actions */
+.emergency-bar {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+}
+.em-btn {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r);
+  padding: 12px;
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s, box-shadow 0.12s;
+  text-align: left;
+  min-height: 56px;
+}
+.em-btn:active { transform: scale(0.95); box-shadow: none; }
+.em-btn-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.em-btn-text { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.3; }
+
+/* Permanent alerts */
+.kp-always {
+  background: var(--blue-bg); border: 1px solid var(--blue-border);
+  border-radius: var(--r-sm); padding: 12px 14px; margin-bottom: 8px;
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; font-weight: 600; color: var(--blue); line-height: 1.5;
+}
+.kp-no-alone {
+  background: var(--red-bg); border: 1px solid var(--red-border);
+  border-radius: var(--r-sm); padding: 12px 14px; margin-bottom: 8px;
+  display: flex; align-items: flex-start; gap: 10px;
+  font-size: 13px; font-weight: 600; color: var(--red); line-height: 1.5;
+}
+.kp-symptom {
+  background: var(--orange-bg); border: 1px solid var(--orange-border);
+  border-radius: var(--r-sm); padding: 12px 14px; margin-bottom: 12px;
+}
+.kp-symptom-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--orange); margin-bottom: 4px; }
+.kp-symptom-body { font-size: 13px; font-weight: 600; color: var(--orange); line-height: 1.5; }
+
+/* Accordion */
+.accordion { margin-bottom: 8px; }
+.acc-header {
+  width: 100%; background: var(--surface); border: 1px solid var(--glass-border);
+  border-radius: var(--r); padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer; box-shadow: var(--shadow-sm);
+  transition: border-radius 0.2s ease;
+  text-align: left;
+}
+.accordion.open .acc-header { border-radius: var(--r) var(--r) 0 0; }
+.acc-severity-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.acc-title { flex: 1; font-size: 14px; font-weight: 700; color: var(--text); }
+.acc-subtitle { font-size: 11px; font-weight: 500; color: var(--text-3); margin-top: 1px; }
+.acc-chevron { color: var(--text-3); flex-shrink: 0; transition: transform 0.22s ease; }
+.accordion.open .acc-chevron { transform: rotate(180deg); }
+.acc-body {
+  background: var(--surface-solid);
+  border: 1px solid var(--glass-border); border-top: none;
+  border-radius: 0 0 var(--r) var(--r);
+  padding: 0 16px;
+  max-height: 0; overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.2s ease;
+}
+.accordion.open .acc-body { max-height: 1200px; padding: 14px 16px; }
+
+/* Steps inside accordion */
+.care-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.care-step:last-child { margin-bottom: 0; }
+.step-num {
+  width: 22px; height: 22px; border-radius: 50%; background: var(--crimson);
+  color: white; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+}
+.step-text { font-size: 13px; font-weight: 500; line-height: 1.6; flex: 1; color: var(--text-2); }
+.step-text strong { font-weight: 700; color: var(--text); }
+.step-text em { font-style: normal; color: var(--crimson); font-weight: 700; }
+
+.inline-alert {
+  border-radius: var(--r-sm); padding: 10px 12px; margin: 10px 0;
+  font-size: 12px; font-weight: 600; line-height: 1.5;
+  display: flex; align-items: flex-start; gap: 8px;
+}
+.ia-red   { background: var(--red-bg); border-left: 3px solid var(--red); color: var(--red); }
+.ia-blue  { background: var(--blue-bg); border-left: 3px solid var(--blue); color: var(--blue); }
+.ia-amber { background: var(--amber-bg); border-left: 3px solid var(--amber); color: var(--amber); }
+.acc-sub { font-size: 12px; color: var(--text-3); font-weight: 500; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+
+/* Baqsimi */
+.baqsimi-step { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; font-size: 13px; font-weight: 500; line-height: 1.5; color: var(--text-2); }
+.bq-bullet { width: 6px; height: 6px; border-radius: 50%; background: var(--red); flex-shrink: 0; margin-top: 6px; }
+
+/* Ketone table */
+.ketone-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+.ketone-table th { background: var(--purple-bg); color: var(--purple); font-weight: 700; padding: 8px 10px; text-align: left; font-size: 11px; border: 1px solid var(--purple-border); }
+.ketone-table td { padding: 8px 10px; border: 1px solid var(--border); font-weight: 500; font-size: 12px; vertical-align: top; line-height: 1.5; color: var(--text-2); }
+.ketone-table tr:nth-child(even) td { background: var(--bg); }
+
+/* Fast carb reference (below divider) */
+.section-divider { display: flex; align-items: center; gap: 10px; margin: 16px 0 12px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-3); }
+.section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.treatment-header { font-size: 12px; font-weight: 700; padding: 9px 12px; border-radius: var(--r-sm); margin: 10px 0 7px; display: flex; align-items: center; gap: 8px; }
+.th-green  { background: var(--green-bg);  color: var(--green);  border: 1px solid var(--green-border); }
+.th-amber  { background: var(--amber-bg);  color: var(--amber);  border: 1px solid var(--amber-border); }
+.th-red    { background: var(--red-bg);    color: var(--red);    border: 1px solid var(--red-border); }
+
+.treat-card {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r-sm);
+  padding: 12px 14px;
+  margin-bottom: 7px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  box-shadow: var(--shadow-sm);
+}
+.treat-card-info .tc-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.treat-card-info .tc-portion { font-size: 12px; color: var(--text-3); font-weight: 500; margin-top: 1px; }
+.treat-card-info .tc-note { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════════
+   SWAPS SCREEN
+═══════════════════════════════════════════════ */
+.swap-card {
+  background: var(--surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r);
+  padding: 14px 16px;
+  margin-bottom: 9px;
+  box-shadow: var(--shadow-sm);
+}
+.swap-restaurant-label { font-size: 11px; font-weight: 700; color: var(--crimson); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 10px; }
+.swap-comparison { display: flex; align-items: stretch; gap: 0; }
+.swap-side { flex: 1; }
+.swap-side-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-3); margin-bottom: 4px; }
+.swap-item-name { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; }
+.swap-middle { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 12px; gap: 4px; flex-shrink: 0; }
+.swap-arrow-icon { color: var(--green); }
+.swap-savings-pill { background: var(--green-bg); border: 1px solid var(--green-border); border-radius: 10px; padding: 2px 8px; font-size: 11px; font-weight: 700; color: var(--green); white-space: nowrap; margin-top: 6px; text-align: center; }
+
+/* ═══════════════════════════════════════════════
+   MODALS — APPLE BOTTOM SHEET
+═══════════════════════════════════════════════ */
+.sheet-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  z-index: 200; align-items: flex-end; justify-content: center;
+}
+.sheet-overlay.open { display: flex; }
+.sheet {
+  background: var(--surface-solid);
+  border-radius: 24px 24px 0 0;
+  width: 100%; max-width: 480px;
+  padding: 20px;
+  padding-bottom: max(env(safe-area-inset-bottom), 28px);
+  max-height: 80dvh;
+  overflow-y: auto;
+  animation: sheetUp 0.26s cubic-bezier(0.34,1.12,0.64,1);
+}
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.sheet-handle { width: 36px; height: 4px; border-radius: 2px; background: #DDD; margin: 0 auto 18px; }
+.sheet-title { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 2px; letter-spacing: -0.3px; }
+.sheet-sub { font-size: 13px; color: var(--text-3); font-weight: 500; margin-bottom: 16px; }
+.sheet-carb-hero {
+  text-align: center; padding: 18px; background: var(--bg);
+  border-radius: var(--r); margin-bottom: 14px;
+}
+.sheet-carb-num { font-size: 52px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--crimson); line-height: 1; letter-spacing: -2px; }
+.sheet-carb-label { font-size: 12px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+.sheet-details { font-size: 13px; color: var(--text-3); margin-bottom: 14px; line-height: 1.7; white-space: pre-line; }
+.sheet-field-label { font-size: 13px; font-weight: 700; color: var(--text-2); margin-bottom: 6px; display: block; }
+.sheet-select {
+  width: 100%; padding: 12px 14px;
+  border: 1.5px solid var(--border-2); border-radius: var(--r-sm);
+  font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600;
+  background: var(--surface-solid); color: var(--text); outline: none; margin-bottom: 16px;
+}
+.sheet-select:focus { border-color: var(--crimson); }
+.sheet-confirm {
+  width: 100%; padding: 15px; background: var(--crimson); color: white;
+  border: none; border-radius: var(--r); font-family: 'Inter', sans-serif;
+  font-size: 16px; font-weight: 700; cursor: pointer; margin-bottom: 8px;
+  box-shadow: 0 4px 16px rgba(139,26,26,0.28);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.sheet-confirm:active { transform: scale(0.98); box-shadow: none; }
+.sheet-cancel {
+  width: 100%; padding: 12px; background: none; color: var(--text-3);
+  border: none; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer;
+}
+.sheet-input {
+  width: 100%; padding: 13px 14px;
+  border: 1.5px solid var(--border-2); border-radius: var(--r-sm);
+  font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500;
+  background: var(--surface-solid); color: var(--text); outline: none; margin-bottom: 14px;
+}
+.sheet-input:focus { border-color: var(--crimson); }
+
+/* export textarea */
+.sheet-textarea {
+  width: 100%; height: 180px;
+  padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+  border: 1.5px solid var(--border-2); border-radius: var(--r-sm);
+  resize: none; outline: none; margin-bottom: 14px;
+  background: var(--bg); color: var(--text);
+}
+
+/* ═══════════════════════════════════════════════
+   STUDENT CARD IN LOG
+═══════════════════════════════════════════════ */
+.log-student-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.log-student-pill {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border: 1px solid var(--glass-border);
+  border-radius: var(--r); padding: 10px 14px; flex: 1;
+  box-shadow: var(--shadow-sm); cursor: pointer;
+}
+.log-student-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--crimson-light); border: 1px solid rgba(139,26,26,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; color: var(--crimson);
+  font-family: 'JetBrains Mono', monospace; flex-shrink: 0;
+}
+.log-student-name { font-size: 14px; font-weight: 700; color: var(--text); }
+.log-student-sub { font-size: 11px; color: var(--text-3); font-weight: 500; }
+.add-student-btn {
+  width: 44px; height: 44px; border-radius: var(--r-sm);
+  background: var(--crimson); color: white; border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(139,26,26,0.22);
+  transition: transform 0.1s;
+}
+.add-student-btn:active { transform: scale(0.9); }
+.add-student-btn svg { width: 18px; height: 18px; }
+
+/* ═══════════════════════════════════════════════
+   STUDENT SELECTOR SHEET ITEMS
+═══════════════════════════════════════════════ */
+.student-option {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px; border-radius: var(--r-sm); cursor: pointer;
+  transition: background 0.1s;
+  margin-bottom: 6px; border: 1.5px solid var(--border);
+  background: var(--surface);
+}
+.student-option.selected { border-color: var(--crimson); background: var(--crimson-light); }
+.student-option:active { background: var(--bg-2); }
+.student-option-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--crimson-light); border: 1px solid rgba(139,26,26,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: var(--crimson);
+  font-family: 'JetBrains Mono', monospace; flex-shrink: 0;
+}
+.student-option-name { font-size: 14px; font-weight: 700; color: var(--text); }
+
+/* ═══════════════════════════════════════════════
+   FAVORITES TABLE
+═══════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════
+   SCREEN TITLE ROW
+═══════════════════════════════════════════════ */
+.screen-title { font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 14px; letter-spacing: -0.4px; }
+.tab-bar { display: flex; gap: 0; margin-bottom: 14px; background: var(--surface); border-radius: var(--r); overflow: hidden; border: 1px solid var(--border); padding: 4px; gap: 4px; }
+.tab-bar-btn { flex: 1; padding: 9px 8px; border: none; background: none; font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 700; color: var(--text-3); cursor: pointer; border-radius: var(--r-sm); transition: all 0.15s; }
+.tab-bar-btn.active { background: var(--crimson); color: white; box-shadow: 0 1px 4px rgba(139,26,26,0.2); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="app-header">
+  <div class="header-eyebrow">Katella ATP · Room 805</div>
+  <div class="header-title">CBI Carb Tracker</div>
+  <div class="header-date" id="headerDate"></div>
+</header>
+
+<!-- ═══ SCREENS ═══ -->
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="home-student-card" id="homeStudentCard">
+    <div class="student-avatar" id="homeAvatar">KM</div>
+    <div class="student-info">
+      <div class="student-name" id="homeStudentName">Kai.Mar</div>
+      <div class="student-sub" id="homeStudentSub">Type 1 Diabetes · Insulin Pump</div>
+    </div>
+    <button class="student-change-btn" onclick="openStudentSheet()">Change</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg>
+        Today's Carbs
+      </div>
+      <div class="stat-value" id="homeTotal">0</div>
+      <div class="stat-unit">grams logged</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Entries
+      </div>
+      <div class="stat-value" id="homeEntries">0</div>
+      <div class="stat-unit">meals logged</div>
+    </div>
+  </div>
+
+  <div style="font-size:12px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Quick Actions</div>
+  <div class="quick-actions-grid">
+    <button class="qa-btn" onclick="setScreen('lookup', document.querySelectorAll('.nav-btn')[1])">
+      <div class="qa-icon-wrap" style="background:var(--crimson-light);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--crimson)" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      </div>
+      <div class="qa-btn-label">Restaurant Lookup</div>
+      <div class="qa-btn-sub">Search carb counts</div>
+    </button>
+    <button class="qa-btn" onclick="setScreen('fast', document.querySelectorAll('.nav-btn')[3])">
+      <div class="qa-icon-wrap" style="background:var(--red-bg);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      </div>
+      <div class="qa-btn-label">Care Plan</div>
+      <div class="qa-btn-sub">Kai.Mar protocols</div>
+    </button>
+    <button class="qa-btn" onclick="setScreen('log', document.querySelectorAll('.nav-btn')[2])">
+      <div class="qa-icon-wrap" style="background:var(--gold-light);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <div class="qa-btn-label">Today's Log</div>
+      <div class="qa-btn-sub">Track meals</div>
+    </button>
+    <button class="qa-btn" onclick="setScreen('swaps', document.querySelectorAll('.nav-btn')[4])">
+      <div class="qa-icon-wrap" style="background:var(--green-bg);">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </div>
+      <div class="qa-btn-label">Smart Swaps</div>
+      <div class="qa-btn-sub">Lower carb choices</div>
+    </button>
+  </div>
+</div>
+
+<!-- LOOKUP -->
+<div class="screen" id="screen-lookup">
+  <div class="screen-title">Restaurant Lookup</div>
+  <div class="search-glass">
+    <div class="search-glass-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </div>
+    <input type="text" id="searchInput" placeholder="Search food or restaurant…" oninput="renderFoodList()">
+  </div>
+  <div class="chip-row" id="chipRow"></div>
+  <div class="carb-legend">
+    <div class="legend-pill"><div class="legend-dot" style="background:#1A6640"></div>0–15g</div>
+    <div class="legend-pill"><div class="legend-dot" style="background:#92620A"></div>16–30g</div>
+    <div class="legend-pill"><div class="legend-dot" style="background:#B84800"></div>31–45g</div>
+    <div class="legend-pill"><div class="legend-dot" style="background:#991A1A"></div>46–60g</div>
+    <div class="legend-pill"><div class="legend-dot" style="background:#7A0000"></div>61g+</div>
+  </div>
+  <div class="results-meta" id="resultsMeta"></div>
+  <div class="food-list-wrap" id="foodListWrap"></div>
+</div>
+
+<!-- LOG -->
+<div class="screen" id="screen-log">
+  <div class="log-student-row">
+    <div class="log-student-pill" onclick="openStudentSheet()">
+      <div class="log-student-avatar" id="logAvatar">KM</div>
+      <div>
+        <div class="log-student-name" id="logStudentName">Kai.Mar</div>
+        <div class="log-student-sub">Tap to switch student</div>
+      </div>
+    </div>
+    <button class="add-student-btn" onclick="openAddStudentSheet()" title="Add student">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+    </button>
+  </div>
+  <div class="log-total-hero">
+    <div class="log-total-label">Today's Total</div>
+    <div class="log-total-num" id="logTotal">0</div>
+    <div class="log-total-unit">grams of carbohydrates</div>
+    <div class="log-total-date" id="logDate"></div>
+  </div>
+  <div id="logEntriesWrap"></div>
+</div>
+
+<!-- CARE PLAN -->
+<div class="screen" id="screen-fast">
+  <div class="kp-banner">
+    <div class="kp-banner-eyebrow">Individualized Care Plan</div>
+    <div class="kp-banner-name">Kai.Mar</div>
+    <div class="kp-banner-type">Type 1 Diabetes · Insulin Pump User</div>
+  </div>
+
+  <!-- Emergency quick-jump bar -->
+  <div class="emergency-bar">
+    <button class="em-btn" onclick="jumpToAccordion('acc-mild')">
+      <div class="em-btn-icon" style="background:var(--amber-bg);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      </div>
+      <div class="em-btn-text">Low BG<br>Protocol</div>
+    </button>
+    <button class="em-btn" onclick="jumpToAccordion('acc-mod')">
+      <div class="em-btn-icon" style="background:var(--orange-bg);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div class="em-btn-text">Moderate<br>Hypo</div>
+    </button>
+    <button class="em-btn" onclick="jumpToAccordion('acc-sev')">
+      <div class="em-btn-icon" style="background:var(--red-bg);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      </div>
+      <div class="em-btn-text">SEVERE<br>Call 911</div>
+    </button>
+    <button class="em-btn" onclick="jumpToAccordion('acc-hi300')">
+      <div class="em-btn-icon" style="background:var(--purple-bg);">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--purple)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="em-btn-text">BG Above<br>300</div>
+    </button>
+  </div>
+
+  <!-- Always / No-Alone alerts -->
+  <div class="kp-always">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><path d="M16 20V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/><rect x="1" y="4" width="22" height="16" rx="2"/></svg>
+    <span>Always have a <strong>quick-acting sugar source in Kailee's backpack</strong> at all times.</span>
+  </div>
+  <div class="kp-no-alone">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+    <span>If Kailee's blood sugar is <strong>below 70</strong>, do not leave Kailee alone. Treat onsite. An adult should accompany her at all times.</span>
+  </div>
+  <div class="kp-symptom">
+    <div class="kp-symptom-label">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Symptoms of High Blood Sugar
+    </div>
+    <div class="kp-symptom-body">Kailee may be <strong>very thirsty and urinate frequently</strong> per Mom.</div>
+  </div>
+
+  <!-- ACCORDIONS -->
+
+  <!-- Mild Hypo - not meal time -->
+  <div class="accordion" id="acc-mild">
+    <button class="acc-header" onclick="toggleAccordion('acc-mild')">
+      <div class="acc-severity-dot" style="background:#92620A;"></div>
+      <div><div class="acc-title">Mild Hypoglycemia</div><div class="acc-subtitle">BG below 70 — not at meal time</div></div>
+      <div class="acc-chevron">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </button>
+    <div class="acc-body">
+      <div class="care-step"><div class="step-num">1</div><div class="step-text">If Kailee is suspected to have a low blood sugar in class, <strong>test her blood sugar</strong> and give juice/tablets <em>before</em> going to the health office. An adult should accompany her at all times.</div></div>
+      <div class="care-step"><div class="step-num">2</div><div class="step-text">Give <em>15 grams of quick-acting sugar</em> — <strong>4 oz juice, or 3 glucose tabs, or 2 pks Smarties</strong> — with <em>NO BOLUS</em>.</div></div>
+      <div class="care-step"><div class="step-num">3</div><div class="step-text"><strong>Retest blood sugar in 10 minutes.</strong> If still below 70, repeat juice or tablets. If hypoglycemic 3 times, <em>call parent.</em></div></div>
+      <div class="care-step"><div class="step-num">4</div><div class="step-text">Once blood sugar is <em>above 70</em>: provide <strong>15 grams of carbohydrate AND protein snack</strong> (e.g., peanut butter/crackers) with <em>NO BOLUS</em>, if next meal is not scheduled within 1 hour.</div></div>
+      <div class="inline-alert ia-blue">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Kailee should remain in adult supervision until blood sugar is above 70.
+      </div>
+    </div>
+  </div>
+
+  <!-- Mild Hypo - at meal time -->
+  <div class="accordion" id="acc-meal">
+    <button class="acc-header" onclick="toggleAccordion('acc-meal')">
+      <div class="acc-severity-dot" style="background:#92620A;"></div>
+      <div><div class="acc-title">Mild Hypoglycemia — Meal Time</div><div class="acc-subtitle">BG below 70 at meal time</div></div>
+      <div class="acc-chevron">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </button>
+    <div class="acc-body">
+      <div class="care-step"><div class="step-num">1</div><div class="step-text">Treat as above for low blood sugar (Mild Hypoglycemia protocol).</div></div>
+      <div class="care-step"><div class="step-num">2</div><div class="step-text">Once blood sugar is <em>above 70</em>, <strong>enter the amount of carbohydrates for her meal in the pump</strong>.</div></div>
+    </div>
+  </div>
+
+  <!-- Moderate Hypo -->
+  <div class="accordion" id="acc-mod">
+    <button class="acc-header" onclick="toggleAccordion('acc-mod')">
+      <div class="acc-severity-dot" style="background:#B84800;"></div>
+      <div><div class="acc-title">Moderate Hypoglycemia</div><div class="acc-subtitle">Conscious but unable to drink — Emergency Care</div></div>
+      <div class="acc-chevron">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </button>
+    <div class="acc-body">
+      <div class="acc-sub">Kailee is conscious but unable to effectively drink fluids or fast-acting sugar offered.</div>
+      <div class="care-step"><div class="step-num">1</div><div class="step-text">Administer <em>15 grams of glucose gel between cheek and gum</em> with head elevated.</div></div>
+      <div class="care-step"><div class="step-num">2</div><div class="step-text">Encourage Kailee to swallow.</div></div>
+      <div class="inline-alert ia-red">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        NOTIFY PARENT AND SCHOOL NURSE immediately.
+      </div>
+      <div class="care-step"><div class="step-num">3</div><div class="step-text"><strong>Recheck in 10 minutes.</strong> If blood sugar is still below 70, repeat above.</div></div>
+      <div class="care-step"><div class="step-num">4</div><div class="step-text">Once blood sugar is above 70, provide <em>15 grams extra carbohydrate AND protein snack</em> (peanut butter and crackers <strong>or</strong> cheese and crackers) if next meal is not scheduled within 1 hour.</div></div>
+    </div>
+  </div>
+
+  <!-- Severe Hypo -->
+  <div class="accordion" id="acc-sev">
+    <button class="acc-header" onclick="toggleAccordion('acc-sev')">
+      <div class="acc-severity-dot" style="background:#991A1A;"></div>
+      <div><div class="acc-title">Severe Hypoglycemia</div><div class="acc-subtitle">Unconscious, seizure, unable to swallow, combative — CALL 911</div></div>
+      <div class="acc-chevron">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </button>
+    <div class="acc-body">
+      <div class="care-step"><div class="step-num">1</div><div class="step-text"><strong>Activate 911.</strong> Position Kailee on her side and ensure open airway.</div></div>
+      <div class="care-step"><div class="step-num">2</div><div class="step-text">Prepare and administer <em>Baqsimi 3mg nasal spray</em>:</div></div>
+      <div style="padding-left:32px;margin-bottom:10px;">
+        <div class="baqsimi-step"><div class="bq-bullet"></div><span>Hold device between fingers and thumb.</span></div>
+        <div class="baqsimi-step"><div class="bq-bullet"></div><span><strong>Do not push plunger yet.</strong></span></div>
+        <div class="baqsimi-step"><div class="bq-bullet"></div><span>Insert tip gently into one nostril until finger(s) touch the outside of the nose.</span></div>
+        <div class="baqsimi-step"><div class="bq-bullet"></div><span><strong>Push plunger firmly all the way in.</strong></span></div>
+        <div class="baqsimi-step"><div class="bq-bullet"></div><span>Dose is complete when the <strong>Green Line disappears</strong>.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BG above 300 -->
+  <div class="accordion" id="acc-hi300">
+    <button class="acc-header" onclick="toggleAccordion('acc-hi300')">
+      <div class="acc-severity-dot" style="background:#5B2D8A;"></div>
+      <div><div class="acc-title">Blood Sugar Above 300</div><div class="acc-subtitle">Check urine ketones and follow table</div></div>
+      <div class="acc-chevron">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </button>
+    <div class="acc-body">
+      <div class="acc-sub">Check urine ketones and follow the table below:</div>
+      <table class="ketone-table">
+        <thead>
+          <tr>
+            <th>No Ketones<br>Feels okay</th>
+            <th>Trace/Small<br>Feels okay</th>
+            <th>Moderate/Large Ketones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Send back to class</td>
+            <td>Encourage water<br>Send back to class</td>
+            <td>Follow correction scale under "Insulin Orders"<br>Call parents for pick up and/or site change<br>Encourage water</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Divider + General fast-carb reference -->
+  <div class="section-divider">General Fast-Acting Carb Reference</div>
+  <div class="inline-alert ia-blue" style="margin-bottom:12px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    General reference only. Always follow Kai.Mar's individualized care plan above. Notify nurse/parent per protocol.
+  </div>
+
+  <div class="treatment-header th-green">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    15g Treatment — BG 54–70 mg/dL · Wait 15 min, recheck
+  </div>
+  <div id="treat15"></div>
+  <div class="treatment-header th-amber">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    30g Treatment — BG below 54 mg/dL · Notify nurse
+  </div>
+  <div id="treat30"></div>
+  <div class="treatment-header th-red">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Emergency — Notify Nurse / Parent
+  </div>
+  <div id="treatEmergency"></div>
+</div>
+
+<!-- SWAPS -->
+<div class="screen" id="screen-swaps">
+  <div class="tab-bar">
+    <button class="tab-bar-btn active" onclick="setSwapTab('swaps',this)">Low-Carb Swaps</button>
+    <button class="tab-bar-btn" onclick="setSwapTab('favorites',this)">Student Favorites</button>
+  </div>
+  <div id="swapsContent"></div>
+  <div id="favoritesContent" style="display:none;"></div>
+</div>
+
+<!-- FLOATING NAV DOCK -->
+<nav class="nav-dock">
+  <button class="nav-btn active" onclick="setScreen('home',this)">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span class="nav-label">Home</span>
+  </button>
+  <button class="nav-btn" onclick="setScreen('lookup',this)">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <span class="nav-label">Lookup</span>
+  </button>
+  <button class="nav-btn" onclick="setScreen('log',this)">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    <span class="nav-label">Log</span>
+  </button>
+  <button class="nav-btn" onclick="setScreen('fast',this)">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    <span class="nav-label">Care Plan</span>
+  </button>
+  <button class="nav-btn" onclick="setScreen('swaps',this)">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    <span class="nav-label">Swaps</span>
+  </button>
+</nav>
+
+<!-- ═══ SHEETS ═══ -->
+
+<!-- Add to log sheet -->
+<div class="sheet-overlay" id="addSheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title" id="sheetFoodName"></div>
+    <div class="sheet-sub" id="sheetFoodSub"></div>
+    <div class="sheet-carb-hero">
+      <div class="sheet-carb-num" id="sheetCarbNum"></div>
+      <div class="sheet-carb-label">grams of carbohydrates</div>
+    </div>
+    <div class="sheet-details" id="sheetDetails"></div>
+    <label class="sheet-field-label">Adding to log for:</label>
+    <select class="sheet-select" id="sheetStudentSelect"></select>
+    <button class="sheet-confirm" onclick="confirmAdd()">Add to Today's Log</button>
+    <button class="sheet-cancel" onclick="closeSheet('addSheet')">Cancel</button>
+  </div>
+</div>
+
+<!-- Export sheet -->
+<div class="sheet-overlay" id="exportSheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Export Log</div>
+    <div class="sheet-sub" id="exportSheetSub"></div>
+    <textarea class="sheet-textarea" id="exportTextarea"></textarea>
+    <button class="sheet-confirm" onclick="copyExport()">Copy to Clipboard</button>
+    <button class="sheet-cancel" onclick="closeSheet('exportSheet')">Close</button>
+  </div>
+</div>
+
+<!-- Student picker sheet -->
+<div class="sheet-overlay" id="studentSheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Select Student</div>
+    <div class="sheet-sub">Tap a student to switch the active log.</div>
+    <div id="studentOptionsList"></div>
+    <button class="sheet-cancel" onclick="closeSheet('studentSheet')">Cancel</button>
+  </div>
+</div>
+
+<!-- Add student sheet -->
+<div class="sheet-overlay" id="addStudentSheet">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-title">Add Student</div>
+    <div class="sheet-sub">Enter student initials or first name only.</div>
+    <input class="sheet-input" id="newStudentInput" type="text" placeholder="e.g. J.R. or Maria" maxlength="20">
+    <button class="sheet-confirm" onclick="confirmAddStudent()">Add Student</button>
+    <button class="sheet-cancel" onclick="closeSheet('addStudentSheet')">Cancel</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════ */
+const FOODS = [
+  {r:"Starbucks",n:"Bacon & Gouda Egg Sandwich",t:"Breakfast",s:"1 Sandwich",c:35,su:2,f:1,note:"Classic breakfast item"},
+  {r:"Starbucks",n:"Sausage, Cheddar & Egg Sandwich",t:"Breakfast",s:"1 Sandwich",c:42,su:4,f:2,note:"High protein, moderate carbs"},
+  {r:"Starbucks",n:"Spinach, Feta & Egg White Wrap",t:"Breakfast",s:"1 Wrap",c:33,su:5,f:2,note:"Lower carb wrap option"},
+  {r:"Starbucks",n:"Egg Bites (Bacon & Gruyere)",t:"Breakfast",s:"2 Pieces",c:11,su:2,f:0,note:"Best low-carb hot food option"},
+  {r:"Starbucks",n:"Frappuccino (Grande)",t:"Drink",s:"16 oz",c:67,su:63,f:0,note:"Very high sugar — count carefully"},
+  {r:"Starbucks",n:"Iced Caffe Latte (Grande, nonfat)",t:"Drink",s:"16 oz",c:19,su:18,f:0,note:"Lower than Frappuccino"},
+  {r:"Starbucks",n:"Iced Coffee (unsweetened)",t:"Drink",s:"16 oz",c:3,su:0,f:0,note:"Best low-carb drink option"},
+  {r:"Starbucks",n:"Croissant",t:"Bakery",s:"1 Croissant",c:32,su:6,f:1,note:"Moderate — pair with protein"},
+  {r:"Starbucks",n:"Chocolate Chip Cookie",t:"Bakery",s:"1 Cookie",c:45,su:24,f:1,note:"High carb — occasional treat"},
+  {r:"McDonald's",n:"Hamburger",t:"Lunch",s:"1 Burger",c:31,su:6,f:1,note:"Lower carb burger option"},
+  {r:"McDonald's",n:"Cheeseburger",t:"Lunch",s:"1 Burger",c:33,su:7,f:1,note:"Add 2g vs plain hamburger"},
+  {r:"McDonald's",n:"Big Mac",t:"Lunch",s:"1 Burger",c:44,su:9,f:3,note:"Moderate — watch the bun"},
+  {r:"McDonald's",n:"McDouble",t:"Lunch",s:"1 Burger",c:34,su:7,f:2,note:"Good value, moderate carbs"},
+  {r:"McDonald's",n:"10 pc Chicken McNuggets",t:"Lunch",s:"10 pieces",c:27,su:0,f:0,note:"No bun = lower carb"},
+  {r:"McDonald's",n:"Medium French Fries",t:"Side",s:"1 Medium",c:43,su:0,f:4,note:"Moderate-high, very common"},
+  {r:"McDonald's",n:"Large French Fries",t:"Side",s:"1 Large",c:66,su:0,f:6,note:"High — be aware"},
+  {r:"McDonald's",n:"Apple Slices",t:"Side",s:"1 Pack",c:8,su:6,f:1,note:"Low carb side option"},
+  {r:"McDonald's",n:"McFlurry (Oreo)",t:"Dessert",s:"1 McFlurry",c:86,su:64,f:0,note:"Very high — occasional only"},
+  {r:"McDonald's",n:"Vanilla Soft Serve (Kids)",t:"Dessert",s:"1 Cup",c:24,su:18,f:0,note:"Lower portion option"},
+  {r:"McDonald's",n:"Chocolate Shake (Medium)",t:"Drink",s:"21 oz",c:72,su:62,f:0,note:"High — plan ahead"},
+  {r:"Chick-fil-A",n:"Original Chicken Sandwich",t:"Lunch",s:"1 Sandwich",c:40,su:6,f:1,note:"Very popular ATP order"},
+  {r:"Chick-fil-A",n:"Deluxe Chicken Sandwich",t:"Lunch",s:"1 Sandwich",c:42,su:7,f:2,note:"Slightly higher with toppings"},
+  {r:"Chick-fil-A",n:"Grilled Chicken Sandwich",t:"Lunch",s:"1 Sandwich",c:36,su:7,f:2,note:"Lower carb grilled option"},
+  {r:"Chick-fil-A",n:"8 pc Nuggets (Grilled)",t:"Lunch",s:"8 pieces",c:2,su:1,f:0,note:"Best low-carb option"},
+  {r:"Chick-fil-A",n:"8 pc Nuggets (Breaded)",t:"Lunch",s:"8 pieces",c:11,su:2,f:0,note:"Still low compared to sandwich"},
+  {r:"Chick-fil-A",n:"Waffle Fries (Medium)",t:"Side",s:"1 Medium",c:43,su:0,f:4,note:"Moderate — common side order"},
+  {r:"Chick-fil-A",n:"Mac & Cheese (Medium)",t:"Side",s:"1 Medium",c:30,su:4,f:1,note:"Comfort side, moderate carbs"},
+  {r:"Chick-fil-A",n:"Side Salad (no dressing)",t:"Side",s:"1 Bowl",c:8,su:3,f:2,note:"Low carb salad option"},
+  {r:"Chick-fil-A",n:"Lemonade (Medium)",t:"Drink",s:"14 oz",c:37,su:35,f:0,note:"High sugar — use small"},
+  {r:"In-N-Out",n:"Hamburger",t:"Lunch",s:"1 Burger",c:33,su:10,f:3,note:"Standard beef burger"},
+  {r:"In-N-Out",n:"Cheeseburger",t:"Lunch",s:"1 Burger",c:34,su:10,f:3,note:"Classic order"},
+  {r:"In-N-Out",n:"Double-Double",t:"Lunch",s:"1 Burger",c:42,su:10,f:3,note:"Protein style available"},
+  {r:"In-N-Out",n:"Protein Style Burger",t:"Lunch",s:"1 Burger",c:11,su:8,f:3,note:"Lettuce wrap = very low carb"},
+  {r:"In-N-Out",n:"French Fries",t:"Side",s:"1 Order",c:52,su:0,f:3,note:"High — regular order"},
+  {r:"Costco Food Court",n:"Cheese Pizza Slice",t:"Lunch",s:"1 Slice",c:80,su:8,f:4,note:"Very high — one slice only"},
+  {r:"Costco Food Court",n:"Pepperoni Pizza Slice",t:"Lunch",s:"1 Slice",c:77,su:8,f:4,note:"Very high — plan accordingly"},
+  {r:"Costco Food Court",n:"Hot Dog + Bun (no condiments)",t:"Lunch",s:"1 Hot Dog",c:42,su:3,f:1,note:"Moderate — popular ATP item"},
+  {r:"Costco Food Court",n:"Churro",t:"Snack",s:"1 Churro",c:52,su:12,f:1,note:"High — occasional treat"},
+  {r:"Costco Food Court",n:"Vanilla Soft Serve (Cup)",t:"Dessert",s:"1 Cup",c:35,su:30,f:0,note:"Moderate — student favorite"},
+  {r:"Costco Food Court",n:"Acai Bowl",t:"Snack",s:"1 Bowl",c:59,su:28,f:6,note:"High natural carbs"},
+  {r:"Subway",n:"6-inch Turkey Breast",t:"Lunch",s:"6 inch",c:44,su:7,f:3,note:"Most popular ATP order"},
+  {r:"Subway",n:"6-inch Veggie Delite",t:"Lunch",s:"6 inch",c:42,su:7,f:4,note:"Vegetarian option"},
+  {r:"Subway",n:"6-inch Tuna",t:"Lunch",s:"6 inch",c:44,su:8,f:3,note:"High protein option"},
+  {r:"Subway",n:"6-inch Spicy Italian",t:"Lunch",s:"6 inch",c:46,su:7,f:3,note:"Common choice"},
+  {r:"Subway",n:"Footlong Turkey Breast",t:"Lunch",s:"12 inch",c:88,su:14,f:6,note:"Double the 6-inch carbs"},
+  {r:"Subway",n:"Chocolate Chip Cookie",t:"Dessert",s:"1 Cookie",c:45,su:26,f:0,note:"High dessert option"},
+  {r:"Jersey Mike's",n:"#7 Turkey & Provolone (Regular)",t:"Lunch",s:"Regular",c:52,su:8,f:2,note:"Popular deli sub"},
+  {r:"Jersey Mike's",n:"Mini Sub (any)",t:"Lunch",s:"Mini",c:27,su:4,f:1,note:"Lower carb portion"},
+  {r:"Jersey Mike's",n:"Sub in a Tub (Turkey)",t:"Lunch",s:"Regular",c:9,su:6,f:2,note:"No bread = low carb"},
+  {r:"Panera Bread",n:"Turkey & Avocado BLT",t:"Lunch",s:"1 Sandwich",c:58,su:7,f:3,note:"Moderate-high"},
+  {r:"Panera Bread",n:"Mac & Cheese (Regular)",t:"Lunch",s:"1 Bowl",c:62,su:7,f:4,note:"High — comfort food"},
+  {r:"Panera Bread",n:"Broccoli Cheddar Soup (Bowl)",t:"Lunch",s:"1 Bowl",c:26,su:7,f:2,note:"Moderate, popular option"},
+  {r:"Panera Bread",n:"Greek Salad (no dressing)",t:"Lunch",s:"1 Bowl",c:11,su:4,f:2,note:"Low carb salad choice"},
+  {r:"Panera Bread",n:"Cinnamon Crunch Bagel",t:"Breakfast",s:"1 Bagel",c:79,su:19,f:3,note:"Very high — breakfast item"},
+  {r:"Raising Cane's",n:"The Box Combo (3 tenders)",t:"Lunch",s:"1 Combo",c:62,su:5,f:2,note:"Includes fries + toast"},
+  {r:"Raising Cane's",n:"3 Chicken Fingers (only)",t:"Lunch",s:"3 pieces",c:14,su:0,f:0,note:"Low carb without sides"},
+  {r:"Raising Cane's",n:"Crinkle-Cut Fries",t:"Side",s:"1 Order",c:43,su:0,f:4,note:"Moderate side"},
+  {r:"Raising Cane's",n:"Texas Toast",t:"Side",s:"1 Slice",c:26,su:2,f:1,note:"Add-on if included"},
+  {r:"Taco Bell",n:"Bean Burrito",t:"Lunch",s:"1 Burrito",c:54,su:3,f:8,note:"Very popular ATP order"},
+  {r:"Taco Bell",n:"Cheese Quesadilla",t:"Lunch",s:"1 Quesadilla",c:39,su:2,f:2,note:"Lower carb option"},
+  {r:"Taco Bell",n:"Crunchy Taco",t:"Lunch",s:"1 Taco",c:15,su:1,f:2,note:"Low carb taco option"},
+  {r:"Taco Bell",n:"Soft Taco (Chicken)",t:"Lunch",s:"1 Taco",c:21,su:2,f:2,note:"Moderate — small item"},
+  {r:"Taco Bell",n:"Burrito Supreme (Chicken)",t:"Lunch",s:"1 Burrito",c:51,su:4,f:6,note:"Moderate-high"},
+  {r:"Taco Bell",n:"Nachos BellGrande",t:"Snack",s:"1 Order",c:77,su:3,f:7,note:"Very high — big item"},
+  {r:"Del Taco",n:"Chicken Soft Taco",t:"Lunch",s:"1 Taco",c:20,su:1,f:1,note:"Lower carb option"},
+  {r:"Del Taco",n:"Bean & Cheese Burrito",t:"Lunch",s:"1 Burrito",c:55,su:3,f:7,note:"Similar to Taco Bell"},
+  {r:"Del Taco",n:"French Fries (Small)",t:"Side",s:"1 Small",c:38,su:0,f:3,note:"Moderate side"},
+  {r:"Panda Express",n:"Orange Chicken (1 scoop)",t:"Lunch",s:"5.4 oz",c:53,su:18,f:0,note:"Most popular, high sugar"},
+  {r:"Panda Express",n:"Broccoli Beef (1 scoop)",t:"Lunch",s:"5.4 oz",c:13,su:5,f:2,note:"Low carb entree option"},
+  {r:"Panda Express",n:"String Bean Chicken (1 scoop)",t:"Lunch",s:"5.6 oz",c:13,su:5,f:2,note:"Low-carb choice"},
+  {r:"Panda Express",n:"Chow Mein (1 scoop)",t:"Side",s:"8.4 oz",c:66,su:5,f:5,note:"High carb noodle side"},
+  {r:"Panda Express",n:"Fried Rice (1 scoop)",t:"Side",s:"8 oz",c:72,su:1,f:2,note:"High carb rice side"},
+  {r:"Panda Express",n:"Mixed Vegetables (1 scoop)",t:"Side",s:"5.6 oz",c:10,su:4,f:3,note:"Best low-carb side"},
+  {r:"Panda Express",n:"Super Greens (1 scoop)",t:"Side",s:"5.9 oz",c:7,su:2,f:4,note:"Lowest carb side option"},
+  {r:"Chipotle",n:"Burrito Bowl (Chicken)",t:"Lunch",s:"1 Bowl",c:70,su:2,f:11,note:"White rice + black beans + chicken"},
+  {r:"Chipotle",n:"Burrito (Chicken, flour tortilla)",t:"Lunch",s:"1 Burrito",c:76,su:5,f:11,note:"High — large tortilla adds carbs"},
+  {r:"Chipotle",n:"Tacos (3 Chicken, corn tortilla)",t:"Lunch",s:"3 Tacos",c:54,su:5,f:9,note:"Moderate-high, smaller portions"},
+  {r:"Chipotle",n:"Salad Bowl (Chicken, no dressing)",t:"Lunch",s:"1 Bowl",c:22,su:2,f:10,note:"Lower carb option"},
+  {r:"Chipotle",n:"Chips",t:"Side",s:"1 Order",c:77,su:0,f:5,note:"Very high — add-on"},
+  {r:"Jack in the Box",n:"Jumbo Jack",t:"Lunch",s:"1 Burger",c:51,su:11,f:3,note:"High — large burger"},
+  {r:"Jack in the Box",n:"Hamburger",t:"Lunch",s:"1 Burger",c:30,su:7,f:1,note:"Lower carb option"},
+  {r:"Jack in the Box",n:"Chicken Strips (3 pc)",t:"Lunch",s:"3 pieces",c:26,su:0,f:1,note:"Moderate-low no bun"},
+  {r:"Jack in the Box",n:"Seasoned Curly Fries (Medium)",t:"Side",s:"1 Medium",c:43,su:0,f:4,note:"Moderate, popular side"},
+  {r:"Burger King",n:"Whopper (no mayo)",t:"Lunch",s:"1 Burger",c:49,su:11,f:3,note:"Moderate-high"},
+  {r:"Burger King",n:"Cheeseburger",t:"Lunch",s:"1 Burger",c:27,su:7,f:1,note:"Lower carb option"},
+  {r:"Burger King",n:"French Fries (Medium)",t:"Side",s:"1 Medium",c:50,su:0,f:4,note:"High side item"},
+  {r:"Wendy's",n:"Jr. Hamburger",t:"Lunch",s:"1 Burger",c:25,su:6,f:1,note:"Lower carb option"},
+  {r:"Wendy's",n:"Dave's Single",t:"Lunch",s:"1 Burger",c:40,su:9,f:2,note:"Moderate burger"},
+  {r:"Wendy's",n:"Grilled Chicken Sandwich",t:"Lunch",s:"1 Sandwich",c:36,su:8,f:2,note:"Lower vs crispy"},
+  {r:"Wendy's",n:"Frosty (Small)",t:"Dessert",s:"8 oz",c:53,su:42,f:0,note:"High sugar dessert"},
+  {r:"Dunkin'",n:"Plain Bagel",t:"Breakfast",s:"1 Bagel",c:65,su:7,f:3,note:"High breakfast carbs"},
+  {r:"Dunkin'",n:"Bacon, Egg & Cheese (English Muffin)",t:"Breakfast",s:"1 Sandwich",c:31,su:3,f:1,note:"Moderate breakfast item"},
+  {r:"Dunkin'",n:"Glazed Donut",t:"Bakery",s:"1 Donut",c:31,su:12,f:0,note:"Moderate, common treat"},
+  {r:"Jamba Juice",n:"Mango-A-Go-Go (16oz)",t:"Drink",s:"16 oz",c:73,su:55,f:4,note:"Very high — smoothies"},
+  {r:"Jamba Juice",n:"Make It Light option",t:"Drink",s:"16 oz",c:45,su:38,f:3,note:"Reduced sugar option"},
+  {r:"7-Eleven",n:"Slurpee (Small)",t:"Drink",s:"12 oz",c:36,su:33,f:0,note:"High sugar drink"},
+  {r:"7-Eleven",n:"Banana",t:"Snack",s:"1 Medium",c:27,su:14,f:3,note:"Natural carb source"},
+  {r:"7-Eleven",n:"String Cheese",t:"Snack",s:"1 Stick",c:1,su:0,f:0,note:"Excellent low-carb snack"},
+  {r:"7-Eleven",n:"Gatorade (20 oz)",t:"Drink",s:"20 oz",c:34,su:34,f:0,note:"Fast-acting carb source"},
+];
+
+const FAST_CARBS = {
+  green:[
+    {n:"Glucose Tablets",p:"4 Tablets",c:16,note:"Preferred — fast, precise, easy to carry"},
+    {n:"Juice Box (apple or orange)",p:"1 Box (4 oz)",c:15,note:"Reliable 15g — common in classrooms"},
+    {n:"Regular Soda (NOT diet)",p:"4 oz",c:15,note:"Use exactly 4 oz — measure carefully"},
+    {n:"Smarties Candy Rolls",p:"3 Rolls",c:18,note:"Easy to portion — each roll ~6g"},
+    {n:"Skittles",p:"15 pieces",c:15,note:"Count exact pieces"},
+    {n:"Fruit Snacks (Welch's)",p:"1 Pouch",c:20,note:"Slightly over 15g — use for mild lows"},
+    {n:"Gummy Bears",p:"5–6 pieces",c:15,note:"Count exact pieces"},
+    {n:"Regular Gatorade",p:"8 oz",c:17,note:"Use 8 oz for ~15g"},
+    {n:"Honey Packet",p:"1 Packet (21g)",c:17,note:"Stable shelf life — keep in kit"},
+  ],
+  yellow:[
+    {n:"Orange Juice",p:"8 oz",c:26,note:"Use when blood sugar very low"},
+    {n:"2 Juice Boxes",p:"2 Boxes (8 oz)",c:30,note:"Double dose for severe low"},
+    {n:"Chocolate Milk",p:"8 oz",c:26,note:"Has fat — slower acting than juice"},
+  ],
+  emergency:[
+    {n:"Regular Soda (12 oz full can)",p:"12 oz",c:39,note:"⚠️ Large amount — only under supervision"},
+    {n:"16 Glucose Tablets",p:"16 Tablets",c:64,note:"Medical emergency level"},
+  ]
+};
+
+const SWAPS = [
+  {r:"Starbucks",hi:"Frappuccino (Grande)",hc:67,lo:"Iced Coffee (unsweetened)",lc:3},
+  {r:"Starbucks",hi:"Cinnamon Crunch Bagel",hc:79,lo:"Egg Bites (2 pieces)",lc:11},
+  {r:"McDonald's",hi:"Large French Fries",hc:66,lo:"Apple Slices",lc:8},
+  {r:"McDonald's",hi:"McFlurry Oreo",hc:86,lo:"Vanilla Soft Serve (Kids Cup)",lc:24},
+  {r:"Chick-fil-A",hi:"Waffle Fries (Medium)",hc:43,lo:"Side Salad (no dressing)",lc:8},
+  {r:"Chick-fil-A",hi:"Lemonade (Medium)",hc:37,lo:"Water or Unsweet Iced Tea",lc:0},
+  {r:"Chick-fil-A",hi:"Original Chicken Sandwich",hc:40,lo:"Grilled Nuggets (8 pc)",lc:2},
+  {r:"In-N-Out",hi:"Regular French Fries",hc:52,lo:"Protein Style Burger (lettuce wrap)",lc:11},
+  {r:"Chipotle",hi:"Burrito (flour tortilla)",hc:76,lo:"Salad Bowl (no dressing)",lc:22},
+  {r:"Chipotle",hi:"Chips (add-on)",hc:77,lo:"Guacamole side only",lc:8},
+  {r:"Panda Express",hi:"Fried Rice (1 scoop)",hc:72,lo:"Mixed Vegetables (1 scoop)",lc:10},
+  {r:"Panda Express",hi:"Orange Chicken + Fried Rice",hc:111,lo:"Broccoli Beef + Mixed Veggies",lc:23},
+  {r:"Taco Bell",hi:"Nachos BellGrande",hc:77,lo:"Crunchy Taco",lc:15},
+  {r:"Taco Bell",hi:"Bean Burrito",hc:54,lo:"Cheese Quesadilla",lc:39},
+  {r:"Subway",hi:"Footlong Turkey",hc:88,lo:"6-inch Turkey",lc:44},
+  {r:"Panera",hi:"Mac & Cheese (Bowl)",hc:62,lo:"Broccoli Cheddar Soup (Bowl)",lc:26},
+  {r:"Panera",hi:"Cinnamon Crunch Bagel",hc:79,lo:"Bacon Egg & Cheese English Muffin",lc:31},
+  {r:"Jamba Juice",hi:"Mango-A-Go-Go (Original)",hc:73,lo:"Make It Light option",lc:45},
+  {r:"Dunkin'",hi:"Frozen Coffee (Medium)",hc:76,lo:"Hot Coffee (black or with cream)",lc:4},
+  {r:"Costco Food Court",hi:"Cheese Pizza Slice",hc:80,lo:"Hot Dog + Bun",lc:42},
+  {r:"Any Restaurant",hi:"Regular Soda (12 oz)",hc:39,lo:"Diet Soda or Water",lc:0},
+];
+
+const FAVORITES = [
+  {n:"Turkey & Provolone Sandwich",r:"Subway",c:46,t:"Lunch",note:"No mayo, add mustard"},
+  {n:"Bean Burrito",r:"Taco Bell",c:54,t:"Lunch",note:"Very popular ATP order"},
+  {n:"Chicken Bowl (rice + beans)",r:"Chipotle",c:48,t:"Lunch",note:"Count rice + beans carefully"},
+  {n:"Original Chicken Sandwich",r:"Chick-fil-A",c:40,t:"Lunch",note:"Often with waffle fries +43g"},
+  {n:"Bacon Gouda Sandwich",r:"Starbucks",c:35,t:"Breakfast",note:"Morning CBI standard"},
+  {n:"Egg Bites",r:"Starbucks",c:11,t:"Breakfast",note:"Great low-carb choice"},
+  {n:"Hot Dog + Bun",r:"Costco Food Court",c:42,t:"Lunch",note:"Costco staple item"},
+  {n:"Orange Chicken Bowl (rice)",r:"Panda Express",c:111,t:"Lunch",note:"Rice + orange chicken combined"},
+  {n:"Hamburger",r:"McDonald's",c:31,t:"Lunch",note:"Simple, lower carb order"},
+  {n:"10 pc McNuggets",r:"McDonald's",c:27,t:"Lunch",note:"No bun option"},
+  {n:"Crunchy Taco x 3",r:"Taco Bell",c:45,t:"Lunch",note:"3 tacos = 45g total"},
+  {n:"Protein Style Double-Double",r:"In-N-Out",c:11,t:"Lunch",note:"Lettuce wrap — excellent low carb"},
+  {n:"Broccoli Beef + Mixed Veggies",r:"Panda Express",c:23,t:"Lunch",note:"Best low-carb Panda combo"},
+  {n:"Gatorade 20 oz",r:"7-Eleven",c:34,t:"Drink",note:"Fast-acting carb source"},
+];
+
+/* ═══════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════ */
+let activeRest = 'All';
+let pendingFood = null;
+let students = JSON.parse(localStorage.getItem('atp_students') || '["Kai.Mar"]');
+if (!students.includes('Kai.Mar')) { students.unshift('Kai.Mar'); }
+let currentStudent = localStorage.getItem('atp_current') || students[0];
+let logs = JSON.parse(localStorage.getItem('atp_logs') || '{}');
+
+function getToday() { return new Date().toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'numeric'}); }
+function logKey(s) { return `${s}__${getToday()}`; }
+function getLog(s) { return logs[logKey(s)] || []; }
+function saveLog(s, e) { logs[logKey(s)] = e; localStorage.setItem('atp_logs', JSON.stringify(logs)); }
+function saveStudents() { localStorage.setItem('atp_students', JSON.stringify(students)); }
+function saveCurrent() { localStorage.setItem('atp_current', currentStudent); }
+
+function initials(name) {
+  return name.split(/[\s.\-]/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('') || name.substring(0,2).toUpperCase();
+}
+
+function carbClass(c) {
+  if (c<=15) return 'cb-low';
+  if (c<=30) return 'cb-modlo';
+  if (c<=45) return 'cb-mod';
+  if (c<=60) return 'cb-high';
+  return 'cb-vhigh';
+}
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+function init() {
+  const now = new Date();
+  const ds = now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  document.getElementById('headerDate').textContent = ds;
+  document.getElementById('logDate').textContent = ds;
+
+  // chip row
+  const restaurants = ['All',...new Set(FOODS.map(f=>f.r))];
+  const cr = document.getElementById('chipRow');
+  restaurants.forEach(r => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (r==='All'?' active':'');
+    c.textContent = r==='All' ? 'All Restaurants' : r;
+    c.onclick = () => {
+      activeRest = r;
+      document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+      renderFoodList();
+    };
+    cr.appendChild(c);
+  });
+
+  renderFoodList();
+  renderFastCarbs();
+  renderSwaps();
+  renderFavorites();
+  refreshStudentUI();
+  renderLog();
+  renderHome();
+}
+
+/* ═══════════════════════════════════════════════
+   HOME
+═══════════════════════════════════════════════ */
+function renderHome() {
+  const entries = getLog(currentStudent);
+  const total = entries.reduce((s,e)=>s+e.c,0);
+  document.getElementById('homeTotal').textContent = total;
+  document.getElementById('homeEntries').textContent = entries.length;
+  const ini = initials(currentStudent);
+  document.getElementById('homeAvatar').textContent = ini;
+  document.getElementById('homeStudentName').textContent = currentStudent;
+}
+
+/* ═══════════════════════════════════════════════
+   FOOD LIST
+═══════════════════════════════════════════════ */
+function renderFoodList() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let items = FOODS;
+  if (activeRest !== 'All') items = items.filter(f=>f.r===activeRest);
+  if (q) items = items.filter(f=>f.n.toLowerCase().includes(q)||f.r.toLowerCase().includes(q));
+  items = [...items].sort((a,b)=>a.c-b.c);
+  document.getElementById('resultsMeta').textContent = `${items.length} item${items.length!==1?'s':''}`;
+  const wrap = document.getElementById('foodListWrap');
+  if (!items.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><div class="empty-title">No results found</div><div class="empty-sub">Try a different search or restaurant</div></div>`;
+    return;
+  }
+  wrap.innerHTML = items.map(f => `
+    <div class="food-row">
+      <div class="food-row-info">
+        <div class="food-row-name">${f.n}</div>
+        <div class="food-row-meta">${f.r} &middot; ${f.t} &middot; ${f.s}</div>
+        ${f.note?`<div class="food-row-note">${f.note}</div>`:''}
+      </div>
+      <div class="food-row-actions">
+        <span class="cbadge ${carbClass(f.c)}">${f.c}g</span>
+        <button class="add-circle" onclick='openAddSheet(${JSON.stringify(f).replace(/'/g,"&#39;")})' aria-label="Add ${f.n}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════════
+   LOG
+═══════════════════════════════════════════════ */
+function renderLog() {
+  const entries = getLog(currentStudent);
+  const total = entries.reduce((s,e)=>s+e.c,0);
+  document.getElementById('logTotal').textContent = total;
+  renderHome();
+  const wrap = document.getElementById('logEntriesWrap');
+  if (!entries.length) {
+    wrap.innerHTML = `<div class="card card-pad"><div class="empty-state"><div class="empty-icon-wrap"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--text-3)" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div><div class="empty-title">No meals logged yet</div><div class="empty-sub">Use Restaurant Lookup to add meals</div></div></div>`;
+    return;
+  }
+  const sorted = [...entries].reverse();
+  wrap.innerHTML = `
+    <div class="food-list-wrap" style="margin-bottom:12px;">
+      ${sorted.map((e,i) => `
+        <div class="timeline-entry">
+          <div class="timeline-time">${e.time}</div>
+          <div class="timeline-dot-col"><div class="timeline-dot"></div>${i<sorted.length-1?'<div class="timeline-line"></div>':''}</div>
+          <div class="timeline-info">
+            <div class="timeline-name">${e.n}</div>
+            <div class="timeline-rest">${e.r}</div>
+          </div>
+          <div class="timeline-right">
+            <div class="timeline-carbs">${e.c}g</div>
+            <button class="del-btn" onclick="deleteEntry(${entries.length-1-i})" aria-label="Remove entry">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <button class="export-btn" onclick="openExportSheet()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export Today's Log
+    </button>
+  `;
+}
+
+function deleteEntry(idx) {
+  const entries = getLog(currentStudent);
+  entries.splice(idx,1);
+  saveLog(currentStudent,entries);
+  renderLog();
+}
+
+/* ═══════════════════════════════════════════════
+   FAST CARBS
+═══════════════════════════════════════════════ */
+function renderFastCarbs() {
+  const render = (items, levelClass) => items.map(item => `
+    <div class="treat-card">
+      <div class="treat-card-info">
+        <div class="tc-name">${item.n}</div>
+        <div class="tc-portion">${item.p}</div>
+        <div class="tc-note">${item.note}</div>
+      </div>
+      <span class="cbadge ${levelClass}">${item.c}g</span>
+    </div>
+  `).join('');
+  document.getElementById('treat15').innerHTML = render(FAST_CARBS.green,'cb-low');
+  document.getElementById('treat30').innerHTML = render(FAST_CARBS.yellow,'cb-modlo');
+  document.getElementById('treatEmergency').innerHTML = render(FAST_CARBS.emergency,'cb-high');
+}
+
+/* ═══════════════════════════════════════════════
+   SWAPS + FAVORITES
+═══════════════════════════════════════════════ */
+function renderSwaps() {
+  document.getElementById('swapsContent').innerHTML = SWAPS.map(s => `
+    <div class="swap-card">
+      <div class="swap-restaurant-label">${s.r}</div>
+      <div class="swap-comparison">
+        <div class="swap-side">
+          <div class="swap-side-label">Instead of</div>
+          <div class="swap-item-name">${s.hi}</div>
+          <span class="cbadge ${carbClass(s.hc)}" style="margin-top:6px;display:inline-flex;">${s.hc}g</span>
+        </div>
+        <div class="swap-middle">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="swap-arrow-icon" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </div>
+        <div class="swap-side">
+          <div class="swap-side-label">Try this</div>
+          <div class="swap-item-name">${s.lo}</div>
+          <span class="cbadge ${carbClass(s.lc)}" style="margin-top:6px;display:inline-flex;">${s.lc}g</span>
+        </div>
+      </div>
+      <div class="swap-savings-pill">Save ${s.hc-s.lc}g carbs</div>
+    </div>
+  `).join('');
+}
+
+function renderFavorites() {
+  document.getElementById('favoritesContent').innerHTML = `
+    <div class="food-list-wrap">
+      ${FAVORITES.map(f=>`
+        <div class="food-row">
+          <div class="food-row-info">
+            <div class="food-row-name">${f.n}</div>
+            <div class="food-row-meta">${f.r} &middot; ${f.t}</div>
+            <div class="food-row-note">${f.note}</div>
+          </div>
+          <div class="food-row-actions">
+            <span class="cbadge ${carbClass(f.c)}">${f.c}g</span>
+            <button class="add-circle" onclick='openAddSheet(${JSON.stringify({r:f.r,n:f.n,t:f.t,s:"1 serving",c:f.c,su:0,f:0,note:f.note})})' aria-label="Add ${f.n}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+/* ═══════════════════════════════════════════════
+   STUDENT UI
+═══════════════════════════════════════════════ */
+function refreshStudentUI() {
+  const ini = initials(currentStudent);
+  document.getElementById('logAvatar').textContent = ini;
+  document.getElementById('logStudentName').textContent = currentStudent;
+  document.getElementById('homeAvatar').textContent = ini;
+  document.getElementById('homeStudentName').textContent = currentStudent;
+}
+
+function openStudentSheet() {
+  const list = document.getElementById('studentOptionsList');
+  list.innerHTML = students.map(s => `
+    <div class="student-option${s===currentStudent?' selected':''}" onclick="selectStudent('${s.replace(/'/g,"\\'")}')">
+      <div class="student-option-avatar">${initials(s)}</div>
+      <div class="student-option-name">${s}</div>
+    </div>
+  `).join('');
+  openSheet('studentSheet');
+}
+
+function selectStudent(name) {
+  currentStudent = name;
+  saveCurrent();
+  refreshStudentUI();
+  renderLog();
+  closeSheet('studentSheet');
+}
+
+function openAddStudentSheet() {
+  document.getElementById('newStudentInput').value = '';
+  openSheet('addStudentSheet');
+  setTimeout(()=>document.getElementById('newStudentInput').focus(),300);
+}
+
+function confirmAddStudent() {
+  const name = document.getElementById('newStudentInput').value.trim();
+  if (!name) return;
+  if (!students.includes(name)) { students.push(name); saveStudents(); }
+  currentStudent = name;
+  saveCurrent();
+  refreshStudentUI();
+  renderLog();
+  closeSheet('addStudentSheet');
+}
+
+/* ═══════════════════════════════════════════════
+   ADD FOOD SHEET
+═══════════════════════════════════════════════ */
+function openAddSheet(food) {
+  pendingFood = food;
+  document.getElementById('sheetFoodName').textContent = food.n;
+  document.getElementById('sheetFoodSub').textContent = `${food.r} · ${food.t} · ${food.s}`;
+  document.getElementById('sheetCarbNum').textContent = food.c;
+  document.getElementById('sheetDetails').textContent = `Sugar: ${food.su}g  ·  Fiber: ${food.f}g${food.note?'\n'+food.note:''}`;
+  document.getElementById('sheetStudentSelect').innerHTML = students.map(s=>`<option value="${s}"${s===currentStudent?' selected':''}>${s}</option>`).join('');
+  openSheet('addSheet');
+}
+
+function confirmAdd() {
+  if (!pendingFood) return;
+  const student = document.getElementById('sheetStudentSelect').value;
+  const time = new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
+  const entries = getLog(student);
+  entries.push({n:pendingFood.n,r:pendingFood.r,c:pendingFood.c,time});
+  saveLog(student,entries);
+  closeSheet('addSheet');
+  if (student===currentStudent) renderLog();
+}
+
+/* ═══════════════════════════════════════════════
+   EXPORT
+═══════════════════════════════════════════════ */
+function openExportSheet() {
+  const entries = getLog(currentStudent);
+  const total = entries.reduce((s,e)=>s+e.c,0);
+  const today = getToday();
+  let txt = `ATP CBI CARB LOG\nStudent: ${currentStudent}\nDate: ${today}\n${'─'.repeat(32)}\n`;
+  entries.forEach(e=>{ txt+=`${e.time.padEnd(10)} ${e.n.substring(0,26).padEnd(26)} ${e.c}g\n`; });
+  txt+=`${'─'.repeat(32)}\nTOTAL: ${total}g carbohydrates\n\nGenerated by Katella ATP CBI Carb Tracker`;
+  document.getElementById('exportSheetSub').textContent = `${currentStudent} · ${today} · ${total}g total`;
+  document.getElementById('exportTextarea').value = txt;
+  openSheet('exportSheet');
+}
+
+function copyExport() {
+  const ta = document.getElementById('exportTextarea');
+  ta.select();
+  document.execCommand('copy');
+  const btn = document.querySelector('#exportSheet .sheet-confirm');
+  btn.textContent = '✓ Copied!';
+  setTimeout(()=>{ btn.textContent='Copy to Clipboard'; },2000);
+}
+
+/* ═══════════════════════════════════════════════
+   SHEET HELPERS
+═══════════════════════════════════════════════ */
+function openSheet(id) { document.getElementById(id).classList.add('open'); }
+function closeSheet(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.sheet-overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+
+/* ═══════════════════════════════════════════════
+   ACCORDION
+═══════════════════════════════════════════════ */
+function toggleAccordion(id) {
+  const acc = document.getElementById(id);
+  const isOpen = acc.classList.contains('open');
+  // close all
+  document.querySelectorAll('.accordion.open').forEach(a=>a.classList.remove('open'));
+  if (!isOpen) acc.classList.add('open');
+}
+
+function jumpToAccordion(id) {
+  // open it
+  document.querySelectorAll('.accordion.open').forEach(a=>a.classList.remove('open'));
+  const acc = document.getElementById(id);
+  acc.classList.add('open');
+  setTimeout(()=>acc.scrollIntoView({behavior:'smooth',block:'start'}),60);
+}
+
+/* ═══════════════════════════════════════════════
+   SCREEN NAV
+═══════════════════════════════════════════════ */
+function setScreen(name, btn) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+
+function setSwapTab(tab,btn) {
+  document.querySelectorAll('.tab-bar-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('swapsContent').style.display = tab==='swaps'?'':'none';
+  document.getElementById('favoritesContent').style.display = tab==='favorites'?'':'none';
+}
+
+init();
+</script>
+</body>
+</html>

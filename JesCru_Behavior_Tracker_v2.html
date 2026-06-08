@@ -440,6 +440,92 @@ body::before {
 .anim > *:nth-child(4) { animation-delay: 0.19s; }
 .anim > *:nth-child(5) { animation-delay: 0.24s; }
 .anim > *:nth-child(6) { animation-delay: 0.29s; }
+
+/* ═══ DATE PICKER MODAL ═══ */
+.datepick-modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+  z-index: 700; display: none; align-items: flex-end;
+  backdrop-filter: blur(6px);
+}
+.datepick-modal.on { display: flex; }
+.datepick-sheet {
+  width: 100%; background: rgba(243,247,253,0.98);
+  backdrop-filter: blur(24px); border-radius: 24px 24px 0 0;
+  padding: 24px 20px calc(var(--sb) + 24px);
+  animation: su 0.3s cubic-bezier(0.4,0,0.2,1);
+}
+.datepick-sheet h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+
+/* ═══ ABSENT BUTTON ═══ */
+.absent-btn {
+  width: 100%; padding: 16px; border-radius: var(--r-sm); margin-top: 8px;
+  background: linear-gradient(135deg, #718096, #4a5568);
+  color: white; font-family: var(--font); font-size: 15px; font-weight: 700;
+  border: none; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(74,85,104,0.35);
+  transition: transform 0.16s, box-shadow 0.16s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.absent-btn:active { transform: scale(0.98); }
+
+/* ═══ ABSENT TIMELINE ENTRY ═══ */
+.te-absent {
+  background: rgba(74,85,104,0.08);
+  border: 1.5px dashed rgba(74,85,104,0.3);
+  border-radius: var(--r); padding: 14px 15px;
+  margin-bottom: 10px;
+}
+.te-absent-lbl { font-size: 14px; font-weight: 600; color: var(--slate); }
+.te-absent-note { font-size: 12px; color: var(--text3); margin-top: 3px; line-height: 1.5; }
+
+/* ═══ DEFIANCE SUB-OPTION ═══ */
+.sub-opt-card {
+  margin-top: 10px; padding: 14px;
+  background: rgba(229,62,62,0.05);
+  border: 1.5px solid rgba(229,62,62,0.2);
+  border-radius: var(--r-sm);
+}
+.sub-opt-lbl { font-size: 11px; font-weight: 700; color: var(--red); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
+.sub-opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sub-opt-btn {
+  padding: 10px 8px; border-radius: 10px; text-align: center;
+  border: 1.5px solid var(--border2); background: rgba(255,255,255,0.8);
+  font-family: var(--font); font-size: 12px; font-weight: 600;
+  color: var(--text2); cursor: pointer; transition: all 0.15s;
+  line-height: 1.3;
+}
+.sub-opt-btn.sel { background: var(--red); border-color: var(--red); color: white; }
+.sub-opt-btn:active { transform: scale(0.96); }
+
+/* ═══ VIEWING DATE BANNER ═══ */
+.viewing-date-bar {
+  background: linear-gradient(135deg, var(--purple), #7c3aed);
+  color: white; padding: 10px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; font-weight: 600; flex-shrink: 0;
+}
+.viewing-date-bar span { opacity: 0.85; font-size: 12px; }
+.viewing-date-clear {
+  background: rgba(255,255,255,0.2); border: none; color: white;
+  border-radius: 8px; padding: 5px 12px; font-family: var(--font);
+  font-size: 12px; font-weight: 600; cursor: pointer;
+}
+
+/* ═══ QUICK ENTRY DATE ROW ═══ */
+.q-date-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.q-date-display {
+  flex: 1; padding: 11px 14px; border-radius: var(--r-sm);
+  background: rgba(255,255,255,0.82); border: 1.5px solid var(--border2);
+  font-family: var(--mono); font-size: 14px; color: var(--text2);
+}
+.q-date-change {
+  padding: 11px 16px; border-radius: var(--r-sm);
+  background: var(--accent-t); color: var(--accent);
+  border: 1.5px solid rgba(26,110,245,0.2);
+  font-family: var(--font); font-size: 13px; font-weight: 600; cursor: pointer;
+}
 </style>
 </head>
 <body>
@@ -503,11 +589,31 @@ body::before {
   <!-- ── QUICK ENTRY ── -->
   <div class="screen" id="scr-quick">
     <div class="ph">
-      <div><h1>Quick Entry</h1><div class="sub">Under 10 seconds</div></div>
+      <div><h1>Quick Entry</h1><div class="sub" id="q-date-sub">Today</div></div>
+    </div>
+    <!-- Viewing Past Date Banner -->
+    <div class="viewing-date-bar" id="q-past-banner" style="display:none">
+      <div>📅 Logging for: <strong id="q-past-label"></strong></div>
+      <button class="viewing-date-clear" onclick="clearEntryDate()">Back to Today</button>
     </div>
     <div class="scroll-area">
+      <!-- Date Selector Row -->
+      <div class="q-date-row">
+        <div class="q-date-display" id="q-date-display">Today</div>
+        <button class="q-date-change" onclick="openDatePicker('quick')">Change Date</button>
+      </div>
+
       <div class="slbl">Select Behavior</div>
       <div class="beh-grid" id="q-beh-grid"></div>
+
+      <!-- Defiance sub-option (shown when defiance selected) -->
+      <div class="sub-opt-card" id="defiance-subopts" style="display:none">
+        <div class="sub-opt-lbl">⚡ Defiance Trigger</div>
+        <div class="sub-opt-grid">
+          <button class="sub-opt-btn" id="def-choice" onclick="setDefianceTrigger('choice')">Choice Presented</button>
+          <button class="sub-opt-btn" id="def-nonpref" onclick="setDefianceTrigger('nonpref')">Non-Preferred Activity</button>
+        </div>
+      </div>
 
       <div class="slbl">Replacement Behavior</div>
       <div class="beh-grid" id="q-rep-grid"></div>
@@ -520,6 +626,16 @@ body::before {
         </div>
       </div>
       <button class="save-btn" onclick="saveQuick()">Save Entry</button>
+
+      <!-- ABSENT BUTTON -->
+      <div style="margin-top:10px;padding:14px;background:rgba(74,85,104,0.06);border-radius:var(--r-sm);border:1px dashed rgba(74,85,104,0.25)">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Absence</div>
+        <button class="absent-btn" onclick="logAbsent()">
+          <i data-lucide="user-x" width="18" height="18"></i>
+          Mark Jes.Cru Absent
+        </button>
+      </div>
+
       <div style="height:16px"></div>
     </div>
   </div>
@@ -529,8 +645,17 @@ body::before {
     <div class="ph">
       <div><h1>Full Incident</h1><div class="sub">Complete ABC documentation</div></div>
     </div>
+    <!-- Viewing Past Date Banner -->
+    <div class="viewing-date-bar" id="ff-past-banner" style="display:none">
+      <div>📅 Logging for: <strong id="ff-past-label"></strong></div>
+      <button class="viewing-date-clear" onclick="clearEntryDate()">Back to Today</button>
+    </div>
     <div class="scroll-area">
       <div class="card card-p">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <span style="font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px">Date &amp; Time</span>
+          <button class="q-date-change" onclick="openDatePicker('full')" style="padding:7px 14px;font-size:12px">Change Date</button>
+        </div>
         <div class="f2">
           <div class="fg"><label class="fl">Date</label><input class="fi" type="date" id="ff-date"></div>
           <div class="fg"><label class="fl">Time</label><input class="fi" type="time" id="ff-time"></div>
@@ -701,6 +826,22 @@ body::before {
   </nav>
 </div>
 
+
+<!-- DATE PICKER MODAL -->
+<div class="datepick-modal" id="datepick-modal" onclick="closeDatePicker(event)">
+  <div class="datepick-sheet" onclick="event.stopPropagation()">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <h3 style="margin-bottom:0">Select Date</h3>
+      <button class="modal-x" onclick="closeDatePicker()"><i data-lucide="x" width="14" height="14"></i></button>
+    </div>
+    <div class="fg">
+      <label class="fl">Pick Any Past Date</label>
+      <input class="fi" type="date" id="dp-date-input">
+    </div>
+    <button class="save-btn" onclick="applyDatePicker()" style="margin-top:12px">Use This Date</button>
+    <button onclick="closeDatePicker()" style="width:100%;padding:13px;border:none;background:none;font-family:var(--font);font-size:14px;color:var(--text3);cursor:pointer;margin-top:4px">Cancel</button>
+  </div>
+</div>
 <!-- FILTER DRAWER -->
 <div class="overlay" id="drw-overlay" onclick="closeDrawer()"></div>
 <div class="drawer" id="drw">
@@ -754,11 +895,12 @@ const BEHAVIORS = [
   { id:'property',   label:'Property Destruction',   icon:'hammer',          color:'var(--orange)', bg:'var(--orange-t)' },
   { id:'disruption', label:'Classroom Disruption',   icon:'zap-off',         color:'var(--teal)',   bg:'var(--teal-t)' },
   { id:'refusal',    label:'Task Refusal',            icon:'x-circle',        color:'var(--slate)',  bg:'var(--slate-t)' },
+  { id:'defiance',    label:'Defiance / Says No',     icon:'shield-off',       color:'var(--red)',    bg:'var(--red-t)' },
   { id:'other_beh',  label:'Other',                  icon:'more-horizontal',  color:'var(--text3)',  bg:'rgba(0,0,0,0.05)' },
 ];
 
 const REP_BEHAVIORS = [
-  { id:'break_req',  label:'Break Request',               icon:'coffee',          color:'var(--green)',  bg:'var(--green-t)' },
+  { id:'break_req',  label:'Drawing Request',               icon:'pencil',          color:'var(--green)',  bg:'var(--green-t)' },
   { id:'task_comp',  label:'Task Completed',              icon:'check-square',    color:'var(--accent)', bg:'var(--accent-t)' },
   { id:'ask_help',   label:'Asked for Help',              icon:'help-circle',     color:'var(--teal)',   bg:'var(--teal-t)' },
   { id:'aac',        label:'Used AAC Device',             icon:'tablet',          color:'var(--purple)', bg:'var(--purple-t)' },
@@ -793,6 +935,12 @@ let selRepBehavs   = [];
 // Quick-entry selections
 let qSelBeh = null;
 let qSelRep = null;
+let qDefianceTrigger = null; // 'choice' | 'nonpref' | null
+
+// Active entry date (null = today, string = past date YYYY-MM-DD)
+let activeEntryDate = null;
+// Which screen opened the date picker
+let datePickerTarget = 'quick';
 
 // ══════════════════════════════════════════════════
 // STORAGE
@@ -862,15 +1010,17 @@ function refreshToday() {
     now.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric' });
 
   const todayE = entries.filter(e => e.date === today);
-  document.getElementById('stat-inc').textContent = todayE.length;
-  document.getElementById('stat-rep').textContent = todayE.filter(e => e.replacementBehavior).length;
+  const todayAbsent = todayE.find(e => e.type === 'absent');
+  const todayBehavior = todayE.filter(e => e.type !== 'absent');
+  document.getElementById('stat-inc').textContent = todayAbsent ? 'ABS' : todayBehavior.length;
+  document.getElementById('stat-rep').textContent = todayAbsent ? '—' : todayBehavior.filter(e => e.replacementBehavior).length;
 
   // Bento cells
   const bentoDefs = [
     { id:'phys_agg',  label:'Physical Aggression', color:'var(--red)',    bg:'var(--red-t)',    icon:'hand' },
     { id:'obj_throw', label:'Object Throwing',      color:'var(--orange)', bg:'var(--orange-t)', icon:'arrow-up-right' },
     { id:'yelling',   label:'Yelling / Screaming',  color:'var(--yellow)', bg:'var(--yellow-t)', icon:'megaphone' },
-    { id:'break_req', label:'Break Requests',        color:'var(--green)',  bg:'var(--green-t)',  icon:'coffee' },
+    { id:'break_req', label:'Drawing Requests',        color:'var(--green)',  bg:'var(--green-t)',  icon:'pencil' },
   ];
   const bentoEl = document.getElementById('bento');
   bentoEl.innerHTML = bentoDefs.map(b => {
@@ -884,14 +1034,16 @@ function refreshToday() {
 
   // Insight
   let insight = 'No incidents logged today.';
-  if (todayE.length > 0) {
+  if (todayAbsent) {
+    insight = '🚫 <strong>Jes.Cru was absent from ESY today.</strong>';
+  } else if (todayBehavior.length > 0) {
     const antMap = {};
-    todayE.forEach(e => (e.antecedents || []).forEach(a => { antMap[a] = (antMap[a]||0)+1; }));
+    todayBehavior.forEach(e => (e.antecedents || []).forEach(a => { antMap[a] = (antMap[a]||0)+1; }));
     const topAnt = Object.entries(antMap).sort((a,b) => b[1]-a[1])[0];
     const respMap = {};
-    todayE.forEach(e => (e.staffResponses || []).forEach(r => { respMap[r] = (respMap[r]||0)+1; }));
+    todayBehavior.forEach(e => (e.staffResponses || []).forEach(r => { respMap[r] = (respMap[r]||0)+1; }));
     const topResp = Object.entries(respMap).sort((a,b) => b[1]-a[1])[0];
-    insight = `<strong>${todayE.length}</strong> incident${todayE.length>1?'s':''} logged today.`;
+    insight = `<strong>${todayBehavior.length}</strong> incident${todayBehavior.length>1?'s':''} logged today.`;
     if (topAnt)  insight += ` Most common antecedent: <strong>${topAnt[0]}</strong>.`;
     if (topResp) insight += ` Most used staff response: <strong>${topResp[0]}</strong>.`;
   }
@@ -907,16 +1059,27 @@ function refreshToday() {
 function buildQuickEntry() {
   qSelBeh = null;
   qSelRep = null;
-  const today = todayStr();
+  qDefianceTrigger = null;
+  const today = activeEntryDate || todayStr();
+  updateEntryDateUI();
 
   // Behavior tiles
   const bg = document.getElementById('q-beh-grid');
   bg.innerHTML = BEHAVIORS.map(b => {
-    const cnt = entries.filter(e => e.date === today && e.behavior === b.id).length;
+    const todayCnt = entries.filter(e => e.date === today && e.behavior === b.id && e.type !== 'absent').length;
+    const totalCnt = entries.filter(e => e.behavior === b.id && e.type !== 'absent').length;
+    const countDisplay = totalCnt > 0
+      ? `<div style="display:flex;flex-direction:column;align-items:center;gap:1px">
+           <span style="font-size:16px;font-weight:700;font-family:var(--mono);color:var(--text3)">${todayCnt > 0 ? todayCnt : '—'}</span>
+           <span style="font-size:9px;color:var(--text3);font-weight:600;letter-spacing:0.3px">TODAY</span>
+           <span style="font-size:11px;font-weight:700;font-family:var(--mono);color:var(--accent)">${totalCnt}</span>
+           <span style="font-size:9px;color:var(--text3);font-weight:600;letter-spacing:0.3px">TOTAL</span>
+         </div>`
+      : '';
     return `<div class="bt" id="qb-${b.id}" onclick="qPickBeh('${b.id}')">
       <div class="bt-ic" style="background:${b.bg}"><i data-lucide="${b.icon}" width="22" height="22" color="${b.color}"></i></div>
       <div class="bt-lbl">${b.label}</div>
-      <div class="bt-cnt">${cnt > 0 ? cnt : ''}</div>
+      <div class="bt-cnt" style="min-height:44px;display:flex;align-items:center">${countDisplay}</div>
     </div>`;
   }).join('');
 
@@ -945,6 +1108,21 @@ function qPickBeh(id) {
   qSelBeh = id;
   const el = document.getElementById('qb-' + id);
   if (el) el.classList.add('sel');
+  // Show defiance sub-options if defiance selected
+  const defCard = document.getElementById('defiance-subopts');
+  if (defCard) {
+    defCard.style.display = id === 'defiance' ? 'block' : 'none';
+    if (id !== 'defiance') {
+      qDefianceTrigger = null;
+      document.querySelectorAll('.sub-opt-btn').forEach(b => b.classList.remove('sel'));
+    }
+  }
+}
+
+function setDefianceTrigger(val) {
+  qDefianceTrigger = val;
+  document.getElementById('def-choice').classList.toggle('sel', val === 'choice');
+  document.getElementById('def-nonpref').classList.toggle('sel', val === 'nonpref');
 }
 
 function qPickRep(id) {
@@ -961,18 +1139,27 @@ function qPickRep(id) {
 
 function saveQuick() {
   if (!qSelBeh) { toast('Select a behavior first', true); return; }
+  const entryDate = activeEntryDate || todayStr();
   const rep = qSelRep ? (REP_BEHAVIORS.find(r => r.id === qSelRep)?.label || '') : '';
+  // Build antecedent note for defiance
+  let antecedents = [];
+  let defianceNote = '';
+  if (qSelBeh === 'defiance' && qDefianceTrigger) {
+    const triggerLabel = qDefianceTrigger === 'choice' ? 'Choice Presented' : 'Non-Preferred Activity';
+    antecedents = [triggerLabel];
+    defianceNote = triggerLabel;
+  }
   const entry = {
     id: mkID(),
-    date: todayStr(),
+    date: entryDate,
     time: nowTime(),
     behavior: qSelBeh,
-    otherBehavior: '',
+    otherBehavior: defianceNote,
     replacementBehavior: rep,
     location: document.getElementById('ql-loc').value,
     activity: '',
     staff: document.getElementById('ql-staff').value,
-    antecedents: [],
+    antecedents: antecedents,
     otherAntecedent: '',
     intensity: '1',
     duration: '<1 min',
@@ -990,6 +1177,41 @@ function saveQuick() {
   buildQuickEntry();
 }
 
+function logAbsent() {
+  const entryDate = activeEntryDate || todayStr();
+  // Check if already absent on this date
+  const alreadyAbsent = entries.find(e => e.date === entryDate && e.type === 'absent');
+  if (alreadyAbsent) { toast('Already marked absent for this date', true); return; }
+  // Block behavior entries on same date
+  const hasBehaviors = entries.find(e => e.date === entryDate && e.type !== 'absent');
+  if (hasBehaviors) {
+    if (!confirm('There are already entries for this date. Mark absent anyway?')) return;
+  }
+  const d = new Date(entryDate + 'T12:00:00');
+  const dateLabel = d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+  const entry = {
+    id: mkID(),
+    date: entryDate,
+    time: '00:00',
+    behavior: 'absent',
+    otherBehavior: '',
+    replacementBehavior: '',
+    location: '', activity: '', staff: '',
+    antecedents: [], otherAntecedent: '',
+    intensity: '', duration: '',
+    staffResponses: [], otherResponse: '',
+    outcomes: [],
+    notes: 'Jes.Cru was absent from ESY on ' + dateLabel + '.',
+    type: 'absent',
+    createdAt: new Date().toISOString(),
+    editedAt: null,
+  };
+  entries.unshift(entry);
+  saveEntries();
+  toast('Absence logged for ' + dateLabel);
+  buildQuickEntry();
+}
+
 // ══════════════════════════════════════════════════
 // FULL INCIDENT
 // ══════════════════════════════════════════════════
@@ -1001,8 +1223,10 @@ function buildFullEntry() {
   selOutcomes    = [];
   selRepBehavs   = [];
 
-  document.getElementById('ff-date').value = todayStr();
+  const entryDate = activeEntryDate || todayStr();
+  document.getElementById('ff-date').value = entryDate;
   document.getElementById('ff-time').value = nowTime();
+  updateEntryDateUI();
   document.getElementById('ff-notes').value = '';
   document.getElementById('ff-other-beh').value = '';
   document.getElementById('ff-other-ant').value = '';
@@ -1084,9 +1308,14 @@ function setSeg(btn, segId, stateVar) {
 function saveFull() {
   const beh = document.getElementById('ff-beh').value;
   if (!beh) { toast('Select a behavior type', true); return; }
+  const entryDateVal = document.getElementById('ff-date').value || todayStr();
+  const absentOnDate = entries.find(e => e.date === entryDateVal && e.type === 'absent');
+  if (absentOnDate) {
+    if (!confirm('Jes.Cru is marked absent on this date. Add behavior entry anyway?')) return;
+  }
   const entry = {
     id: mkID(),
-    date: document.getElementById('ff-date').value || todayStr(),
+    date: entryDateVal,
     time: document.getElementById('ff-time').value || nowTime(),
     behavior: beh,
     otherBehavior: document.getElementById('ff-other-beh').value,
@@ -1110,6 +1339,77 @@ function saveFull() {
   saveEntries();
   toast('Full incident saved');
   showScr('log');
+}
+
+
+// ══════════════════════════════════════════════════
+// DATE PICKER & ACTIVE DATE
+// ══════════════════════════════════════════════════
+
+function openDatePicker(target) {
+  datePickerTarget = target;
+  const input = document.getElementById('dp-date-input');
+  input.value = activeEntryDate || todayStr();
+  input.max = todayStr(); // can't log future dates
+  document.getElementById('datepick-modal').classList.add('on');
+  safeCreateIcons();
+}
+
+function closeDatePicker(e) {
+  if (!e || e.target === document.getElementById('datepick-modal')) {
+    document.getElementById('datepick-modal').classList.remove('on');
+  }
+}
+
+function applyDatePicker() {
+  const val = document.getElementById('dp-date-input').value;
+  if (!val) { toast('Pick a date first', true); return; }
+  if (val > todayStr()) { toast("Can't log future dates", true); return; }
+  activeEntryDate = val === todayStr() ? null : val;
+  document.getElementById('datepick-modal').classList.remove('on');
+  // Navigate to the target screen with date applied
+  if (datePickerTarget === 'quick') buildQuickEntry();
+  if (datePickerTarget === 'full')  buildFullEntry();
+  toast(activeEntryDate ? 'Logging for ' + formatDate(activeEntryDate) : 'Back to today');
+}
+
+function clearEntryDate() {
+  activeEntryDate = null;
+  updateEntryDateUI();
+  if (document.getElementById('scr-quick').classList.contains('active')) buildQuickEntry();
+  if (document.getElementById('scr-full').classList.contains('active'))  buildFullEntry();
+}
+
+function updateEntryDateUI() {
+  const isToday = !activeEntryDate;
+  const displayLabel = isToday ? 'Today' : formatDate(activeEntryDate);
+  const displayFull  = isToday ? new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}) : formatDate(activeEntryDate);
+
+  // Quick entry UI
+  const qDisplay = document.getElementById('q-date-display');
+  const qSub     = document.getElementById('q-date-sub');
+  const qBanner  = document.getElementById('q-past-banner');
+  const qLabel   = document.getElementById('q-past-label');
+  if (qDisplay) qDisplay.textContent = isToday ? 'Today — ' + new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'}) : displayFull;
+  if (qSub)     qSub.textContent = isToday ? 'Today' : '📅 ' + displayLabel;
+  if (qBanner)  qBanner.style.display = isToday ? 'none' : 'flex';
+  if (qLabel)   qLabel.textContent = displayFull;
+
+  // Full incident UI
+  const ffBanner = document.getElementById('ff-past-banner');
+  const ffLabel  = document.getElementById('ff-past-label');
+  if (ffBanner)  ffBanner.style.display = isToday ? 'none' : 'flex';
+  if (ffLabel)   ffLabel.textContent = displayFull;
+
+  // Also update the date input value in the full form
+  const ffDateInput = document.getElementById('ff-date');
+  if (ffDateInput && activeEntryDate) ffDateInput.value = activeEntryDate;
+}
+
+function formatDate(isoStr) {
+  if (!isoStr) return 'Today';
+  const d = new Date(isoStr + 'T12:00:00');
+  return d.toLocaleDateString('en-US', { weekday:'short', month:'short', day:'numeric', year:'numeric' });
 }
 
 // ══════════════════════════════════════════════════
@@ -1493,9 +1793,11 @@ function genReport(type) {
     title = 'BIP Review Report';
   }
 
-  const data = type === 'daily'
+  const allData = type === 'daily'
     ? entries.filter(e => e.date === fromDate)
     : entries.filter(e => e.date >= fromDate);
+  const absentDays = allData.filter(e => e.type === 'absent');
+  const data = allData.filter(e => e.type !== 'absent');
 
   const tally = (arr) => {
     const m = {};
@@ -1521,6 +1823,7 @@ function genReport(type) {
       <h4>Student</h4><p>${cfg.studentName||'—'} · ${cfg.program||'—'}</p>
       <h4>Period</h4><p>${fromDate} — ${todayS}</p>
       <h4>Total Incidents</h4><p>${data.length}</p>
+      ${absentDays.length ? `<h4>Absent Days</h4><p>${absentDays.length} day${absentDays.length>1?'s':''}: ${absentDays.map(a=>a.date).join(', ')}</p>` : ''}
       <h4>Behavior Breakdown</h4>${tableOf(behCounts,'Behavior','Count')}
       <h4>Antecedent Frequency</h4>${tableOf(antCounts,'Antecedent','Freq.')}
       <h4>Staff Response Usage</h4>${tableOf(respCounts,'Response','Used')}
@@ -1571,17 +1874,19 @@ function exportCSV() {
   if (!entries.length) { toast('No data to export', true); return; }
   const hdr = ['ID','Date','Time','Behavior','Other Behavior','Location','Activity','Staff','Antecedents','Intensity','Duration','Staff Responses','Other Response','Outcomes','Replacement Behaviors','Notes','Type','Created'];
   const esc = v => `"${String(v||'').replace(/"/g,'""')}"`;
-  const rows = entries.map(e => [
-    e.id, e.date, e.time,
-    BEHAVIORS.find(b=>b.id===e.behavior)?.label || e.behavior,
-    e.otherBehavior||'', e.location||'', e.activity||'', e.staff||'',
-    (e.antecedents||[]).join('; '),
-    e.intensity||'', e.duration||'',
-    (e.staffResponses||[]).join('; '),
-    e.otherResponse||'',
-    (e.outcomes||[]).join('; '),
-    e.replacementBehavior||'', e.notes||'', e.type||'', e.createdAt||'',
-  ].map(esc).join(','));
+  const rows = entries.map(e => {
+    const behLabel = e.type === 'absent' ? 'ABSENT' : (BEHAVIORS.find(b=>b.id===e.behavior)?.label || e.behavior);
+    return [
+      e.id, e.date, e.time, behLabel,
+      e.otherBehavior||'', e.location||'', e.activity||'', e.staff||'',
+      (e.antecedents||[]).join('; '),
+      e.intensity||'', e.duration||'',
+      (e.staffResponses||[]).join('; '),
+      e.otherResponse||'',
+      (e.outcomes||[]).join('; '),
+      e.replacementBehavior||'', e.notes||'', e.type||'', e.createdAt||'',
+    ].map(esc).join(',');
+  });
   const blob = new Blob([[hdr.join(','), ...rows].join('\n')], { type:'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
